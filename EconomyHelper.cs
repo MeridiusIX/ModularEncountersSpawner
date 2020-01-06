@@ -31,6 +31,7 @@ using VRage.Utils;
 using VRageMath;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
+using ModularEncountersSpawner.Configuration;
 
 namespace ModularEncountersSpawner {
 	
@@ -658,7 +659,7 @@ namespace ModularEncountersSpawner {
 
                         double markup = 1.2; //TODO: Figure out how reputation affects this
                         int itemValue = (int)Math.Floor((double)MinimumValuesMaster[item] * markup);
-                        MyStoreItemData orderData = new MyStoreItemData(item, itemsAvailable[item], itemValue, null, null);
+                        MyStoreItemData orderData = new MyStoreItemData(item, itemsAvailable[item], itemValue, OnSaleComplete, null);
                         long orderResult = 0;
                         var storeAddResult = store.InsertOffer(orderData, out orderResult);
                         errorLog.Append("     - Added Item To Store With Result: " + storeAddResult.ToString()).AppendLine();
@@ -705,7 +706,7 @@ namespace ModularEncountersSpawner {
                                     long orderResult = 0;
                                     var storeAddResult = store.InsertOrder(orderData, out orderResult);
 
-                                    if(storeAddResult == MyStoreInsertResults.Success && SpawnResources.IsIdentityNPC(store.OwnerId) == true) {
+                                    if(storeAddResult == Sandbox.ModAPI.Ingame.MyStoreInsertResults.Success && SpawnResources.IsIdentityNPC(store.OwnerId) == true) {
 
                                         MyAPIGateway.Players.RequestChangeBalance(store.OwnerId, itemCount * itemValue);
 
@@ -733,7 +734,76 @@ namespace ModularEncountersSpawner {
 			
 		}
 
-		
+        public static void OnSaleComplete(int amtSold, int amtRemain, long cost, long storeOwner, long customer) {
+
+            if(Settings.General.UseEconomyBuyingReputationIncrease == false || customer == 0) {
+
+                Logger.AddMsg("Economy Buy Rep Increaser Disabled or Buyer is Nobody", true);
+                return;
+
+            }
+
+            var playerSales = new SaleTracker();
+
+            string saleDataString = "";
+
+            if(MyAPIGateway.Utilities.GetVariable<string>("MES-SaleTracker-" + customer.ToString(), out saleDataString) == true) {
+
+                try {
+
+                    var saleByteData = Convert.FromBase64String(saleDataString);
+                    var saleData = MyAPIGateway.Utilities.SerializeFromBinary<SaleTracker>(saleByteData);
+
+                    if(saleData != null) {
+
+                        Logger.AddMsg("Got Existing Player Sale Tracker", true);
+                        playerSales = saleData;
+
+                    }
+
+                } catch(Exception e) {
+
+
+
+                }
+
+            }
+
+            long existingAmt = 0;
+
+            if(playerSales.Transactions.TryGetValue(storeOwner, out existingAmt) == false) {
+
+                Logger.AddMsg("First Time Purchase From Faction", true);
+                playerSales.Transactions.Add(storeOwner, 0);
+
+            }
+
+            existingAmt += cost;
+            double dividedAmount = Math.Floor((double)existingAmt / Settings.General.EconomyBuyingReputationCostAmount);
+            Logger.AddMsg("Total Added To Cost: " + existingAmt.ToString(), true);
+
+            if(dividedAmount > 0) {
+
+                var npcFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(storeOwner);
+
+                if(npcFaction != null) {
+
+                    Logger.AddMsg("Change Rep", true);
+                    var rep = MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(customer, npcFaction.FactionId);
+                    MyAPIGateway.Session.Factions.SetReputationBetweenPlayerAndFaction(customer, npcFaction.FactionId, rep + (int)dividedAmount);
+                    existingAmt -= (int)dividedAmount * Settings.General.EconomyBuyingReputationCostAmount;
+
+                }
+
+            }
+
+            playerSales.Transactions[storeOwner] = existingAmt;
+            var newByteData = MyAPIGateway.Utilities.SerializeToBinary<SaleTracker>(playerSales);
+            var newStringData = Convert.ToBase64String(newByteData);
+            MyAPIGateway.Utilities.SetVariable<string>("MES-SaleTracker-" + customer.ToString(), newStringData);
+
+        }
+
 	}
 	
 }

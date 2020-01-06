@@ -53,8 +53,14 @@ namespace ModularEncountersSpawner{
 		
 		//Pending Boss Encounters
 		public static List<BossEncounter> BossEncounters = new List<BossEncounter>();
-		
-		//Pending NPC Spawns and Deletions
+
+        //Pending NPC Deletion
+        public static bool DeleteGrids = false;
+        public static int DeletionTimer = 0;
+        public static List<IMyCubeGrid> DeleteGridList = new List<IMyCubeGrid>();
+        public static IMyCubeGrid LastDeletedGrid = null;
+
+		//Pending NPC Spawns
 		public static List<ActiveNPC> PendingNPCs = new List<ActiveNPC>();
 		public static int PreviousPendingSpawns = 0;
 		public static int PendingNPCTimeout = 0;
@@ -231,18 +237,22 @@ namespace ModularEncountersSpawner{
 						
 						ActiveNPCs[cubeGrid].KeenBehaviorCheck = true;
 						
-						if(string.IsNullOrEmpty(ActiveNPCs[cubeGrid].KeenAiName) == false){
-							
-							//TODO: Attach AI Here.
-							if(string.IsNullOrEmpty(cubeGrid.Name) == true){
-								
-								MyVisualScriptLogicProvider.SetName(cubeGrid.EntityId, cubeGrid.EntityId.ToString());
-								
-							}
-							
-							MyVisualScriptLogicProvider.SetDroneBehaviourFull(cubeGrid.EntityId.ToString(), ActiveNPCs[cubeGrid].KeenAiName, true, false, null, false, null, 10, ActiveNPCs[cubeGrid].KeenAiTriggerDistance);
-							ActiveNPCs[cubeGrid].KeenBehaviorCheck = false;
-							
+						if(string.IsNullOrWhiteSpace(ActiveNPCs[cubeGrid].KeenAiName) == false){
+
+                            if(RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(ActiveNPCs[cubeGrid].KeenAiName) == false) {
+
+                                //TODO: Attach AI Here.
+                                if(string.IsNullOrEmpty(cubeGrid.Name) == true) {
+
+                                    MyVisualScriptLogicProvider.SetName(cubeGrid.EntityId, cubeGrid.EntityId.ToString());
+
+                                }
+
+                                MyVisualScriptLogicProvider.SetDroneBehaviourFull(cubeGrid.EntityId.ToString(), ActiveNPCs[cubeGrid].KeenAiName, true, false, null, false, null, 10, ActiveNPCs[cubeGrid].KeenAiTriggerDistance);
+                                ActiveNPCs[cubeGrid].KeenBehaviorCheck = false;
+
+                            }
+
 						}else{
 							
 							Logger.AddMsg("Encounter Has No Stock AI Defined", true);
@@ -537,13 +547,15 @@ namespace ModularEncountersSpawner{
 				
 				foreach(var grid in gridGroups){
 
-                    if(grid.MarkedForClose == false) {
+                    if(DeleteGridList.Contains(grid) == false) {
 
-                        grid.Close();
+                        DeleteGridList.Add(grid);
 
                     }
-
+     
 				}
+
+                DeleteGrids = true;
 				
 				/*if(cubeGrid != null && MyAPIGateway.Entities.Exist(cubeGrid) == true){
 
@@ -563,6 +575,42 @@ namespace ModularEncountersSpawner{
 			}
 
 		}
+
+        public static void DeleteGridsProcessing() {
+
+            if(DeleteGridList.Count == 0) {
+
+                DeleteGrids = false;
+                return;
+
+            }
+
+            if(MyAPIGateway.Entities.Exist(LastDeletedGrid) == true) {
+
+                return;
+
+            }
+
+            MyAPIGateway.Utilities.InvokeOnGameThread(() => {
+
+                for(int i = DeleteGridList.Count - 1;i >= 0;i--) {
+
+                    if(MyAPIGateway.Entities.Exist(DeleteGridList[i]) == true) {
+
+                        LastDeletedGrid = DeleteGridList[i];
+                        DeleteGridList[i].Close();
+                        DeleteGridList.RemoveAt(i);
+                        return;
+
+                    }
+
+                    DeleteGridList.RemoveAt(i);
+
+                }
+
+            });
+
+        }
 		
 		public static void DistanceChecker(){
 			
@@ -1315,7 +1363,15 @@ namespace ModularEncountersSpawner{
 			if(closestIndex >= 0){
 				
 				PendingNPCs[closestIndex].CubeGrid = cubeGrid;
-				
+
+                /*
+                if(PendingNPCs[closestIndex].SpawnType == "PlanetaryCargoShip" && string.IsNullOrWhiteSpace(PendingNPCs[closestIndex].KeenAiName) == false) {
+
+                    PendingNPCs[closestIndex].SpawnType = "Other";
+
+                }
+                */
+
 				if(ActiveNPCs.ContainsKey(cubeGrid) == false){
 
 					if(PendingNPCs[closestIndex].SpawnType == "PlanetaryCargoShip" || PendingNPCs[closestIndex].SpawnGroup.UseAutoPilotInSpace == true) {

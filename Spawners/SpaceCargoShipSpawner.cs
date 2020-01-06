@@ -53,6 +53,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
+            KnownPlayerLocationManager.CleanExpiredLocations();
             var validFactions = new Dictionary<string, List<string>>();
             var spawnGroupList = GetSpaceCargoShips(startCoords, out validFactions);
 			
@@ -138,7 +139,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 				
 				//Grid Manipulation
-				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "SpaceCargoShip");
+				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "SpaceCargoShip", prefab.Behaviour);
 
 				try{
 					

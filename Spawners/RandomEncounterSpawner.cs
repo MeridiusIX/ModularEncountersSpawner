@@ -53,6 +53,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
+            KnownPlayerLocationManager.CleanExpiredLocations();
             var validFactions = new Dictionary<string, List<string>>();
             var spawnGroupList = GetRandomEncounters(startCoords, out validFactions);
 			
@@ -186,7 +187,7 @@ namespace ModularEncountersSpawner.Spawners{
 				var gridList = new List<IMyCubeGrid>();
 				
 				//Grid Manipulation
-				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup);
+				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "RandomEncounter", prefab.Behaviour);
 				
 				try{
 					

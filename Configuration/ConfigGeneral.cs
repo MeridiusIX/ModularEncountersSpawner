@@ -116,8 +116,11 @@ namespace ModularEncountersSpawner.Configuration{
 		public bool UseNonPhysicalAmmoForNPCs { get; set;} 
 
         public bool RemoveContainerInventoryFromNPCs { get; set; }
-	
-		public ConfigGeneral(){
+
+        public bool UseEconomyBuyingReputationIncrease { get; set; }
+        public long EconomyBuyingReputationCostAmount { get; set; }
+
+        public ConfigGeneral(){
 			
 			ModVersion = MES_SessionCore.ModVersion;
 			EnableSpaceCargoShips = true;
@@ -161,7 +164,8 @@ namespace ModularEncountersSpawner.Configuration{
             GlobalBlockReplacerProfiles = new string[]{};
             UseNonPhysicalAmmoForNPCs = false;
             RemoveContainerInventoryFromNPCs = false;
-
+            UseEconomyBuyingReputationIncrease = true;
+            EconomyBuyingReputationCostAmount = 500000;
 
         }
 		

@@ -223,8 +223,32 @@ namespace ModularEncountersSpawner{
 			}
 		
 		}
-		
 
-	}
+        public static void ModMessageReceiverRivalAISpawnRequest(object payload) {
+
+            try {
+
+                var byteData = (byte[])payload;
+                var payloadData = MyAPIGateway.Utilities.SerializeFromBinary<RivalAISpawnRequest>(byteData);
+
+                if(payloadData == null) {
+
+                    Logger.AddMsg("RivalAI Spawn Request Mod Message Received an Invalid Payload.");
+                    return;
+
+                }
+
+                //CustomSpawner.AttemptSpawn(payloadData);
+
+            } catch(Exception exc) {
+
+
+
+            }
+
+        }
+
+
+    }
 	
 }

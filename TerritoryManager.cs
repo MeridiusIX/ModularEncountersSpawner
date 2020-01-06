@@ -533,7 +533,7 @@ namespace ModularEncountersSpawner{
 					
 				}
 				
-				if(player.Character == null){
+				if(player.Controller?.ControlledEntity?.Entity == null){
 					
 					continue;
 					

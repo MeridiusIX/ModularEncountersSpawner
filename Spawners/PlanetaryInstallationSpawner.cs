@@ -103,8 +103,9 @@ namespace ModularEncountersSpawner.Spawners{
 				return "Player Not In Watcher List... Although They Probably Should Be If The Script Got Here.";
 				
 			}
-			
-			var smallStations = new List<ImprovedSpawnGroup>();
+
+            KnownPlayerLocationManager.CleanExpiredLocations();
+            var smallStations = new List<ImprovedSpawnGroup>();
 			var mediumStations = new List<ImprovedSpawnGroup>();
 			var largeStations = new List<ImprovedSpawnGroup>();
             var validFactions = new Dictionary<string, List<string>>();
@@ -305,7 +306,7 @@ namespace ModularEncountersSpawner.Spawners{
 				var gridList = new List<IMyCubeGrid>();
 				
 				//Grid Manipulation
-				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "PlanetaryInstallation");
+				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "PlanetaryInstallation", prefab.Behaviour);
 				
 				try{
 					

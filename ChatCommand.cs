@@ -31,7 +31,7 @@ namespace ModularEncountersSpawner{
 	
 	public static class ChatCommand{
 
-        public static List<MyCubeBlockDefinition> BlockDefinitionList = new List<MyCubeBlockDefinition>();
+		public static List<MyCubeBlockDefinition> BlockDefinitionList = new List<MyCubeBlockDefinition>();
 
 		public static void MESChatCommand(string messageText, ref bool sendToOthers){
 			
@@ -209,7 +209,7 @@ namespace ModularEncountersSpawner{
 
 		}
 		
-        /*
+		/*
 		public static void ClientGetBossGPS(SyncData receivedData){
 			
 			foreach(var boss in NPCWatcher.BossEncounters){
@@ -230,7 +230,7 @@ namespace ModularEncountersSpawner{
 			}
 			
 		}
-        */
+		*/
 		
 		public static void ClipboardProcessing(SyncData receivedData){
 			
@@ -248,7 +248,37 @@ namespace ModularEncountersSpawner{
 		}
 		
 		public static void ServerChatProcessing(SyncData receivedData){
-			
+
+			if(receivedData.ChatMessage.StartsWith("/MES.SSCS") == true) {
+
+				receivedData.ChatMessage = receivedData.ChatMessage.Replace("/MES.SSCS", "/MES.Spawn.SpaceCargoShip");
+
+			}
+
+			if(receivedData.ChatMessage.StartsWith("/MES.SRE") == true) {
+
+				receivedData.ChatMessage = receivedData.ChatMessage.Replace("/MES.SRE", "/MES.Spawn.RandomEncounter");
+
+			}
+
+			if(receivedData.ChatMessage.StartsWith("/MES.SPCS") == true) {
+
+				receivedData.ChatMessage = receivedData.ChatMessage.Replace("/MES.SPCS", "/MES.Spawn.PlanetaryCargoShip");
+
+			}
+
+			if(receivedData.ChatMessage.StartsWith("/MES.SPI") == true) {
+
+				receivedData.ChatMessage = receivedData.ChatMessage.Replace("/MES.SPI", "/MES.Spawn.PlanetaryInstallation");
+
+			}
+
+			if(receivedData.ChatMessage.StartsWith("/MES.SBE") == true) {
+
+				receivedData.ChatMessage = receivedData.ChatMessage.Replace("/MES.SBE", "/MES.Spawn.BossEncounter");
+
+			}
+
 			//Debug Commands
 			if(receivedData.ChatMessage.StartsWith("/MES.") == true){
 				
@@ -279,129 +309,173 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                //Debug: InitStoreBlocks
-                if(receivedData.ChatMessage.StartsWith("/MES.Debug.InitStoreBlocks") == true) {
+				//Debug: InitStoreBlocks
+				if(receivedData.ChatMessage.StartsWith("/MES.Debug.InitStoreBlocks") == true) {
 
-                    Debug.InitStoreBlocks();
+					Debug.InitStoreBlocks();
 
-                }
+				}
 
-                if(receivedData.ChatMessage.StartsWith("/MES.Debug.Reputation.") == true) {
+				if(receivedData.ChatMessage.StartsWith("/MES.Debug.Reputation.") == true) {
 
-                    Debug.ReputationCheck(receivedData);
+					Debug.ReputationCheck(receivedData);
 
-                }
+				}
 
-                if(receivedData.ChatMessage.StartsWith("/MES.Debug.MoreEcMad") == true) {
+				if(receivedData.ChatMessage.StartsWith("/MES.Debug.MoreEcMad") == true) {
 
-                    var player = SpawnResources.GetPlayerById(receivedData.PlayerId);
+					var player = SpawnResources.GetPlayerById(receivedData.PlayerId);
 
-                    if(player != null) {
+					if(player != null) {
 
-                        foreach(var faction in MyAPIGateway.Session.Factions.Factions.Keys) {
+						foreach(var faction in MyAPIGateway.Session.Factions.Factions.Keys) {
 
-                            var npcFaction = MyAPIGateway.Session.Factions.Factions[faction];
-                            MyAPIGateway.Session.Factions.SetReputationBetweenPlayerAndFaction(player.IdentityId, npcFaction.FactionId, -501);
-
-
-
-                        }
-
-                    }
-
-                }
-
-                if(receivedData.ChatMessage.StartsWith("/MES.Debug.MoreEcHostile") == true) {
-
-                    var player = SpawnResources.GetPlayerById(receivedData.PlayerId);
-
-                    if(player != null) {
-
-                        foreach(var faction in MyAPIGateway.Session.Factions.Factions.Keys) {
-
-                            var npcFaction = MyAPIGateway.Session.Factions.Factions[faction];
-                            MyAPIGateway.Session.Factions.SetReputationBetweenPlayerAndFaction(player.IdentityId, npcFaction.FactionId, -1500);
-
-                        }
-
-                    }
-
-                }
-
-                if(receivedData.ChatMessage.StartsWith("/MES.Debug.MoreEcNeutral") == true) {
-
-                    var player = SpawnResources.GetPlayerById(receivedData.PlayerId);
-
-                    if(player != null) {
-
-                        foreach(var faction in MyAPIGateway.Session.Factions.Factions.Keys) {
-
-                            var npcFaction = MyAPIGateway.Session.Factions.Factions[faction];
-                            MyAPIGateway.Session.Factions.SetReputationBetweenPlayerAndFaction(player.IdentityId, npcFaction.FactionId, 0);
+							var npcFaction = MyAPIGateway.Session.Factions.Factions[faction];
+							MyAPIGateway.Session.Factions.SetReputationBetweenPlayerAndFaction(player.IdentityId, npcFaction.FactionId, -501);
 
 
 
-                        }
+						}
 
-                    }
+					}
 
-                }
+				}
 
-                //Joke: ComeAtMeBro
-                if(receivedData.ChatMessage.StartsWith("/MES.ComeAtMeBro") == true) {
+				if(receivedData.ChatMessage.StartsWith("/MES.Debug.MoreEcHostile") == true) {
 
-                    var playerList = new List<IMyPlayer>();
-                    MyAPIGateway.Players.GetPlayers(playerList);
-                    IMyPlayer thisPlayer = null;
+					var player = SpawnResources.GetPlayerById(receivedData.PlayerId);
 
-                    foreach(var player in playerList) {
+					if(player != null) {
 
-                        if(player.IdentityId == receivedData.PlayerId) {
+						foreach(var faction in MyAPIGateway.Session.Factions.Factions.Keys) {
 
-                            thisPlayer = player;
-                            break;
+							var npcFaction = MyAPIGateway.Session.Factions.Factions[faction];
+							MyAPIGateway.Session.Factions.SetReputationBetweenPlayerAndFaction(player.IdentityId, npcFaction.FactionId, -1500);
 
-                        }
+						}
 
-                    }
+					}
 
-                    if(thisPlayer == null) {
+				}
 
-                        return;
+				if(receivedData.ChatMessage.StartsWith("/MES.Debug.MoreEcNeutral") == true) {
 
-                    }
+					var player = SpawnResources.GetPlayerById(receivedData.PlayerId);
 
-                    int bros = 0;
+					if(player != null) {
 
-                    foreach(var cubeGrid in NPCWatcher.ActiveNPCs.Keys.ToList()) {
+						foreach(var faction in MyAPIGateway.Session.Factions.Factions.Keys) {
 
-                        if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
+							var npcFaction = MyAPIGateway.Session.Factions.Factions[faction];
+							MyAPIGateway.Session.Factions.SetReputationBetweenPlayerAndFaction(player.IdentityId, npcFaction.FactionId, 0);
 
-                            continue;
 
-                        }
 
-                        if(cubeGrid.Physics == null) {
+						}
 
-                            continue;
+					}
 
-                        }
+				}
 
-                        if(NPCWatcher.ActiveNPCs[cubeGrid].SpawnType == "SpaceCargoShip") {
+				//Debug.CheckRemovalStatus
+				if(receivedData.ChatMessage.StartsWith("/MES.Debug.CheckRemovalStatus") == true) {
 
-                            cubeGrid.Physics.LinearVelocity = Vector3D.Normalize(thisPlayer.GetPosition() - cubeGrid.GetPosition()) * 100;
-                            bros++;
+					MyVisualScriptLogicProvider.ShowNotification("Number Of Pending Deletions: " + NPCWatcher.DeleteGridList.Count.ToString(), 5000, "White", receivedData.PlayerId);
+					MyVisualScriptLogicProvider.ShowNotification("Deletion Process Status: " + NPCWatcher.DeleteGrids.ToString(), 5000, "White", receivedData.PlayerId);
 
-                        }
+				}
 
-                    }
+				//Debug.CheckRemovalStatus
+				if(receivedData.ChatMessage.StartsWith("/MES.Debug.CreateKPL") == true) {
 
-                    MyVisualScriptLogicProvider.ShowNotification(bros.ToString() + " Bros Coming At You!", 5000, "Red", thisPlayer.IdentityId);
+					KnownPlayerLocationManager.AddKnownPlayerLocation(MyAPIGateway.Session.LocalHumanPlayer.GetPosition(), "SPRT", 200, 1, -1);
 
-                }
+				}
 
-                //Settings
-                if(receivedData.ChatMessage.StartsWith("/MES.Settings.") == true){
+				//Joke: ComeAtMeBro
+				if(receivedData.ChatMessage.StartsWith("/MES.ComeAtMeBro") == true) {
+
+					var playerList = new List<IMyPlayer>();
+					MyAPIGateway.Players.GetPlayers(playerList);
+					IMyPlayer thisPlayer = null;
+
+					foreach(var player in playerList) {
+
+						if(player.IdentityId == receivedData.PlayerId) {
+
+							thisPlayer = player;
+							break;
+
+						}
+
+					}
+
+					if(thisPlayer == null) {
+
+						return;
+
+					}
+
+					int bros = 0;
+
+					foreach(var cubeGrid in NPCWatcher.ActiveNPCs.Keys.ToList()) {
+
+						if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
+
+							continue;
+
+						}
+
+						if(cubeGrid.Physics == null) {
+
+							continue;
+
+						}
+
+						if(NPCWatcher.ActiveNPCs[cubeGrid].SpawnType == "SpaceCargoShip") {
+
+							cubeGrid.Physics.LinearVelocity = Vector3D.Normalize(thisPlayer.GetPosition() - cubeGrid.GetPosition()) * 100;
+							bros++;
+
+						}
+
+					}
+
+					MyVisualScriptLogicProvider.ShowNotification(bros.ToString() + " Bros Coming At You!", 5000, "Red", thisPlayer.IdentityId);
+
+				}
+
+				//RemoveAllNPCs
+				if(receivedData.ChatMessage.StartsWith("/MES.RemoveAllNPCs") == true) {
+
+					foreach(var cubeGrid in NPCWatcher.ActiveNPCs.Keys.ToList()) {
+
+						if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
+
+							continue;
+
+						}
+
+						if(cubeGrid.Physics == null) {
+
+							continue;
+
+						}
+
+						if(NPCWatcher.ActiveNPCs[cubeGrid].CleanupIgnore == false) {
+
+							NPCWatcher.ActiveNPCs[cubeGrid].FlagForDespawn = true;
+
+						}
+
+					}
+
+					MyVisualScriptLogicProvider.ShowNotification("All Eligible NPC Grids Processed For Removal", 5000, "White", receivedData.PlayerId);
+
+				}
+
+				//Settings
+				if(receivedData.ChatMessage.StartsWith("/MES.Settings.") == true){
 					
 					var result = SettingsEditor.EditSettings(receivedData.ChatMessage);
 					MyVisualScriptLogicProvider.ShowNotification(result, 5000, "White", receivedData.PlayerId);
@@ -620,33 +694,33 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                //Get Block Definition Info
-                if(receivedData.ChatMessage.StartsWith("/MES.GetBlockDefinitions") == true) {
+				//Get Block Definition Info
+				if(receivedData.ChatMessage.StartsWith("/MES.GetBlockDefinitions") == true) {
 
-                    var syncData = receivedData;
-                    syncData.Instruction = "MESClipboard";
-                    syncData.ClipboardContents = Logger.GetBlockDefinitionInfo();
-                    var sendData = MyAPIGateway.Utilities.SerializeToBinary<SyncData>(syncData);
-                    bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
-                    MyVisualScriptLogicProvider.ShowNotification("Block Data To Clipboard. Success: " + sendStatus.ToString(), 5000, "White", receivedData.PlayerId);
-                    return;
+					var syncData = receivedData;
+					syncData.Instruction = "MESClipboard";
+					syncData.ClipboardContents = Logger.GetBlockDefinitionInfo();
+					var sendData = MyAPIGateway.Utilities.SerializeToBinary<SyncData>(syncData);
+					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
+					MyVisualScriptLogicProvider.ShowNotification("Block Data To Clipboard. Success: " + sendStatus.ToString(), 5000, "White", receivedData.PlayerId);
+					return;
 
-                }
+				}
 
-                //Get Block Definition Info
-                if(receivedData.ChatMessage.StartsWith("/MES.GetColorsFromGrid") == true) {
+				//Get Block Definition Info
+				if(receivedData.ChatMessage.StartsWith("/MES.GetColorsFromGrid") == true) {
 
-                    var syncData = receivedData;
-                    syncData.Instruction = "MESClipboard";
-                    syncData.ClipboardContents = Logger.GetColorListFromGrid(SpawnResources.GetPlayerById(syncData.PlayerId));
-                    var sendData = MyAPIGateway.Utilities.SerializeToBinary<SyncData>(syncData);
-                    bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
-                    return;
+					var syncData = receivedData;
+					syncData.Instruction = "MESClipboard";
+					syncData.ClipboardContents = Logger.GetColorListFromGrid(SpawnResources.GetPlayerById(syncData.PlayerId));
+					var sendData = MyAPIGateway.Utilities.SerializeToBinary<SyncData>(syncData);
+					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
+					return;
 
-                }
+				}
 
-                //Get Player Watch Lists
-                if(receivedData.ChatMessage.StartsWith("/MES.GetPlayerWatchList") == true){
+				//Get Player Watch Lists
+				if(receivedData.ChatMessage.StartsWith("/MES.GetPlayerWatchList") == true){
 					
 					var syncData = receivedData;
 					syncData.Instruction = "MESClipboard";
@@ -659,7 +733,7 @@ namespace ModularEncountersSpawner{
 				}
 				
 				//Get Local Threat Score
-				if(receivedData.ChatMessage.StartsWith("/MES.GetThreatScore") == true){
+				if(receivedData.ChatMessage.StartsWith("/MES.GetThreatScore") == true || receivedData.ChatMessage.StartsWith("/MES.GTS") == true) {
 					
 					var messageReplace = receivedData.ChatMessage.Replace("/MES.GetThreatScore.", "");
 					ImprovedSpawnGroup selectedSpawnGroup = null;
@@ -754,7 +828,7 @@ namespace ModularEncountersSpawner{
 				}
 				
 				//Get Spawn Group Eligibility At Position
-				if(receivedData.ChatMessage.StartsWith("/MES.GetEligibleSpawnsAtPosition") == true){
+				if(receivedData.ChatMessage.StartsWith("/MES.GetEligibleSpawnsAtPosition") == true || receivedData.ChatMessage.StartsWith("/MES.GESAP") == true) {
 					
 					var syncData = receivedData;
 					syncData.Instruction = "MESClipboard";

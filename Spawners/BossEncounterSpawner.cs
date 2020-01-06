@@ -448,7 +448,7 @@ namespace ModularEncountersSpawner.Spawners{
 					}
 					
 					//Grid Manipulation
-					GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, encounter.SpawnGroup, "BossEncounter");
+					GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, encounter.SpawnGroup, "BossEncounter", prefab.Behaviour);
 					
 					try{
 						

@@ -1124,13 +1124,48 @@ namespace ModularEncountersSpawner.Configuration{
 
                 }
 
+                //UseEconomyBuyingReputationIncrease
+                if(receivedCommand.StartsWith("/MES.Settings.General.UseEconomyBuyingReputationIncrease.") == true) {
+
+                    var receivedValue = receivedCommand.Replace("/MES.Settings.General.UseEconomyBuyingReputationIncrease.", "");
+                    bool result = false;
+
+                    if(bool.TryParse(receivedValue, out result) == false) {
+
+                        return "Failed To Parse Value: " + receivedValue;
+
+                    }
+
+                    Settings.General.UseEconomyBuyingReputationIncrease = result;
+                    var saveSetting = Settings.General.SaveSettings(Settings.General);
+                    return saveSetting;
+
+                }
+
+                //EconomyBuyingReputationCostAmount
+                if(receivedCommand.StartsWith("/MES.Settings.General.EconomyBuyingReputationCostAmount.") == true) {
+
+                    var receivedValue = receivedCommand.Replace("/MES.Settings.General.EconomyBuyingReputationCostAmount.", "");
+                    long result = 0;
+
+                    if(long.TryParse(receivedValue, out result) == false) {
+
+                        return "Failed To Parse Value: " + receivedValue;
+
+                    }
+
+                    Settings.General.EconomyBuyingReputationCostAmount = result;
+                    var saveSetting = Settings.General.SaveSettings(Settings.General);
+                    return saveSetting;
+
+                }
 
             }
-			////////////////////////////////////////////////////////
-			//                   SpaceCargoShips
-			////////////////////////////////////////////////////////
-			
-			if(receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.") == true){
+            ////////////////////////////////////////////////////////
+            //                   SpaceCargoShips
+            ////////////////////////////////////////////////////////
+
+            if(receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.") == true){
 				
 				//FirstSpawnTime
 				if(receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.FirstSpawnTime.") == true){

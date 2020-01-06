@@ -26,6 +26,7 @@ using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
+using ModularEncountersSpawner.Api;
 
 namespace ModularEncountersSpawner{
 	
@@ -33,7 +34,8 @@ namespace ModularEncountersSpawner{
 	
 	public class MES_SessionCore : MySessionComponentBase{
 		
-		public static float ModVersion = 1.065f;
+		public static float ModVersion = 1.073f;
+		public static string SaveName = "";
 		public static int PlayerWatcherTimer = 0;
 		public static Dictionary<IMyPlayer, PlayerWatcher> playerWatchList = new Dictionary<IMyPlayer, PlayerWatcher>();
 		public static List<IMyPlayer> PlayerList = new List<IMyPlayer>();
@@ -53,7 +55,8 @@ namespace ModularEncountersSpawner{
 		//Mod Message Receivers
 		public static long blockReplacerModId = 1521905890001;
 		public static long manualSpawnRequestModId = 1521905890002;
-		
+		public static long rivalAISpawnRequestModId = 1521905890003;
+
 		public static IMyGps BossEncounterGps;
 		
 		public static bool NPCWeaponUpgradesModDetected = false;
@@ -75,7 +78,19 @@ namespace ModularEncountersSpawner{
 			string Message;
 			
 		}
-		
+
+		public override void LoadData() {
+			
+
+
+		}
+
+		public override void BeforeStart() {
+
+			SpawnerLocalApi.SendApiToMods();
+
+		}
+
 		public override void UpdateBeforeSimulation(){
 			
 			if(scriptInit == false){
@@ -128,7 +143,20 @@ namespace ModularEncountersSpawner{
 		
 			}
 
-            tickCounter += tickCounterIncrement;
+			if(NPCWatcher.DeleteGrids == true && MyAPIGateway.Multiplayer.IsServer == true) {
+
+				NPCWatcher.DeletionTimer++;
+
+				if(NPCWatcher.DeletionTimer >= 10) {
+
+					NPCWatcher.DeletionTimer = 0;
+					NPCWatcher.DeleteGridsProcessing();
+
+				}
+
+			}
+
+			tickCounter += tickCounterIncrement;
 			
 			if(tickCounter < 60){
 				
@@ -144,8 +172,23 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-            //Temporary Until Keen Fixes NPCs Randomly Stopping
-            CargoShipWatcher.ProcessCargoShipSpeedWatcher();
+			if(SaveName != MyAPIGateway.Session.Name) {
+
+				Logger.AddMsg("New Save Detected. Applying Existing Settings To Save File.");
+				SaveName = MyAPIGateway.Session.Name;
+				Settings.General.SaveSettings(Settings.General);
+				Settings.SpaceCargoShips.SaveSettings(Settings.SpaceCargoShips);
+				Settings.RandomEncounters.SaveSettings(Settings.RandomEncounters);
+				Settings.PlanetaryCargoShips.SaveSettings(Settings.PlanetaryCargoShips);
+				Settings.PlanetaryInstallations.SaveSettings(Settings.PlanetaryInstallations);
+				Settings.BossEncounters.SaveSettings(Settings.BossEncounters);
+				Settings.OtherNPCs.SaveSettings(Settings.OtherNPCs);
+				Settings.CustomBlocks.SaveSettings(Settings.CustomBlocks);
+
+			}
+
+			//Temporary Until Keen Fixes NPCs Randomly Stopping
+			CargoShipWatcher.ProcessCargoShipSpeedWatcher();
 			
 			if(NPCWatcher.PendingNPCs.Count == 0){
 				
@@ -170,7 +213,9 @@ namespace ModularEncountersSpawner{
 					PlayerWatcherTimer--;
 					
 					if(PlayerWatcherTimer <= 0){
-						
+
+						RelationManager.InitialReputationFixer();
+
 						PlayerWatcherTimer = Settings.General.PlayerWatcherTimerTrigger;
 						ProcessPlayerWatchList();
 						
@@ -189,7 +234,33 @@ namespace ModularEncountersSpawner{
 		public void SetupScript(){
 			
 			Logger.AddMsg("Loading Settings From Spawner Version: " + ModVersion.ToString());
-			
+
+			//Save File Validation
+			SaveName = MyAPIGateway.Session.Name;
+
+			//Some Faction BS - Temporary
+			if(1 == 0) {
+
+				var factions = MyDefinitionManager.Static.GetDefaultFactions();
+				var sb = new StringBuilder();
+				sb.Append("Faction Data: ").AppendLine().AppendLine();
+
+				foreach(var faction in factions) {
+
+					sb.Append(faction.Tag).AppendLine();
+					sb.Append(faction.DefaultRelation).AppendLine();
+					sb.Append(faction.DefaultRelationToPlayers).AppendLine().AppendLine();
+
+				}
+
+				Logger.AddMsg(sb.ToString());
+
+			}
+
+			//Rival AI Stuff
+			Logger.AddMsg("Initializing RivalAI Helper");
+			RivalAIHelper.SetupRivalAIHelper();
+
 			//Setup Watchers and Handlers
 			MyAPIGateway.Multiplayer.RegisterMessageHandler(8877, ChatCommand.MESMessageHandler);
 			MyAPIGateway.Utilities.MessageEntered += ChatCommand.MESChatCommand;	
@@ -241,11 +312,11 @@ namespace ModularEncountersSpawner{
 					var blockDef = definition as MyCubeBlockDefinition;
 					SpawnResources.BlockDefinitionIdList.Add(definition.Id.SubtypeName);
 
-                    if(ChatCommand.BlockDefinitionList.Contains(blockDef) == false) {
+					if(ChatCommand.BlockDefinitionList.Contains(blockDef) == false) {
 
-                        ChatCommand.BlockDefinitionList.Add(blockDef);
+						ChatCommand.BlockDefinitionList.Add(blockDef);
 
-                    }
+					}
 					
 				}
 				
@@ -292,74 +363,75 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-            //Economy Stations
-            
-            Logger.AddMsg("The Following Economy Stations Will Not Be Monitored By Spawner Mod:", true);
-            try {
+			//Economy Stations
+			
+			Logger.AddMsg("The Following Economy Stations Will Not Be Monitored By Spawner Mod:", true);
+			try {
 
-                NPCWatcher.EconomyStationNames.Add("Economy_MiningStation_1");
-                NPCWatcher.EconomyStationNames.Add("Economy_MiningStation_2");
-                NPCWatcher.EconomyStationNames.Add("Economy_MiningStation_3");
-                NPCWatcher.EconomyStationNames.Add("Economy_OrbitalStation_1");
-                NPCWatcher.EconomyStationNames.Add("Economy_OrbitalStation_2");
-                NPCWatcher.EconomyStationNames.Add("Economy_OrbitalStation_3");
-                NPCWatcher.EconomyStationNames.Add("Economy_OrbitalStation_4");
-                NPCWatcher.EconomyStationNames.Add("Economy_Outpost_1");
-                NPCWatcher.EconomyStationNames.Add("Economy_Outpost_2");
-                NPCWatcher.EconomyStationNames.Add("Economy_Outpost_3");
-                NPCWatcher.EconomyStationNames.Add("Economy_Outpost_4");
-                NPCWatcher.EconomyStationNames.Add("Economy_Outpost_5");
-                NPCWatcher.EconomyStationNames.Add("Economy_Outpost_6");
-                NPCWatcher.EconomyStationNames.Add("Economy_Outpost_7");
-                NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_1");
-                NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_2");
-                NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_3");
-                NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_4");
-                NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_5");
+				NPCWatcher.EconomyStationNames.Add("Economy_MiningStation_1");
+				NPCWatcher.EconomyStationNames.Add("Economy_MiningStation_2");
+				NPCWatcher.EconomyStationNames.Add("Economy_MiningStation_3");
+				NPCWatcher.EconomyStationNames.Add("Economy_OrbitalStation_1");
+				NPCWatcher.EconomyStationNames.Add("Economy_OrbitalStation_2");
+				NPCWatcher.EconomyStationNames.Add("Economy_OrbitalStation_3");
+				NPCWatcher.EconomyStationNames.Add("Economy_OrbitalStation_4");
+				NPCWatcher.EconomyStationNames.Add("Economy_Outpost_1");
+				NPCWatcher.EconomyStationNames.Add("Economy_Outpost_2");
+				NPCWatcher.EconomyStationNames.Add("Economy_Outpost_3");
+				NPCWatcher.EconomyStationNames.Add("Economy_Outpost_4");
+				NPCWatcher.EconomyStationNames.Add("Economy_Outpost_5");
+				NPCWatcher.EconomyStationNames.Add("Economy_Outpost_6");
+				NPCWatcher.EconomyStationNames.Add("Economy_Outpost_7");
+				NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_1");
+				NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_2");
+				NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_3");
+				NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_4");
+				NPCWatcher.EconomyStationNames.Add("Economy_SpaceStation_5");
 
-                /*
-                var ecoStationsDefs = new List<MyStationsListDefinition>(MyDefinitionManager.Static.GetDefinitionsOfType<MyStationsListDefinition>().ToList());
-               
-                foreach(var station in ecoStationsDefs) {
+				/*
+				var ecoStationsDefs = new List<MyStationsListDefinition>(MyDefinitionManager.Static.GetDefinitionsOfType<MyStationsListDefinition>().ToList());
+			   
+				foreach(var station in ecoStationsDefs) {
 
-                    foreach(var stationPrefabName in station.StationNames) {
+					foreach(var stationPrefabName in station.StationNames) {
 
-                        var stationNameString = stationPrefabName.ToString();
+						var stationNameString = stationPrefabName.ToString();
 
-                        if(string.IsNullOrWhiteSpace(stationNameString) == true) {
+						if(string.IsNullOrWhiteSpace(stationNameString) == true) {
 
-                            continue;
+							continue;
 
-                        }
+						}
 
-                        if(NPCWatcher.EconomyStationNames.Contains(stationNameString) == false) {
+						if(NPCWatcher.EconomyStationNames.Contains(stationNameString) == false) {
 
-                            NPCWatcher.EconomyStationNames.Add(stationNameString);
-                            Logger.AddMsg("Economy Station: " + stationNameString);
+							NPCWatcher.EconomyStationNames.Add(stationNameString);
+							Logger.AddMsg("Economy Station: " + stationNameString);
 
-                        }
+						}
 
-                    }
+					}
 
-                }
-                */
+				}
+				*/
 
-            } catch(Exception exc) {
+			} catch(Exception exc) {
 
-                Logger.AddMsg("Something Failed While Building List Of Economy Station Prefab Names. See Below:");
-                Logger.AddMsg(dropContainerErrorLog.ToString());
+				Logger.AddMsg("Something Failed While Building List Of Economy Station Prefab Names. See Below:");
+				Logger.AddMsg(dropContainerErrorLog.ToString());
 
-            }
+			}
 
-            Logger.AddMsg("Registering Mod Message Handlers.");
+			Logger.AddMsg("Registering Mod Message Handlers.");
 			Logger.AddMsg("Mod Channel: " + MyAPIGateway.Utilities.GamePaths.ModScopeName);
-			MyAPIGateway.Utilities.RegisterMessageHandler(1521905890, ModMessages.ModMessageHandler);
+			//MyAPIGateway.Utilities.RegisterMessageHandler(1521905890, ModMessages.ModMessageHandler);
 			MyAPIGateway.Utilities.RegisterMessageHandler(1521905890001, ModMessages.ModMessageReceiverBlockReplace);
 			MyAPIGateway.Utilities.RegisterMessageHandler(1521905890002, ModMessages.ModMessageReceiverSpawnRequest);
+			MyAPIGateway.Utilities.RegisterMessageHandler(1521905890003, ModMessages.ModMessageReceiverRivalAISpawnRequest);
 			Logger.AddMsg("Initiating Main Settings.");
 			Settings.InitSettings();
 			NPCWatcher.InitFactionData();
-            SpawnResources.PopulateNpcFactionLists();
+			SpawnResources.PopulateNpcFactionLists();
 			TerritoryManager.TerritoryRefresh();
 			SpawnGroupManager.CreateSpawnLists();
 			
@@ -502,16 +574,16 @@ namespace ModularEncountersSpawner{
 			PlayerList.Clear();
 			MyAPIGateway.Players.GetPlayers(PlayerList);
 
-            //Get Existing NPCs
-            Logger.AddMsg("Check For Existing NPC Grids");
+			//Get Existing NPCs
+			Logger.AddMsg("Check For Existing NPC Grids");
 			NPCWatcher.StartupScan();
 			
 			//Setup Wave Spawners
 			SpaceCargoShipWaveSpawner = new WaveSpawner("SpaceCargoShip");
 
-            //Init Economy Stuff
-            Logger.AddMsg("Initializing Economy Resources");
-            EconomyHelper.Setup();
+			//Init Economy Stuff
+			Logger.AddMsg("Initializing Economy Resources");
+			EconomyHelper.Setup();
 			
 			//Get Spawned Voxels From Save
 			try{

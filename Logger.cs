@@ -396,9 +396,7 @@ namespace ModularEncountersSpawner{
 				sb.Append("MaximumBlocksPercent: ").Append(spawnGroup.MaximumBlocksPercent.ToString()).AppendLine();
 				sb.Append("MinimumBuildPercent: ").Append(spawnGroup.MinimumBuildPercent.ToString()).AppendLine();
 				sb.Append("MaximumBuildPercent: ").Append(spawnGroup.MaximumBuildPercent.ToString()).AppendLine();
-				sb.Append("ReplaceRemoteControl: ").Append(spawnGroup.ReplaceRemoteControl.ToString()).AppendLine();
-				sb.Append("TargetCockpitIfNoRemoteControl: ").Append(spawnGroup.TargetCockpitIfNoRemoteControl.ToString()).AppendLine();
-				sb.Append("NewRemoteControlId: ").Append(spawnGroup.NewRemoteControlId.ToString()).AppendLine();
+				sb.Append("UseRivalAi: ").Append(spawnGroup.UseRivalAi.ToString()).AppendLine();
 				sb.Append("MinSpawnFromWorldCenter: ").Append(spawnGroup.MinSpawnFromWorldCenter.ToString()).AppendLine();
 				sb.Append("MaxSpawnFromWorldCenter: ").Append(spawnGroup.MaxSpawnFromWorldCenter.ToString()).AppendLine();
 				sb.Append("PlanetBlackList: ").Append(string.Join(",", spawnGroup.PlanetBlacklist)).AppendLine();
@@ -507,6 +505,8 @@ namespace ModularEncountersSpawner{
 			
 			var sb = new StringBuilder();
             var validFactions = new Dictionary<string, List<string>>();
+
+
 			
 			//Space Cargo Ship
 			sb.Append("::: Space / Lunar Cargo Ship Eligible Spawns :::").AppendLine();

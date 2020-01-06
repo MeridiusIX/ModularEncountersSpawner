@@ -36,6 +36,9 @@ namespace ModularEncountersSpawner.Spawners{
 		public static DateTime LastEntityRefresh = DateTime.Now;
 		public static DateTime GameStartTime = DateTime.Now;
 
+        private static List<string> _checkedDefinitions = new List<string>();
+        private static bool _checkedDefinitionsInitialized = false;
+
         public static List<IMyFaction> NpcFactions = new List<IMyFaction>();
         public static List<IMyFaction> NpcBuilderFactions = new List<IMyFaction>();
         public static List<IMyFaction> NpcMinerFactions = new List<IMyFaction>();
@@ -43,7 +46,9 @@ namespace ModularEncountersSpawner.Spawners{
 
         public static Dictionary<IMyCubeGrid, float> GridThreatLevels = new Dictionary<IMyCubeGrid, float>();
 		public static Dictionary<IMyCubeGrid, int> GridPCULevels = new Dictionary<IMyCubeGrid, int>();
-		
+
+        public static List<KnownPlayerLocation> KnownPlayerLocations = new List<KnownPlayerLocation>();
+
 		public static List<string> BlockDefinitionIdList = new List<string>();
 		
 		public static DateTime LastThreatRefresh = DateTime.Now;
@@ -106,7 +111,7 @@ namespace ModularEncountersSpawner.Spawners{
 				}
 				
 			}
-			
+
 			if(spawnGroup.RandomNumberRoll > 1 && specificSpawnRequest == false){
 				
 				var roll = rnd.Next(0, spawnGroup.RandomNumberRoll);
@@ -153,7 +158,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 			
-			if(CheckSandboxVariables(spawnGroup.SandboxVariables) == false){
+			if(CheckSandboxVariables(spawnGroup.SandboxVariables, spawnGroup.FalseSandboxVariables) == false){
 				
 				return false;
 				
@@ -178,7 +183,17 @@ namespace ModularEncountersSpawner.Spawners{
 				}
 				
 			}
-			
+
+            if(spawnGroup.UseKnownPlayerLocations == true) {
+
+                if(KnownPlayerLocationManager.IsPositionInKnownPlayerLocation(playerCoords, spawnGroup.KnownPlayerLocationMustMatchFaction, spawnGroup.FactionOwner) == false) {
+
+                    return false;
+
+                }
+
+            }
+
 			if(TerritoryValidation(spawnGroup, playerCoords) == false){
 				
 				return false;
@@ -373,8 +388,10 @@ namespace ModularEncountersSpawner.Spawners{
             return true;
 
 		}
-		
-		public static bool CheckSandboxVariables(List<string> variableNames){
+
+        
+
+		public static bool CheckSandboxVariables(List<string> variableNames, List<string> falseVariableNames){
 			
 			foreach(var name in variableNames){
 				
@@ -388,8 +405,21 @@ namespace ModularEncountersSpawner.Spawners{
 				}
 				
 			}
-			
-			return true;
+
+            foreach(var name in falseVariableNames) {
+
+                bool varValue = false;
+                bool foundVariable = MyAPIGateway.Utilities.GetVariable<bool>(name, out varValue);
+
+                if(varValue == true) {
+
+                    return false;
+
+                }
+
+            }
+
+            return true;
 		
 		}
 		
@@ -415,19 +445,23 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 		
-		public static void GetGridThreatLevels(){
-		
-			var currentTime = DateTime.Now;
-			TimeSpan threatTimeDifference = currentTime - LastThreatRefresh;
-			
-			if(threatTimeDifference.TotalMilliseconds < Settings.General.ThreatRefreshTimerMinimum * 1000){
-				
-				return;
-				
-			}
-			
-			LastThreatRefresh = currentTime;
-			
+		public static void GetGridThreatLevels(bool overrideTime = false){
+
+            if(overrideTime == false) {
+
+                var currentTime = DateTime.Now;
+                TimeSpan threatTimeDifference = currentTime - LastThreatRefresh;
+
+                if(threatTimeDifference.TotalMilliseconds < Settings.General.ThreatRefreshTimerMinimum * 1000) {
+
+                    return;
+
+                }
+
+                LastThreatRefresh = currentTime;
+
+            }
+
 			GridThreatLevels.Clear();
 			GridPCULevels.Clear();
 			
@@ -880,7 +914,7 @@ namespace ModularEncountersSpawner.Spawners{
 			var gravityProvider = planetEntity.Components.Get<MyGravityProviderComponent>();
 			
 			if(gravityProvider.IsPositionInRange(position) == true){
-							
+			
 				return true;
 				
 			}

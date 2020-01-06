@@ -44,6 +44,7 @@ namespace ModularEncountersSpawner{
 		public static Dictionary<string, MyCubeBlockDefinition> BlockDirectory = new Dictionary<string, MyCubeBlockDefinition>();
 		public static Dictionary<string, WeaponProfile> WeaponProfiles = new Dictionary<string, WeaponProfile>();
 		public static Dictionary<string, float> PowerProviderBlocks = new Dictionary<string, float>();
+        public static Dictionary<string, float> BatteryMaxCapacity = new Dictionary<string, float>();
 		public static List<string> ForwardGunIDs = new List<string>();
 		public static List<string> TurretIDs = new List<string>();
 		
@@ -72,9 +73,9 @@ namespace ModularEncountersSpawner{
 		public static void Setup(){
 			
 			try{
-				
-				//Setup Power Hogging Weapons Reference
-				PowerDrainingWeapons.Add("NovaTorpedoLauncher_Large", 20); //Nova Heavy Plasma Torpedo
+
+                //Setup Power Hogging Weapons Reference
+                PowerDrainingWeapons.Add("NovaTorpedoLauncher_Large", 20); //Nova Heavy Plasma Torpedo
 				PowerDrainingWeapons.Add("LargeDualBeamGTFBase_Large", 1050); //GTF Large Dual Beam Laser Turret
 				PowerDrainingWeapons.Add("LargeStaticLBeamGTF_Small", 787.50f); //GTF Large Heavy Beam Laser
 				PowerDrainingWeapons.Add("LargeStaticLBeamGTF_Large", 787.50f); //GTF Large Heavy Beam Laser
@@ -438,6 +439,18 @@ namespace ModularEncountersSpawner{
 							PowerProviderBlocks.Add(definition.Id.ToString(), powerBlock.MaxPowerOutput);
 							
 						}
+
+                        var batteryDef = powerBlock as MyBatteryBlockDefinition;
+
+                        if(batteryDef != null) {
+
+                            if(BatteryMaxCapacity.ContainsKey(batteryDef.Id.SubtypeName) == false) {
+
+                                BatteryMaxCapacity.Add(batteryDef.Id.SubtypeName, batteryDef.MaxStoredPower);
+
+                            }
+
+                        }
 						
 					}
 					
@@ -544,7 +557,7 @@ namespace ModularEncountersSpawner{
 		}
 
 
-        public static void ProcessPrefabForManipulation(string prefabName, ImprovedSpawnGroup spawnGroup, string spawnType = "") {
+        public static void ProcessPrefabForManipulation(string prefabName, ImprovedSpawnGroup spawnGroup, string spawnType = "", string behavior = "") {
 
             Logger.AddMsg("Prefab Manipulation Started For [" + prefabName + "] in SpawnGroup [" + spawnGroup.SpawnGroupName + "]", true);
 
@@ -607,7 +620,7 @@ namespace ModularEncountersSpawner{
 			Manipulation Order
 			 - UseBlockReplacer
 			 - UseBlockReplacerProfile
-			 - ReplaceRemoteControl
+			 - UseRivalAi
 			 - Weapon Randomization
 			 - Cleanup Block Disables
 				- ShiftBlockColorsHue
@@ -688,11 +701,11 @@ namespace ModularEncountersSpawner{
             }
 
             //Replace RemoteControl
-            if(spawnGroup.ReplaceRemoteControl == true) {
+            if(spawnGroup.UseRivalAi == true) {
 
                 foreach(var grid in prefabDef.CubeGrids) {
 
-                    ReplaceRemoteControl(grid, spawnGroup);
+                    RivalAiInitialize(grid, spawnGroup, behavior);
 
                 }
 
@@ -1646,7 +1659,10 @@ namespace ModularEncountersSpawner{
 
                     if(battery != null) {
 
-                        battery.CurrentStoredPower = battery.MaxStoredPower;
+                        float maxStored = 0;
+                        BatteryMaxCapacity.TryGetValue(battery.SubtypeName, out maxStored);
+                        battery.CurrentStoredPower = maxStored;
+                        battery.MaxStoredPower = maxStored;
 
                     }
 
@@ -2165,11 +2181,12 @@ namespace ModularEncountersSpawner{
 
 		}
 		
-		public static bool ReplaceRemoteControl(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup){
+		public static bool RivalAiInitialize(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup, string behaviorName = null){
 			
 			MyObjectBuilder_RemoteControl primaryRemote = null;
+            MyObjectBuilder_RemoteControl rivalAiRemote = null;
 
-			foreach(var block in cubeGrid.CubeBlocks){
+            foreach(var block in cubeGrid.CubeBlocks){
 				
 				var thisRemote = block as MyObjectBuilder_RemoteControl;
 				
@@ -2178,7 +2195,14 @@ namespace ModularEncountersSpawner{
 					continue;
 					
 				}else{
-					
+
+                    if(RivalAIHelper.RivalAiControlModules.Contains(thisRemote.SubtypeName) == true) {
+
+                        rivalAiRemote = thisRemote;
+                        break;
+
+                    }
+
 					if(primaryRemote == null){
 						
 						primaryRemote = thisRemote;
@@ -2188,20 +2212,111 @@ namespace ModularEncountersSpawner{
 					if(thisRemote.IsMainRemoteControl == true){
 						
 						primaryRemote = thisRemote;
-						break;
 						
 					}
-					
+
 				}
 				
 			}
-			
-			if(primaryRemote != null){
-				
-				primaryRemote.SubtypeName = spawnGroup.NewRemoteControlId.SubtypeName;
-				return true;
+
+            if(primaryRemote != null && rivalAiRemote == null && spawnGroup.RivalAiReplaceRemoteControl == true) {
+
+                if(cubeGrid.GridSizeEnum == MyCubeSize.Large) {
+
+                    primaryRemote.SubtypeName = "RivalAIRemoteControlLarge";
+
+                } else {
+
+                    primaryRemote.SubtypeName = "RivalAIRemoteControlSmall";
+
+                }
+
+                rivalAiRemote = primaryRemote;
 				
 			}
+
+            if(rivalAiRemote != null && string.IsNullOrWhiteSpace(behaviorName) == false) {
+
+                string fullBehavior = "";
+
+                if(RivalAIHelper.RivalAiBehaviorProfiles.TryGetValue(behaviorName, out fullBehavior) == false) {
+
+                    Logger.AddMsg("RivalAI Profile Does Not Exist For: " + behaviorName, true);
+                    return false;
+
+                }
+
+                Logger.AddMsg("Attempt Attach RivalAI CustomData", true);
+                if(rivalAiRemote.ComponentContainer == null) {
+
+                    Logger.AddMsg(" - Container Created", true);
+                    rivalAiRemote.ComponentContainer = new MyObjectBuilder_ComponentContainer();
+
+                }
+
+                if(rivalAiRemote.ComponentContainer.Components == null) {
+
+                    Logger.AddMsg(" - Components List Created", true);
+                    rivalAiRemote.ComponentContainer.Components = new List<VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData>();
+
+                }
+
+                bool foundModStorage = false;
+
+                Logger.AddMsg(" - Check Existing Components", true);
+                foreach(var component in rivalAiRemote.ComponentContainer.Components) {
+
+                    if(component.TypeId != "MyModStorageComponentBase") {
+
+                        Logger.AddMsg("   - Non ModStorage", true);
+                        continue;
+
+                    }
+
+                    var storage = component.Component as MyObjectBuilder_ModStorageComponent;
+
+                    if(storage == null) {
+
+                        Logger.AddMsg("   - Created Storage Null", true);
+                        continue;
+
+                    }
+
+                    foundModStorage = true;
+
+                    Logger.AddMsg("   - Checking If Storage Already Contains CustomData", true);
+                    if(storage.Storage.Dictionary.ContainsKey(new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1")) == true) {
+
+                        Logger.AddMsg("   - CustomData Exists, Updating", true);
+                        storage.Storage.Dictionary[new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1")] = fullBehavior;
+
+                    } else {
+
+                        Logger.AddMsg("   - CustomData Non-Exist, Creating", true);
+                        storage.Storage.Dictionary.Add(new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1"), fullBehavior);
+
+                    }
+
+                }
+
+                if(foundModStorage == false) {
+
+                    Logger.AddMsg(" - Storage Not Found, Creating Structure and Adding CustomData", true);
+                    var modStorage = new MyObjectBuilder_ModStorageComponent();
+                    var dictA = new Dictionary<Guid, string>();
+                    dictA.Add(new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1"), fullBehavior);
+                    var dictB = new SerializableDictionary<Guid, string>(dictA);
+                    modStorage.Storage = dictB;
+                    var componentData = new VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData();
+                    componentData.TypeId = "MyModStorageComponentBase";
+                    componentData.Component = modStorage;
+                    rivalAiRemote.ComponentContainer.Components.Add(componentData);
+
+                }
+
+                return true;
+
+            }
 			
 			return false;
 			
@@ -2610,7 +2725,7 @@ namespace ModularEncountersSpawner{
 			//Check Settings After
 			if(BlacklistedWeaponSubtypes.Count > 0 && spawnGroup.IgnoreWeaponRandomizerGlobalBlacklist == false){
 				
-				if(BlacklistedWeaponSubtypes.Contains(weaponDefinition.Id.SubtypeName) == true || spawnGroup.WeaponRandomizerBlacklist.Contains(weaponDefinition.Id.ToString()) == true){
+				if(BlacklistedWeaponSubtypes.Contains(weaponDefinition.Id.SubtypeName) == true || BlacklistedWeaponSubtypes.Contains(weaponDefinition.Id.ToString()) == true){
 				
 					return false;
 				
@@ -2636,7 +2751,7 @@ namespace ModularEncountersSpawner{
 				
 				bool passWhitelist = false;
 				
-				if(WhitelistedWeaponSubtypes.Contains(weaponDefinition.Id.SubtypeName) == true || spawnGroup.WeaponRandomizerWhitelist.Contains(weaponDefinition.Id.ToString()) == true){
+				if(WhitelistedWeaponSubtypes.Contains(weaponDefinition.Id.SubtypeName) == true || WhitelistedWeaponSubtypes.Contains(weaponDefinition.Id.ToString()) == true){
 				
 					passWhitelist = true;
 				
@@ -2730,7 +2845,7 @@ namespace ModularEncountersSpawner{
 			//Check Settings After
 			if(BlacklistedWeaponTargetSubtypes.Count > 0 && spawnGroup.IgnoreWeaponRandomizerTargetGlobalBlacklist == false){
 				
-				if(BlacklistedWeaponTargetSubtypes.Contains(weaponDefinition.Id.SubtypeName) == true || spawnGroup.WeaponRandomizerTargetBlacklist.Contains(weaponDefinition.Id.ToString()) == true){
+				if(BlacklistedWeaponTargetSubtypes.Contains(weaponDefinition.Id.SubtypeName) == true || BlacklistedWeaponTargetSubtypes.Contains(weaponDefinition.Id.ToString()) == true){
 				
 					return false;
 				
@@ -2756,7 +2871,7 @@ namespace ModularEncountersSpawner{
 				
 				bool passWhitelist = false;
 				
-				if(WhitelistedWeaponTargetSubtypes.Contains(weaponDefinition.Id.SubtypeName) == true || spawnGroup.WeaponRandomizerTargetWhitelist.Contains(weaponDefinition.Id.ToString()) == true){
+				if(WhitelistedWeaponTargetSubtypes.Contains(weaponDefinition.Id.SubtypeName) == true || WhitelistedWeaponTargetSubtypes.Contains(weaponDefinition.Id.ToString()) == true){
 				
 					passWhitelist = true;
 				

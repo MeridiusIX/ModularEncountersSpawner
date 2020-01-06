@@ -42,47 +42,52 @@ namespace ModularEncountersSpawner.Templates{
 		public bool PlanetaryInstallation;
 		public string PlanetaryInstallationType;
 		public bool SkipTerrainCheck;
-        public List<Vector3D> RotateInstallations;
-        public List<bool> ReverseForwardDirections;
+		public List<Vector3D> RotateInstallations;
+		public List<bool> ReverseForwardDirections;
 
-		
 		public bool CutVoxelsAtAirtightCells;
 		
 		public bool BossEncounterSpace;
 		public bool BossEncounterAtmo;
 		public bool BossEncounterAny;
-		
+
+		public bool RivalAiSpaceSpawn;
+		public bool RivalAiAtmosphericSpawn;
+		public bool RivalAiAnySpawn;
+
 		public int Frequency;
 		public bool UniqueEncounter;
 		public string FactionOwner;
-        public bool UseRandomMinerFaction;
-        public bool UseRandomBuilderFaction;
-        public bool UseRandomTraderFaction;
-        public bool IgnoreCleanupRules;
+		public bool UseRandomMinerFaction;
+		public bool UseRandomBuilderFaction;
+		public bool UseRandomTraderFaction;
+		public bool IgnoreCleanupRules;
 		public bool ReplenishSystems;
-        public bool UseNonPhysicalAmmo;
-        public bool RemoveContainerContents;
-        public bool InitializeStoreBlocks;
-        public List<string> ContainerTypesForStoreOrders;
+		public bool UseNonPhysicalAmmo;
+		public bool RemoveContainerContents;
+		public bool InitializeStoreBlocks;
+		public List<string> ContainerTypesForStoreOrders;
 		public bool ForceStaticGrid;
 		public bool AdminSpawnOnly;
 		public List<string> SandboxVariables;
+		public List<string> FalseSandboxVariables;
 		public int RandomNumberRoll;
+		public bool UseCommonConditions;
 
-        public bool UseAutoPilotInSpace; 
-        public double PauseAutopilotAtPlayerDistance; 
+		public bool UseAutoPilotInSpace; 
+		public double PauseAutopilotAtPlayerDistance; 
 
-        public bool PreventOwnershipChange; //Implement / Doc
+		public bool PreventOwnershipChange; //Implement / Doc
 		
 		public bool RandomizeWeapons;
 		public bool IgnoreWeaponRandomizerMod;
 		public bool IgnoreWeaponRandomizerTargetGlobalBlacklist; 
-        public bool IgnoreWeaponRandomizerTargetGlobalWhitelist; 
-        public bool IgnoreWeaponRandomizerGlobalBlacklist;
+		public bool IgnoreWeaponRandomizerTargetGlobalWhitelist; 
+		public bool IgnoreWeaponRandomizerGlobalBlacklist;
 		public bool IgnoreWeaponRandomizerGlobalWhitelist;
 		public List<string> WeaponRandomizerTargetBlacklist; 
-        public List<string> WeaponRandomizerTargetWhitelist; 
-        public List<string> WeaponRandomizerBlacklist;
+		public List<string> WeaponRandomizerTargetWhitelist; 
+		public List<string> WeaponRandomizerBlacklist;
 		public List<string> WeaponRandomizerWhitelist; 
 		
 		public bool UseBlockReplacer;
@@ -94,40 +99,40 @@ namespace ModularEncountersSpawner.Templates{
 		public bool RelaxReplacedBlocksSize;
 		public bool AlwaysRemoveBlock;
 
-        public bool IgnoreGlobalBlockReplacer;
+		public bool IgnoreGlobalBlockReplacer;
 
-        public bool ConvertToHeavyArmor;
+		public bool ConvertToHeavyArmor;
 
-        public bool UseRandomNameGenerator; 
-        public string RandomGridNamePrefix; 
-        public string RandomGridNamePattern; 
-        public string ReplaceAntennaNameWithRandomizedName;
+		public bool UseRandomNameGenerator; 
+		public string RandomGridNamePrefix; 
+		public string RandomGridNamePattern; 
+		public string ReplaceAntennaNameWithRandomizedName;
 
-        public bool UseBlockNameReplacer; 
-        public Dictionary<string, string> BlockNameReplacerReference; 
+		public bool UseBlockNameReplacer; 
+		public Dictionary<string, string> BlockNameReplacerReference; 
 
-        public List<string> AssignContainerTypesToAllCargo; 
+		public List<string> AssignContainerTypesToAllCargo; 
 
-        public bool UseContainerTypeAssignment; //Test / Doc
-        public Dictionary<string, string> ContainerTypeAssignmentReference; //Test / Doc
+		public bool UseContainerTypeAssignment; //Test / Doc
+		public Dictionary<string, string> ContainerTypeAssignmentReference; //Test / Doc
 
-        public bool OverrideBlockDamageModifier;
+		public bool OverrideBlockDamageModifier;
 		public double BlockDamageModifier;
 
-        public bool GridsAreEditable; 
-        public bool GridsAreDestructable; 
+		public bool GridsAreEditable; 
+		public bool GridsAreDestructable; 
 
-        public bool ShiftBlockColorsHue;
+		public bool ShiftBlockColorsHue;
 		public bool RandomHueShift;
 		public double ShiftBlockColorAmount;
 
-        public List<string> AssignGridSkin;
+		public List<string> AssignGridSkin;
 
-        public bool RecolorGrid;
-        public Dictionary<Vector3, Vector3> ColorReferencePairs;
-        public Dictionary<Vector3, string> ColorSkinReferencePairs;
+		public bool RecolorGrid;
+		public Dictionary<Vector3, Vector3> ColorReferencePairs;
+		public Dictionary<Vector3, string> ColorSkinReferencePairs;
 
-        public bool ReduceBlockBuildStates;
+		public bool ReduceBlockBuildStates;
 		public bool AffectNonFunctionalBlock;
 		public bool AffectFunctionalBlock;
 		public int MinimumBlocksPercent;
@@ -135,11 +140,10 @@ namespace ModularEncountersSpawner.Templates{
 		public int MinimumBuildPercent;
 		public int MaximumBuildPercent;
 
-        public List<string> ReduceBlockStateByType;
+		public List<string> ReduceBlockStateByType;
 
-        public bool ReplaceRemoteControl;
-		public bool TargetCockpitIfNoRemoteControl;
-		public MyDefinitionId NewRemoteControlId;
+		public bool UseRivalAi;
+		public bool RivalAiReplaceRemoteControl;
 		
 		public bool EraseIngameScripts;
 		public bool DisableTimerBlocks;
@@ -178,12 +182,12 @@ namespace ModularEncountersSpawner.Templates{
 		public double PlanetMinimumSize;
 		public double PlanetMaximumSize;
 
-        public bool UsePlayerCountCheck;
-        public double PlayerCountCheckRadius;
-        public int MinimumPlayers;
-        public int MaximumPlayers;
+		public bool UsePlayerCountCheck;
+		public double PlayerCountCheckRadius;
+		public int MinimumPlayers;
+		public int MaximumPlayers;
 
-        public bool UseThreatLevelCheck;
+		public bool UseThreatLevelCheck;
 		public double ThreatLevelCheckRange;
 		public bool ThreatIncludeOtherNpcOwners;
 		public int ThreatScoreMinimum;
@@ -195,19 +199,19 @@ namespace ModularEncountersSpawner.Templates{
 		public int PCUMaximum;
 		
 		public bool UsePlayerCredits;
-        public bool IncludeAllPlayersInRadius;
-        public bool IncludeFactionBalance;
-        public double PlayerCreditsCheckRadius;
-        public int MinimumPlayerCredits;
-        public int MaximumPlayerCredits;
+		public bool IncludeAllPlayersInRadius;
+		public bool IncludeFactionBalance;
+		public double PlayerCreditsCheckRadius;
+		public int MinimumPlayerCredits;
+		public int MaximumPlayerCredits;
 
-        public bool UsePlayerFactionReputation;
-        public double PlayerReputationCheckRadius;
-        public string CheckReputationAgainstOtherNPCFaction;
-        public int MinimumReputation;
-        public int MaximumReputation;
+		public bool UsePlayerFactionReputation;
+		public double PlayerReputationCheckRadius;
+		public string CheckReputationAgainstOtherNPCFaction;
+		public int MinimumReputation;
+		public int MaximumReputation;
 
-        public List<ulong> RequireAllMods;
+		public List<ulong> RequireAllMods;
 		public List<ulong> RequireAnyMods;
 		public List<ulong> ExcludeAllMods;
 		public List<ulong> ExcludeAnyMods;
@@ -218,9 +222,14 @@ namespace ModularEncountersSpawner.Templates{
 		
 		public bool AttachModStorageComponentToGrid; 
 		public Guid StorageKey; 
-        public string StorageValue; 
+		public string StorageValue;
 
-        public string Territory;
+		public bool UseKnownPlayerLocations;
+		public bool KnownPlayerLocationMustMatchFaction;
+		public int KnownPlayerLocationMinSpawnedEncounters;
+		public int KnownPlayerLocationMaxSpawnedEncounters;
+
+		public string Territory;
 		public double MinDistanceFromTerritoryCenter;
 		public double MaxDistanceFromTerritoryCenter;
 		
@@ -235,7 +244,7 @@ namespace ModularEncountersSpawner.Templates{
 		public bool DisableDampeners;
 		public bool ReactorsOn;
 		public bool UseBoundingBoxCheck;
-        public bool RemoveVoxelsIfGridRemoved;
+		public bool RemoveVoxelsIfGridRemoved;
 		
 		public ImprovedSpawnGroup(){
 			
@@ -252,38 +261,44 @@ namespace ModularEncountersSpawner.Templates{
 			PlanetaryInstallation = false;
 			PlanetaryInstallationType = "Small";
 			SkipTerrainCheck = false;
-            RotateInstallations = new List<Vector3D>();
-            ReverseForwardDirections = new List<bool>();
+			RotateInstallations = new List<Vector3D>();
+			ReverseForwardDirections = new List<bool>();
 
-            CutVoxelsAtAirtightCells = false;
+			CutVoxelsAtAirtightCells = false;
 			
 			BossEncounterSpace = false;
 			BossEncounterAtmo = false;
 			BossEncounterAny = false;
-			
-			Frequency = 0;
+
+			RivalAiSpaceSpawn = false;
+			RivalAiAtmosphericSpawn = false;
+			RivalAiAnySpawn = false;
+
+			Frequency = 0; 
 			UniqueEncounter = false;
 			FactionOwner = "SPRT";
-            UseRandomMinerFaction = false;
-            UseRandomBuilderFaction = false;
-            UseRandomTraderFaction = false;
-            IgnoreCleanupRules = false;
+			UseRandomMinerFaction = false;
+			UseRandomBuilderFaction = false;
+			UseRandomTraderFaction = false;
+			IgnoreCleanupRules = false;
 			ReplenishSystems = false;
-            UseNonPhysicalAmmo = false;
-            RemoveContainerContents = false;
-            InitializeStoreBlocks = false;
-            ContainerTypesForStoreOrders = new List<string>();
-            ForceStaticGrid = false;
+			UseNonPhysicalAmmo = false;
+			RemoveContainerContents = false;
+			InitializeStoreBlocks = false;
+			ContainerTypesForStoreOrders = new List<string>();
+			ForceStaticGrid = false;
 			AdminSpawnOnly = false;
 			SandboxVariables = new List<string>();
+			FalseSandboxVariables = new List<string>();
 			RandomNumberRoll = 1;
+			UseCommonConditions = true;
 
-            UseAutoPilotInSpace = false;
-            PauseAutopilotAtPlayerDistance = -1;
+			UseAutoPilotInSpace = false;
+			PauseAutopilotAtPlayerDistance = -1;
 
-            PreventOwnershipChange = false;
+			PreventOwnershipChange = false;
 
-            RandomizeWeapons = false;
+			RandomizeWeapons = false;
 			IgnoreWeaponRandomizerMod = false;
 			IgnoreWeaponRandomizerTargetGlobalBlacklist = false;
 			IgnoreWeaponRandomizerTargetGlobalWhitelist = false;
@@ -303,38 +318,38 @@ namespace ModularEncountersSpawner.Templates{
 			RelaxReplacedBlocksSize = false;
 			AlwaysRemoveBlock = false;
 
-            IgnoreGlobalBlockReplacer = false;
+			IgnoreGlobalBlockReplacer = false;
 
 			ConvertToHeavyArmor = false;
 
-            UseRandomNameGenerator = false;
-            RandomGridNamePrefix = "";
-            RandomGridNamePattern = "";
-            ReplaceAntennaNameWithRandomizedName = "";
+			UseRandomNameGenerator = false;
+			RandomGridNamePrefix = "";
+			RandomGridNamePattern = "";
+			ReplaceAntennaNameWithRandomizedName = "";
 
-            UseBlockNameReplacer = false;
-            BlockNameReplacerReference = new Dictionary<string, string>();
+			UseBlockNameReplacer = false;
+			BlockNameReplacerReference = new Dictionary<string, string>();
 
-            AssignContainerTypesToAllCargo = new List<string>();
+			AssignContainerTypesToAllCargo = new List<string>();
 
-            UseContainerTypeAssignment = false;
-            ContainerTypeAssignmentReference = new Dictionary<string, string>();
+			UseContainerTypeAssignment = false;
+			ContainerTypeAssignmentReference = new Dictionary<string, string>();
 
-            OverrideBlockDamageModifier = false;
+			OverrideBlockDamageModifier = false;
 			BlockDamageModifier = 1;
 
-            GridsAreEditable = true;
-            GridsAreDestructable = true;
+			GridsAreEditable = true;
+			GridsAreDestructable = true;
 
 			ShiftBlockColorsHue = false;
 			RandomHueShift = false;
 			ShiftBlockColorAmount = 0;
 
-            AssignGridSkin = new List<string>();
+			AssignGridSkin = new List<string>();
 
-            RecolorGrid = false;
-            ColorReferencePairs = new Dictionary<Vector3, Vector3>();
-            ColorSkinReferencePairs = new Dictionary<Vector3, string>();
+			RecolorGrid = false;
+			ColorReferencePairs = new Dictionary<Vector3, Vector3>();
+			ColorSkinReferencePairs = new Dictionary<Vector3, string>();
 			
 			ReduceBlockBuildStates = false;
 			AffectNonFunctionalBlock = true;
@@ -344,10 +359,9 @@ namespace ModularEncountersSpawner.Templates{
 			MinimumBuildPercent = 10;
 			MaximumBuildPercent = 75;
 			
-			ReplaceRemoteControl = false;
-			TargetCockpitIfNoRemoteControl = false;
-			NewRemoteControlId = new MyDefinitionId();
-			
+			UseRivalAi = false;
+			RivalAiReplaceRemoteControl = false;
+
 			EraseIngameScripts = false;
 			DisableTimerBlocks = false;
 			DisableSensorBlocks = false;
@@ -385,12 +399,12 @@ namespace ModularEncountersSpawner.Templates{
 			PlanetMinimumSize = -1;
 			PlanetMaximumSize = -1;
 
-            UsePlayerCountCheck = false;
-            PlayerCountCheckRadius = -1;
-            MinimumPlayers = -1;
-            MaximumPlayers = -1;
+			UsePlayerCountCheck = false;
+			PlayerCountCheckRadius = -1;
+			MinimumPlayers = -1;
+			MaximumPlayers = -1;
 
-            UseThreatLevelCheck = false;
+			UseThreatLevelCheck = false;
 			ThreatLevelCheckRange = 5000;
 			ThreatIncludeOtherNpcOwners = false;
 			ThreatScoreMinimum = -1;
@@ -402,10 +416,10 @@ namespace ModularEncountersSpawner.Templates{
 			PCUMaximum = -1;
 			
 			UsePlayerCredits = false;
-            IncludeAllPlayersInRadius = false;
-            IncludeFactionBalance = false;
-            PlayerCreditsCheckRadius = 15000;
-            MinimumPlayerCredits = -1;
+			IncludeAllPlayersInRadius = false;
+			IncludeFactionBalance = false;
+			PlayerCreditsCheckRadius = 15000;
+			MinimumPlayerCredits = -1;
 			MaximumPlayerCredits = -1;
 			
 			UsePlayerFactionReputation = false;
@@ -426,7 +440,12 @@ namespace ModularEncountersSpawner.Templates{
 			AttachModStorageComponentToGrid = false;
 			StorageKey = new Guid("00000000-0000-0000-0000-000000000000");
 			StorageValue = "";
-			
+
+			UseKnownPlayerLocations = false;
+			KnownPlayerLocationMustMatchFaction = false;
+			KnownPlayerLocationMinSpawnedEncounters = -1;
+			KnownPlayerLocationMaxSpawnedEncounters = -1;
+
 			Territory = "";
 			MinDistanceFromTerritoryCenter = -1;
 			MaxDistanceFromTerritoryCenter = -1;
@@ -442,9 +461,9 @@ namespace ModularEncountersSpawner.Templates{
 			DisableDampeners = false;
 			ReactorsOn = true;
 			UseBoundingBoxCheck = false;
-            RemoveVoxelsIfGridRemoved = true;
+			RemoveVoxelsIfGridRemoved = true;
 
-        }
+		}
 	
 	}
 

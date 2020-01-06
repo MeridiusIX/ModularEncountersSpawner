@@ -166,7 +166,7 @@ namespace ModularEncountersSpawner.Configuration{
 			MinAirDensity = 0.70f;
 			MinSpawningAltitude = 1500;
 			MaxSpawningAltitude = 2000;
-			MinPathAltitude = 500;
+			MinPathAltitude = 300;
 			MinPathDistance = 10000;
 			MaxPathDistance = 15000;
 			PathStepCheckDistance = 100;

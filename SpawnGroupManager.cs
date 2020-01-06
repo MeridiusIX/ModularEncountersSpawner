@@ -107,14 +107,27 @@ namespace ModularEncountersSpawner{
 			//Get Regular SpawnGroups
 			var regularSpawnGroups = MyDefinitionManager.Static.GetSpawnGroupDefinitions();
 
-			//Get Actual SpawnGroups
-			foreach(var spawnGroup in regularSpawnGroups){
+            var blacklist = new List<string>();
+            blacklist.Add("1933101542.sbm"); //SUPERNPCS (uses unauthorized content from several mods).
+
+            //Get Actual SpawnGroups
+            foreach(var spawnGroup in regularSpawnGroups){
 				
 				if(spawnGroup.Enabled == false){
 					
 					continue;
 					
 				}
+
+                if(spawnGroup.Context?.ModId != null) {
+
+                    if(blacklist.Contains(spawnGroup.Context.ModId) == true) {
+
+                        continue;
+
+                    }
+
+                }
 				
 				if(TerritoryManager.IsSpawnGroupATerritory(spawnGroup) == true){
 					
@@ -371,9 +384,30 @@ namespace ModularEncountersSpawner{
 					improveSpawnGroup.BossEncounterAny = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
 				}
-				
-				//Frequency
-				improveSpawnGroup.Frequency = (int)Math.Round((double)spawnGroup.Frequency * 10);
+
+                //RivalAiSpaceSpawn
+                if(tag.Contains("[RivalAiSpaceSpawn") == true) {
+
+                    improveSpawnGroup.RivalAiSpaceSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+                }
+
+                //RivalAiAtmosphericSpawn
+                if(tag.Contains("[RivalAiAtmosphericSpawn") == true) {
+
+                    improveSpawnGroup.RivalAiAtmosphericSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+                }
+
+                //RivalAiAnySpawn
+                if(tag.Contains("[RivalAiAnySpawn") == true) {
+
+                    improveSpawnGroup.RivalAiAnySpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+                }
+
+                //Frequency
+                improveSpawnGroup.Frequency = (int)Math.Round((double)spawnGroup.Frequency * 10);
 				
 				//UniqueEncounter
 				if(tag.Contains("[UniqueEncounter") == true){
@@ -392,7 +426,7 @@ namespace ModularEncountersSpawner{
 						improveSpawnGroup.FactionOwner = "SPRT";
 						
 					}
-					
+
 				}
 
                 //UseRandomMinerFaction
@@ -479,13 +513,27 @@ namespace ModularEncountersSpawner{
 					improveSpawnGroup.SandboxVariables = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
 				}
-				
-				//RandomNumberRoll
-				if(tag.Contains("[RandomNumberRoll") == true){
+
+                //FalseSandboxVariables
+                if(tag.Contains("[FalseSandboxVariables") == true) {
+
+                    improveSpawnGroup.FalseSandboxVariables = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+                }
+
+                //RandomNumberRoll
+                if(tag.Contains("[RandomNumberRoll") == true){
 
 					improveSpawnGroup.RandomNumberRoll = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.RandomNumberRoll, out badParse);
 						
 				}
+
+                //UseCommonConditions
+                if(tag.Contains("[UseCommonConditions") == true) {
+
+                    improveSpawnGroup.UseCommonConditions = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+                }
 
                 //UseAutoPilotInSpace
                 if(tag.Contains("[UseAutoPilotInSpace") == true) {
@@ -809,24 +857,17 @@ namespace ModularEncountersSpawner{
 						
 				}
 				
-				//ReplaceRemoteControl
-				if(tag.Contains("[ReplaceRemoteControl") == true){
+				//UseRivalAi
+				if(tag.Contains("[UseRivalAi") == true){
 
-					improveSpawnGroup.ReplaceRemoteControl = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseRivalAi = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
 				}
-				
-				//TargetCockpitIfNoRemoteControl
-				if(tag.Contains("[TargetCockpitIfNoRemoteControl") == true){
 
-					improveSpawnGroup.TargetCockpitIfNoRemoteControl = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-						
-				}
-				
-				//NewRemoteControlId
-				if(tag.Contains("[NewRemoteControlId") == true){
+                //RivalAiReplaceRemoteControl
+                if(tag.Contains("[RivalAiReplaceRemoteControl") == true){
 
-					improveSpawnGroup.NewRemoteControlId = TagMyDefIdCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RivalAiReplaceRemoteControl = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
 				}
 				
@@ -1290,9 +1331,37 @@ namespace ModularEncountersSpawner{
 					improveSpawnGroup.StorageValue = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 				
 				}
-				
-				//Territory
-				if(tag.Contains("[Territory") == true){
+
+                //UseKnownPlayerLocations
+                if(tag.Contains("[UseKnownPlayerLocations") == true) {
+
+                    improveSpawnGroup.UseKnownPlayerLocations = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+                }
+
+                //KnownPlayerLocationMustMatchFaction
+                if(tag.Contains("[KnownPlayerLocationMustMatchFaction") == true) {
+
+                    improveSpawnGroup.KnownPlayerLocationMustMatchFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+                }
+
+                //KnownPlayerLocationMinSpawnedEncounters
+                if(tag.Contains("[KnownPlayerLocationMinSpawnedEncounters") == true) {
+
+                    improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters, out badParse);
+
+                }
+
+                //KnownPlayerLocationMaxSpawnedEncounters
+                if(tag.Contains("[KnownPlayerLocationMaxSpawnedEncounters") == true) {
+
+                    improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters, out badParse);
+
+                }
+
+                //Territory
+                if(tag.Contains("[Territory") == true){
 
 					improveSpawnGroup.Territory = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
