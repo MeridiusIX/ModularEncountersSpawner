@@ -44,7 +44,7 @@ namespace ModularEncountersSpawner{
 		public static Dictionary<string, MyCubeBlockDefinition> BlockDirectory = new Dictionary<string, MyCubeBlockDefinition>();
 		public static Dictionary<string, WeaponProfile> WeaponProfiles = new Dictionary<string, WeaponProfile>();
 		public static Dictionary<string, float> PowerProviderBlocks = new Dictionary<string, float>();
-        public static Dictionary<string, float> BatteryMaxCapacity = new Dictionary<string, float>();
+		public static Dictionary<string, float> BatteryMaxCapacity = new Dictionary<string, float>();
 		public static List<string> ForwardGunIDs = new List<string>();
 		public static List<string> TurretIDs = new List<string>();
 		
@@ -54,7 +54,7 @@ namespace ModularEncountersSpawner{
 		public static List<string> WhitelistedWeaponTargetSubtypes = new List<string>();
 		public static Dictionary<string, float> PowerDrainingWeapons = new Dictionary<string, float>();
 
-        public static Dictionary<MyDefinitionId, MyDefinitionId> GlobalBlockReplacements = new Dictionary<MyDefinitionId, MyDefinitionId>();
+		public static Dictionary<MyDefinitionId, MyDefinitionId> GlobalBlockReplacements = new Dictionary<MyDefinitionId, MyDefinitionId>();
 
 		public static Dictionary<MyDefinitionId, MyDefinitionId> HeavyArmorConvertReference = new Dictionary<MyDefinitionId, MyDefinitionId>();
 		public static List<MyDefinitionId> PartialBuiltAllowedBlocks = new List<MyDefinitionId>();
@@ -74,8 +74,8 @@ namespace ModularEncountersSpawner{
 			
 			try{
 
-                //Setup Power Hogging Weapons Reference
-                PowerDrainingWeapons.Add("NovaTorpedoLauncher_Large", 20); //Nova Heavy Plasma Torpedo
+				//Setup Power Hogging Weapons Reference
+				PowerDrainingWeapons.Add("NovaTorpedoLauncher_Large", 20); //Nova Heavy Plasma Torpedo
 				PowerDrainingWeapons.Add("LargeDualBeamGTFBase_Large", 1050); //GTF Large Dual Beam Laser Turret
 				PowerDrainingWeapons.Add("LargeStaticLBeamGTF_Small", 787.50f); //GTF Large Heavy Beam Laser
 				PowerDrainingWeapons.Add("LargeStaticLBeamGTF_Large", 787.50f); //GTF Large Heavy Beam Laser
@@ -224,57 +224,57 @@ namespace ModularEncountersSpawner{
 				
 				}
 
-                if(BlockReplacementProfiles.ContainsKey("MES-ProprietaryValuableBlocks") == false) {
+				if(BlockReplacementProfiles.ContainsKey("MES-ProprietaryValuableBlocks") == false) {
 
-                    var blockReplacePropBlocks = new BlockReplacementProfileMES();
-                    blockReplacePropBlocks.ReplacementReferenceName = "MES-ProprietaryValuableBlocks";
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "SmallBlockSmallGenerator"), new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "ProprietarySmallBlockSmallGenerator"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "SmallBlockLargeGenerator"), new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "ProprietarySmallBlockLargeGenerator"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "LargeBlockSmallGenerator"), new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "ProprietaryLargeBlockSmallGenerator"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "LargeBlockLargeGenerator"), new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "ProprietaryLargeBlockLargeGenerator"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_GravityGenerator), ""), new SerializableDefinitionId(typeof(MyObjectBuilder_GravityGenerator), "ProprietaryGravGen"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_GravityGeneratorSphere), ""), new SerializableDefinitionId(typeof(MyObjectBuilder_GravityGeneratorSphere), "ProprietaryGravGenSphere"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_VirtualMass), "VirtualMassLarge"), new SerializableDefinitionId(typeof(MyObjectBuilder_VirtualMass), "ProprietaryVirtualMassLarge"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_VirtualMass), "VirtualMassSmall"), new SerializableDefinitionId(typeof(MyObjectBuilder_VirtualMass), "ProprietaryVirtualMassSmall"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_SpaceBall), "SpaceBallLarge"), new SerializableDefinitionId(typeof(MyObjectBuilder_SpaceBall), "ProprietarySpaceBallLarge"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_SpaceBall), "SpaceBallSmall"), new SerializableDefinitionId(typeof(MyObjectBuilder_SpaceBall), "ProprietarySpaceBallSmall"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockSmallThrust"), new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "ProprietarySmallBlockSmallThrust"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockLargeThrust"), new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "ProprietarySmallBlockLargeThrust"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockSmallThrust"), new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "ProprietaryLargeBlockSmallThrust"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockLargeThrust"), new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "ProprietaryLargeBlockLargeThrust"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_JumpDrive), "LargeJumpDrive"), new SerializableDefinitionId(typeof(MyObjectBuilder_JumpDrive), "ProprietaryLargeJumpDrive"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_LaserAntenna), "SmallBlockLaserAntenna"), new SerializableDefinitionId(typeof(MyObjectBuilder_LaserAntenna), "ProprietarySmallBlockLaserAntenna"));
-                    blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_LaserAntenna), "LargeBlockLaserAntenna"), new SerializableDefinitionId(typeof(MyObjectBuilder_LaserAntenna), "ProprietaryLargeBlockLaserAntenna"));
-                    //blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(), ""), new SerializableDefinitionId(typeof(), ""));
-                    BlockReplacementProfiles.Add(blockReplacePropBlocks.ReplacementReferenceName, blockReplacePropBlocks);
+					var blockReplacePropBlocks = new BlockReplacementProfileMES();
+					blockReplacePropBlocks.ReplacementReferenceName = "MES-ProprietaryValuableBlocks";
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "SmallBlockSmallGenerator"), new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "ProprietarySmallBlockSmallGenerator"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "SmallBlockLargeGenerator"), new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "ProprietarySmallBlockLargeGenerator"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "LargeBlockSmallGenerator"), new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "ProprietaryLargeBlockSmallGenerator"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "LargeBlockLargeGenerator"), new SerializableDefinitionId(typeof(MyObjectBuilder_Reactor), "ProprietaryLargeBlockLargeGenerator"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_GravityGenerator), ""), new SerializableDefinitionId(typeof(MyObjectBuilder_GravityGenerator), "ProprietaryGravGen"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_GravityGeneratorSphere), ""), new SerializableDefinitionId(typeof(MyObjectBuilder_GravityGeneratorSphere), "ProprietaryGravGenSphere"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_VirtualMass), "VirtualMassLarge"), new SerializableDefinitionId(typeof(MyObjectBuilder_VirtualMass), "ProprietaryVirtualMassLarge"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_VirtualMass), "VirtualMassSmall"), new SerializableDefinitionId(typeof(MyObjectBuilder_VirtualMass), "ProprietaryVirtualMassSmall"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_SpaceBall), "SpaceBallLarge"), new SerializableDefinitionId(typeof(MyObjectBuilder_SpaceBall), "ProprietarySpaceBallLarge"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_SpaceBall), "SpaceBallSmall"), new SerializableDefinitionId(typeof(MyObjectBuilder_SpaceBall), "ProprietarySpaceBallSmall"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockSmallThrust"), new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "ProprietarySmallBlockSmallThrust"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockLargeThrust"), new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "ProprietarySmallBlockLargeThrust"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockSmallThrust"), new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "ProprietaryLargeBlockSmallThrust"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockLargeThrust"), new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "ProprietaryLargeBlockLargeThrust"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_JumpDrive), "LargeJumpDrive"), new SerializableDefinitionId(typeof(MyObjectBuilder_JumpDrive), "ProprietaryLargeJumpDrive"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_LaserAntenna), "SmallBlockLaserAntenna"), new SerializableDefinitionId(typeof(MyObjectBuilder_LaserAntenna), "ProprietarySmallBlockLaserAntenna"));
+					blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_LaserAntenna), "LargeBlockLaserAntenna"), new SerializableDefinitionId(typeof(MyObjectBuilder_LaserAntenna), "ProprietaryLargeBlockLaserAntenna"));
+					//blockReplacePropBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(), ""), new SerializableDefinitionId(typeof(), ""));
+					BlockReplacementProfiles.Add(blockReplacePropBlocks.ReplacementReferenceName, blockReplacePropBlocks);
 
-                }
+				}
 
-                if(BlockReplacementProfiles.ContainsKey("MES-ProprietaryCompRichBlocks") == false) {
+				if(BlockReplacementProfiles.ContainsKey("MES-ProprietaryCompRichBlocks") == false) {
 
-                    var blockReplaceCompRichBlocks = new BlockReplacementProfileMES();
-                    blockReplaceCompRichBlocks.ReplacementReferenceName = "MES-ProprietaryCompRichBlocks";
-                    blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Conveyor), "LargeBlockConveyor"), new SerializableDefinitionId(typeof(MyObjectBuilder_Conveyor), "ProprietaryLargeBlockConveyor"));
-                    blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorConnector), "ConveyorTube"), new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorConnector), "ProprietaryConveyorTube"));
-                    blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorConnector), "ConveyorTubeCurved"), new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorConnector), "ProprietaryConveyorTubeCurved"));
-                    blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorSorter), "LargeBlockConveyorSorter"), new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorSorter), "ProprietaryLargeBlockConveyorSorter"));
-                    blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Gyro), "LargeBlockGyro"), new SerializableDefinitionId(typeof(MyObjectBuilder_Gyro), "ProprietaryLargeBlockGyro"));
-                    BlockReplacementProfiles.Add(blockReplaceCompRichBlocks.ReplacementReferenceName, blockReplaceCompRichBlocks);
+					var blockReplaceCompRichBlocks = new BlockReplacementProfileMES();
+					blockReplaceCompRichBlocks.ReplacementReferenceName = "MES-ProprietaryCompRichBlocks";
+					blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Conveyor), "LargeBlockConveyor"), new SerializableDefinitionId(typeof(MyObjectBuilder_Conveyor), "ProprietaryLargeBlockConveyor"));
+					blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorConnector), "ConveyorTube"), new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorConnector), "ProprietaryConveyorTube"));
+					blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorConnector), "ConveyorTubeCurved"), new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorConnector), "ProprietaryConveyorTubeCurved"));
+					blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorSorter), "LargeBlockConveyorSorter"), new SerializableDefinitionId(typeof(MyObjectBuilder_ConveyorSorter), "ProprietaryLargeBlockConveyorSorter"));
+					blockReplaceCompRichBlocks.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Gyro), "LargeBlockGyro"), new SerializableDefinitionId(typeof(MyObjectBuilder_Gyro), "ProprietaryLargeBlockGyro"));
+					BlockReplacementProfiles.Add(blockReplaceCompRichBlocks.ReplacementReferenceName, blockReplaceCompRichBlocks);
 
-                }
+				}
 
-                if(BlockReplacementProfiles.ContainsKey("MES-DisposableNpcBeacons") == false) {
+				if(BlockReplacementProfiles.ContainsKey("MES-DisposableNpcBeacons") == false) {
 
-                    var blockReplaceDisposableBeacons = new BlockReplacementProfileMES();
-                    blockReplaceDisposableBeacons.ReplacementReferenceName = "MES-DisposableNpcBeacons";
-                    blockReplaceDisposableBeacons.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Beacon), "SmallBlockBeacon"), new SerializableDefinitionId(typeof(MyObjectBuilder_Beacon), "DisposableNpcBeaconSmall"));
-                    blockReplaceDisposableBeacons.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Beacon), "LargeBlockBeacon"), new SerializableDefinitionId(typeof(MyObjectBuilder_Beacon), "DisposableNpcBeaconLarge"));
-                    BlockReplacementProfiles.Add(blockReplaceDisposableBeacons.ReplacementReferenceName, blockReplaceDisposableBeacons);
+					var blockReplaceDisposableBeacons = new BlockReplacementProfileMES();
+					blockReplaceDisposableBeacons.ReplacementReferenceName = "MES-DisposableNpcBeacons";
+					blockReplaceDisposableBeacons.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Beacon), "SmallBlockBeacon"), new SerializableDefinitionId(typeof(MyObjectBuilder_Beacon), "DisposableNpcBeaconSmall"));
+					blockReplaceDisposableBeacons.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Beacon), "LargeBlockBeacon"), new SerializableDefinitionId(typeof(MyObjectBuilder_Beacon), "DisposableNpcBeaconLarge"));
+					BlockReplacementProfiles.Add(blockReplaceDisposableBeacons.ReplacementReferenceName, blockReplaceDisposableBeacons);
 
-                }
+				}
 
-                //Partial Block Construction Blocks
-                PartialBuiltAllowedBlocks.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "LargeBlockArmorBlock"));
+				//Partial Block Construction Blocks
+				PartialBuiltAllowedBlocks.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "LargeBlockArmorBlock"));
 				PartialBuiltAllowedBlocks.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "LargeHeavyBlockArmorBlock"));
 				PartialBuiltAllowedBlocks.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "LargeBlockArmorSlope"));
 				PartialBuiltAllowedBlocks.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "LargeHeavyBlockArmorSlope"));
@@ -440,17 +440,17 @@ namespace ModularEncountersSpawner{
 							
 						}
 
-                        var batteryDef = powerBlock as MyBatteryBlockDefinition;
+						var batteryDef = powerBlock as MyBatteryBlockDefinition;
 
-                        if(batteryDef != null) {
+						if(batteryDef != null) {
 
-                            if(BatteryMaxCapacity.ContainsKey(batteryDef.Id.SubtypeName) == false) {
+							if(BatteryMaxCapacity.ContainsKey(batteryDef.Id.SubtypeName) == false) {
 
-                                BatteryMaxCapacity.Add(batteryDef.Id.SubtypeName, batteryDef.MaxStoredPower);
+								BatteryMaxCapacity.Add(batteryDef.Id.SubtypeName, batteryDef.MaxStoredPower);
 
-                            }
+							}
 
-                        }
+						}
 						
 					}
 					
@@ -557,66 +557,66 @@ namespace ModularEncountersSpawner{
 		}
 
 
-        public static void ProcessPrefabForManipulation(string prefabName, ImprovedSpawnGroup spawnGroup, string spawnType = "", string behavior = "") {
+		public static void ProcessPrefabForManipulation(string prefabName, ImprovedSpawnGroup spawnGroup, string spawnType = "", string behavior = "") {
 
-            Logger.AddMsg("Prefab Manipulation Started For [" + prefabName + "] in SpawnGroup [" + spawnGroup.SpawnGroupName + "]", true);
+			Logger.AddMsg("Prefab Manipulation Started For [" + prefabName + "] in SpawnGroup [" + spawnGroup.SpawnGroupName + "]", true);
 
-            //Run Setup
-            if(SetupComplete == false) {
+			//Run Setup
+			if(SetupComplete == false) {
 
-                SetupComplete = true;
-                Setup();
+				SetupComplete = true;
+				Setup();
 
-            }
+			}
 
-            Logger.AddMsg("Getting Weapon Randomizer Blacklist/Whitelist from Global Settings", true);
-            //Update Lists
-            BlacklistedWeaponSubtypes = Settings.General.WeaponReplacerBlacklist.ToList();
-            WhitelistedWeaponSubtypes = Settings.General.WeaponReplacerWhitelist.ToList();
-            BlacklistedWeaponTargetSubtypes = Settings.General.WeaponReplacerTargetBlacklist.ToList();
-            WhitelistedWeaponTargetSubtypes = Settings.General.WeaponReplacerTargetWhitelist.ToList();
+			Logger.AddMsg("Getting Weapon Randomizer Blacklist/Whitelist from Global Settings", true);
+			//Update Lists
+			BlacklistedWeaponSubtypes = Settings.General.WeaponReplacerBlacklist.ToList();
+			WhitelistedWeaponSubtypes = Settings.General.WeaponReplacerWhitelist.ToList();
+			BlacklistedWeaponTargetSubtypes = Settings.General.WeaponReplacerTargetBlacklist.ToList();
+			WhitelistedWeaponTargetSubtypes = Settings.General.WeaponReplacerTargetWhitelist.ToList();
 
-            Logger.AddMsg("Getting Prefab By Name", true);
-            //Get Prefab
-            var prefabDef = MyDefinitionManager.Static.GetPrefabDefinition(prefabName);
+			Logger.AddMsg("Getting Prefab By Name", true);
+			//Get Prefab
+			var prefabDef = MyDefinitionManager.Static.GetPrefabDefinition(prefabName);
 
-            if(prefabDef == null) {
+			if(prefabDef == null) {
 
-                return;
+				return;
 
-            }
+			}
 
-            Logger.AddMsg("Making Backup Prefab or Restoring From Backup", true);
-            //Backup / Restore Original Prefab
-            if(SpawnGroupManager.prefabBackupList.ContainsKey(prefabName) == false) {
+			Logger.AddMsg("Making Backup Prefab or Restoring From Backup", true);
+			//Backup / Restore Original Prefab
+			if(SpawnGroupManager.prefabBackupList.ContainsKey(prefabName) == false) {
 
-                var backupGridList = new List<MyObjectBuilder_CubeGrid>();
+				var backupGridList = new List<MyObjectBuilder_CubeGrid>();
 
-                for(int j = 0;j < prefabDef.CubeGrids.Length;j++) {
+				for(int j = 0;j < prefabDef.CubeGrids.Length;j++) {
 
-                    var clonedGridOb = prefabDef.CubeGrids[j].Clone();
-                    backupGridList.Add(clonedGridOb as MyObjectBuilder_CubeGrid);
+					var clonedGridOb = prefabDef.CubeGrids[j].Clone();
+					backupGridList.Add(clonedGridOb as MyObjectBuilder_CubeGrid);
 
-                }
+				}
 
-                SpawnGroupManager.prefabBackupList.Add(prefabName, backupGridList);
+				SpawnGroupManager.prefabBackupList.Add(prefabName, backupGridList);
 
-            } else {
+			} else {
 
-                if(SpawnGroupManager.prefabBackupList[prefabName].Count == prefabDef.CubeGrids.Length) {
+				if(SpawnGroupManager.prefabBackupList[prefabName].Count == prefabDef.CubeGrids.Length) {
 
-                    for(int j = 0;j < SpawnGroupManager.prefabBackupList[prefabName].Count;j++) {
+					for(int j = 0;j < SpawnGroupManager.prefabBackupList[prefabName].Count;j++) {
 
-                        var clonedGridOb = SpawnGroupManager.prefabBackupList[prefabName][j].Clone();
-                        prefabDef.CubeGrids[j] = clonedGridOb as MyObjectBuilder_CubeGrid;
+						var clonedGridOb = SpawnGroupManager.prefabBackupList[prefabName][j].Clone();
+						prefabDef.CubeGrids[j] = clonedGridOb as MyObjectBuilder_CubeGrid;
 
-                    }
+					}
 
-                }
+				}
 
-            }
+			}
 
-            /*
+			/*
 			Manipulation Order
 			 - UseBlockReplacer
 			 - UseBlockReplacerProfile
@@ -632,324 +632,324 @@ namespace ModularEncountersSpawner{
 			 - Reduce Block States
 			*/
 
-            
-            //Block Replacer Individual
-            if(spawnGroup.UseBlockReplacer == true) {
+			
+			//Block Replacer Individual
+			if(spawnGroup.UseBlockReplacer == true) {
 
-                Logger.AddMsg("Running Block Replacer", true);
+				Logger.AddMsg("Running Block Replacer", true);
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    ProcessBlockReplacements(grid, spawnGroup);
+					ProcessBlockReplacements(grid, spawnGroup);
 
-                }
+				}
 
-            }
+			}
 
-            
-            //Global Block Replacer Individual
-            if(Settings.General.UseGlobalBlockReplacer == true && spawnGroup.IgnoreGlobalBlockReplacer == false) {
+			
+			//Global Block Replacer Individual
+			if(Settings.General.UseGlobalBlockReplacer == true && spawnGroup.IgnoreGlobalBlockReplacer == false) {
 
-                Logger.AddMsg("Running Global Block Replacer", true);
+				Logger.AddMsg("Running Global Block Replacer", true);
 
-                GlobalBlockReplacements = Settings.General.GetReplacementReferencePairs();
+				GlobalBlockReplacements = Settings.General.GetReplacementReferencePairs();
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    ProcessGlobalBlockReplacements(grid);
+					ProcessGlobalBlockReplacements(grid);
 
-                }
+				}
 
-            }
+			}
 
-            if(spawnGroup.ConvertToHeavyArmor == true) {
+			if(spawnGroup.ConvertToHeavyArmor == true) {
 
-                Logger.AddMsg("Converting To Heavy Armor", true);
+				Logger.AddMsg("Converting To Heavy Armor", true);
 
-                if(spawnGroup.BlockReplacerProfileNames.Contains("MES-Armor-LightToHeavy") == false) {
+				if(spawnGroup.BlockReplacerProfileNames.Contains("MES-Armor-LightToHeavy") == false) {
 
-                    spawnGroup.BlockReplacerProfileNames.Add("MES-Armor-LightToHeavy");
+					spawnGroup.BlockReplacerProfileNames.Add("MES-Armor-LightToHeavy");
 
-                }
+				}
 
-            }
+			}
 
-            //Block Replacer Profiles
-            if(spawnGroup.UseBlockReplacerProfile == true) {
+			//Block Replacer Profiles
+			if(spawnGroup.UseBlockReplacerProfile == true) {
 
-                Logger.AddMsg("Applying Block Replacement Profiles", true);
+				Logger.AddMsg("Applying Block Replacement Profiles", true);
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    ApplyBlockReplacementProfile(grid, spawnGroup);
+					ApplyBlockReplacementProfile(grid, spawnGroup);
 
-                }
+				}
 
-            }
+			}
 
-            //Global Block Replacer Profiles
-            if(Settings.General.UseGlobalBlockReplacer == true && Settings.General.GlobalBlockReplacerProfiles.Length > 0 && spawnGroup.IgnoreGlobalBlockReplacer == false) {
+			//Global Block Replacer Profiles
+			if(Settings.General.UseGlobalBlockReplacer == true && Settings.General.GlobalBlockReplacerProfiles.Length > 0 && spawnGroup.IgnoreGlobalBlockReplacer == false) {
 
-                Logger.AddMsg("Applying Global Block Replacement Profiles", true);
+				Logger.AddMsg("Applying Global Block Replacement Profiles", true);
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    ApplyGlobalBlockReplacementProfile(grid);
+					ApplyGlobalBlockReplacementProfile(grid);
 
-                }
+				}
 
-            }
+			}
 
-            //Replace RemoteControl
-            if(spawnGroup.UseRivalAi == true) {
+			//Replace RemoteControl
+			if(spawnGroup.UseRivalAi == true) {
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    RivalAiInitialize(grid, spawnGroup, behavior);
+					RivalAiInitialize(grid, spawnGroup, behavior);
 
-                }
+				}
 
-            }
+			}
 
-            //Weapon Randomizer
-            bool randomWeaponsDone = false;
+			//Weapon Randomizer
+			bool randomWeaponsDone = false;
 
-            if(spawnGroup.RandomizeWeapons == true) {
+			if(spawnGroup.RandomizeWeapons == true) {
 
-                Logger.AddMsg("Randomizing Weapons Based On SpawnGroup rules", true);
+				Logger.AddMsg("Randomizing Weapons Based On SpawnGroup rules", true);
 
-                randomWeaponsDone = true;
+				randomWeaponsDone = true;
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    RandomWeaponReplacing(grid, spawnGroup);
+					RandomWeaponReplacing(grid, spawnGroup);
 
-                }
+				}
 
-            }
+			}
 
-            if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.General.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false && randomWeaponsDone == false) {
+			if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.General.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false && randomWeaponsDone == false) {
 
-                Logger.AddMsg("Randomizing Weapons Based On World Rules", true);
+				Logger.AddMsg("Randomizing Weapons Based On World Rules", true);
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    RandomWeaponReplacing(grid, spawnGroup);
+					RandomWeaponReplacing(grid, spawnGroup);
 
-                }
+				}
 
-            }
+			}
 
-            //Disable Blocks Cleanup Settings
-            var cleanup = Cleanup.GetCleaningSettingsForType(spawnType);
+			//Disable Blocks Cleanup Settings
+			var cleanup = Cleanup.GetCleaningSettingsForType(spawnType);
 
-            if(cleanup.UseBlockDisable == true) {
+			if(cleanup.UseBlockDisable == true) {
 
-                Logger.AddMsg("Applying SpawnType Cleanup Rules and Disabling Specified Blocks", true);
+				Logger.AddMsg("Applying SpawnType Cleanup Rules and Disabling Specified Blocks", true);
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    ApplyBlockDisable(grid, cleanup);
+					ApplyBlockDisable(grid, cleanup);
 
-                }
+				}
 
-            }
+			}
 
-            //Color, Block Disable, BlockName On/Off, Turret Settings
-            Logger.AddMsg("Processing Common Block Operations", true);
-            foreach(var grid in prefabDef.CubeGrids) {
+			//Color, Block Disable, BlockName On/Off, Turret Settings
+			Logger.AddMsg("Processing Common Block Operations", true);
+			foreach(var grid in prefabDef.CubeGrids) {
 
-                ProcessCommonBlockObjectBuilders(grid, spawnGroup);
+				ProcessCommonBlockObjectBuilders(grid, spawnGroup);
 
-            }
+			}
 
 
-            //Partial Block Construction
-            if(spawnGroup.ReduceBlockBuildStates == true) {
+			//Partial Block Construction
+			if(spawnGroup.ReduceBlockBuildStates == true) {
 
-                Logger.AddMsg("Reducing Block States", true);
+				Logger.AddMsg("Reducing Block States", true);
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    PartialBlockBuildStates(grid, spawnGroup);
+					PartialBlockBuildStates(grid, spawnGroup);
 
-                }
+				}
 
-            }
+			}
 
-            //Random Name Generator
-            if(spawnGroup.UseRandomNameGenerator == true) {
+			//Random Name Generator
+			if(spawnGroup.UseRandomNameGenerator == true) {
 
-                Logger.AddMsg("Randomizing Grid Name", true);
+				Logger.AddMsg("Randomizing Grid Name", true);
 
-                string newGridName = RandomNameGenerator.CreateRandomNameFromPattern(spawnGroup.RandomGridNamePattern);
-                string newRandomName = spawnGroup.RandomGridNamePrefix + newGridName;
+				string newGridName = RandomNameGenerator.CreateRandomNameFromPattern(spawnGroup.RandomGridNamePattern);
+				string newRandomName = spawnGroup.RandomGridNamePrefix + newGridName;
 
-                if(prefabDef.CubeGrids.Length > 0) {
+				if(prefabDef.CubeGrids.Length > 0) {
 
-                    prefabDef.CubeGrids[0].DisplayName = newRandomName;
+					prefabDef.CubeGrids[0].DisplayName = newRandomName;
 
-                    foreach(var grid in prefabDef.CubeGrids) {
+					foreach(var grid in prefabDef.CubeGrids) {
 
-                        for(int i = 0;i < grid.CubeBlocks.Count;i++) {
+						for(int i = 0;i < grid.CubeBlocks.Count;i++) {
 
-                            var antenna = grid.CubeBlocks[i] as MyObjectBuilder_RadioAntenna;
+							var antenna = grid.CubeBlocks[i] as MyObjectBuilder_RadioAntenna;
 
-                            if(antenna == null) {
+							if(antenna == null) {
 
-                                continue;
+								continue;
 
-                            }
+							}
 
-                            var antennaName = antenna.CustomName.ToUpper();
-                            var replaceName = spawnGroup.ReplaceAntennaNameWithRandomizedName.ToUpper();
+							var antennaName = antenna.CustomName.ToUpper();
+							var replaceName = spawnGroup.ReplaceAntennaNameWithRandomizedName.ToUpper();
 
-                            if(antennaName.Contains(replaceName) && string.IsNullOrWhiteSpace(replaceName) == false) {
+							if(antennaName.Contains(replaceName) && string.IsNullOrWhiteSpace(replaceName) == false) {
 
-                                (grid.CubeBlocks[i] as MyObjectBuilder_TerminalBlock).CustomName = newGridName;
-                                break;
+								(grid.CubeBlocks[i] as MyObjectBuilder_TerminalBlock).CustomName = newGridName;
+								break;
 
-                            }
+							}
 
-                        }
+						}
 
-                    }
+					}
 
-                }
+				}
 
-            }
+			}
 
-            //Block Name Replacer
-            if(spawnGroup.UseBlockNameReplacer == true) {
+			//Block Name Replacer
+			if(spawnGroup.UseBlockNameReplacer == true) {
 
-                Logger.AddMsg("Renaming Blocks From SpawnGroup Rules", true);
+				Logger.AddMsg("Renaming Blocks From SpawnGroup Rules", true);
 
-                if(prefabDef.CubeGrids.Length > 0) {
+				if(prefabDef.CubeGrids.Length > 0) {
 
-                    foreach(var grid in prefabDef.CubeGrids) {
+					foreach(var grid in prefabDef.CubeGrids) {
 
-                        for(int i = 0;i < grid.CubeBlocks.Count;i++) {
+						for(int i = 0;i < grid.CubeBlocks.Count;i++) {
 
-                            var block = grid.CubeBlocks[i] as MyObjectBuilder_TerminalBlock;
+							var block = grid.CubeBlocks[i] as MyObjectBuilder_TerminalBlock;
 
-                            if(block == null) {
+							if(block == null) {
 
-                                continue;
+								continue;
 
-                            }
+							}
 
-                            if(string.IsNullOrWhiteSpace(block.CustomName) == true) {
+							if(string.IsNullOrWhiteSpace(block.CustomName) == true) {
 
-                                continue;
+								continue;
 
-                            }
+							}
 
-                            if(spawnGroup.BlockNameReplacerReference.ContainsKey(block.CustomName) == true) {
+							if(spawnGroup.BlockNameReplacerReference.ContainsKey(block.CustomName) == true) {
 
-                                (grid.CubeBlocks[i] as MyObjectBuilder_TerminalBlock).CustomName = spawnGroup.BlockNameReplacerReference[block.CustomName];
+								(grid.CubeBlocks[i] as MyObjectBuilder_TerminalBlock).CustomName = spawnGroup.BlockNameReplacerReference[block.CustomName];
 
-                            }
+							}
 
-                        }
+						}
 
-                    }
+					}
 
-                }
+				}
 
-            }
+			}
 
-            //AssignContainerTypesToAllCargo
-            if(spawnGroup.AssignContainerTypesToAllCargo.Count > 0) {
+			//AssignContainerTypesToAllCargo
+			if(spawnGroup.AssignContainerTypesToAllCargo.Count > 0) {
 
-                Logger.AddMsg("Assigning ContainerTypes to Cargo", true);
+				Logger.AddMsg("Assigning ContainerTypes to Cargo", true);
 
-                var dlcLockers = new List<string>();
-                dlcLockers.Add("LargeBlockLockerRoom");
-                dlcLockers.Add("LargeBlockLockerRoomCorner");
-                dlcLockers.Add("LargeBlockLockers");
+				var dlcLockers = new List<string>();
+				dlcLockers.Add("LargeBlockLockerRoom");
+				dlcLockers.Add("LargeBlockLockerRoomCorner");
+				dlcLockers.Add("LargeBlockLockers");
 
-                if(prefabDef.CubeGrids.Length > 0) {
+				if(prefabDef.CubeGrids.Length > 0) {
 
-                    foreach(var grid in prefabDef.CubeGrids) {
+					foreach(var grid in prefabDef.CubeGrids) {
 
-                        for(int i = 0;i < grid.CubeBlocks.Count;i++) {
+						for(int i = 0;i < grid.CubeBlocks.Count;i++) {
 
-                            var block = grid.CubeBlocks[i] as MyObjectBuilder_CargoContainer;
+							var block = grid.CubeBlocks[i] as MyObjectBuilder_CargoContainer;
 
-                            if(block == null || dlcLockers.Contains(grid.CubeBlocks[i].SubtypeName) == true) {
+							if(block == null || dlcLockers.Contains(grid.CubeBlocks[i].SubtypeName) == true) {
 
-                                continue;
+								continue;
 
-                            }
+							}
 
-                            (grid.CubeBlocks[i] as MyObjectBuilder_CargoContainer).ContainerType = spawnGroup.AssignContainerTypesToAllCargo[Rnd.Next(0, spawnGroup.AssignContainerTypesToAllCargo.Count)];
+							(grid.CubeBlocks[i] as MyObjectBuilder_CargoContainer).ContainerType = spawnGroup.AssignContainerTypesToAllCargo[Rnd.Next(0, spawnGroup.AssignContainerTypesToAllCargo.Count)];
 
-                        }
+						}
 
-                    }
+					}
 
-                }
+				}
 
-            }
+			}
 
-            //Container Type Assignment
-            if(spawnGroup.UseContainerTypeAssignment == true) {
+			//Container Type Assignment
+			if(spawnGroup.UseContainerTypeAssignment == true) {
 
-                Logger.AddMsg("Assigning Specific ContainerTypes to Cargo", true);
+				Logger.AddMsg("Assigning Specific ContainerTypes to Cargo", true);
 
-                if(prefabDef.CubeGrids.Length > 0) {
+				if(prefabDef.CubeGrids.Length > 0) {
 
-                    foreach(var grid in prefabDef.CubeGrids) {
+					foreach(var grid in prefabDef.CubeGrids) {
 
-                        for(int i = 0;i < grid.CubeBlocks.Count;i++) {
+						for(int i = 0;i < grid.CubeBlocks.Count;i++) {
 
-                            var block = grid.CubeBlocks[i] as MyObjectBuilder_CargoContainer;
+							var block = grid.CubeBlocks[i] as MyObjectBuilder_CargoContainer;
 
-                            if(block == null) {
+							if(block == null) {
 
-                                continue;
+								continue;
 
-                            }
+							}
 
-                            if(string.IsNullOrWhiteSpace(block.CustomName) == true) {
+							if(string.IsNullOrWhiteSpace(block.CustomName) == true) {
 
-                                continue;
+								continue;
 
-                            }
+							}
 
-                            if(spawnGroup.ContainerTypeAssignmentReference.ContainsKey(block.CustomName) == true) {
+							if(spawnGroup.ContainerTypeAssignmentReference.ContainsKey(block.CustomName) == true) {
 
-                                (grid.CubeBlocks[i] as MyObjectBuilder_CargoContainer).ContainerType = spawnGroup.ContainerTypeAssignmentReference[block.CustomName];
+								(grid.CubeBlocks[i] as MyObjectBuilder_CargoContainer).ContainerType = spawnGroup.ContainerTypeAssignmentReference[block.CustomName];
 
-                            }
+							}
 
-                        }
+						}
 
-                    }
+					}
 
-                }
+				}
 
-            }
+			}
 
-            //Mod Storage Attach
-            if(spawnGroup.AttachModStorageComponentToGrid == true) {
+			//Mod Storage Attach
+			if(spawnGroup.AttachModStorageComponentToGrid == true) {
 
-                Logger.AddMsg("Assigning ModStorageComponent", true);
+				Logger.AddMsg("Assigning ModStorageComponent", true);
 
-                foreach(var grid in prefabDef.CubeGrids) {
+				foreach(var grid in prefabDef.CubeGrids) {
 
-                    ApplyCustomStorage(grid, spawnGroup);
+					ApplyCustomStorage(grid, spawnGroup);
 
-                }
+				}
 
-            }
+			}
 
-            Logger.AddMsg("Prefab Manipulation For [" + prefabName + "] in SpawnGroup [" + spawnGroup.SpawnGroupName + "] Completed.", true);
+			Logger.AddMsg("Prefab Manipulation For [" + prefabName + "] in SpawnGroup [" + spawnGroup.SpawnGroupName + "] Completed.", true);
 
 
-        }
+		}
 
-        public static void ApplyBlockDisable(MyObjectBuilder_CubeGrid cubeGrid, CleanupSettings cleanSettings){
+		public static void ApplyBlockDisable(MyObjectBuilder_CubeGrid cubeGrid, CleanupSettings cleanSettings){
 			
 			foreach(var block in cubeGrid.CubeBlocks){
 				
@@ -1491,32 +1491,32 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-            string newSkin = "";
+			string newSkin = "";
 
-            if(spawnGroup.AssignGridSkin.Count > 0) {
+			if(spawnGroup.AssignGridSkin.Count > 0) {
 
-                newSkin = spawnGroup.AssignGridSkin[Rnd.Next(0, spawnGroup.AssignGridSkin.Count)];
+				newSkin = spawnGroup.AssignGridSkin[Rnd.Next(0, spawnGroup.AssignGridSkin.Count)];
 
-            }
+			}
 
-            //Get ReplaceColor Keys
-            var replaceColorList = new List<Vector3>(spawnGroup.ColorReferencePairs.Keys.ToList());
+			//Get ReplaceColor Keys
+			var replaceColorList = new List<Vector3>(spawnGroup.ColorReferencePairs.Keys.ToList());
 
-            //Get ReplaceSkin Keys
-            var replaceSkinList = new List<Vector3>(spawnGroup.ColorSkinReferencePairs.Keys.ToList());
+			//Get ReplaceSkin Keys
+			var replaceSkinList = new List<Vector3>(spawnGroup.ColorSkinReferencePairs.Keys.ToList());
 
-            Logger.AddMsg("Check Replacable Color", true);
+			Logger.AddMsg("Check Replacable Color", true);
 
-            Logger.AddMsg(replaceColorList.Count.ToString() + " - " + replaceSkinList.Count.ToString(), true);
+			Logger.AddMsg(replaceColorList.Count.ToString() + " - " + replaceSkinList.Count.ToString(), true);
 
-            foreach(var rsl in replaceSkinList) {
+			foreach(var rsl in replaceSkinList) {
 
-                Logger.AddMsg("RSL: " + rsl.ToString(), true);
+				Logger.AddMsg("RSL: " + rsl.ToString(), true);
 
-            }
+			}
 
-            //Damage Modifier Value
-            float damageModifier = 100;
+			//Damage Modifier Value
+			float damageModifier = 100;
 			
 			if(spawnGroup.BlockDamageModifier <= 0){
 				
@@ -1528,18 +1528,18 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-            //Editable
-            cubeGrid.Editable = spawnGroup.GridsAreEditable;
+			//Editable
+			cubeGrid.Editable = spawnGroup.GridsAreEditable;
 
-            //Destructable
-            cubeGrid.DestructibleBlocks = spawnGroup.GridsAreDestructable;
+			//Destructable
+			cubeGrid.DestructibleBlocks = spawnGroup.GridsAreDestructable;
 
-            foreach(var block in cubeGrid.CubeBlocks){
+			foreach(var block in cubeGrid.CubeBlocks){
 
 				//Hue Shift
 				if(spawnGroup.ShiftBlockColorsHue == true){
 
-                    if(shiftAmount > 0){
+					if(shiftAmount > 0){
 	
 						var newH = block.ColorMaskHSV.X + shiftAmount;
 						
@@ -1571,39 +1571,40 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                //Random Skin
-                if(newSkin != "") {
+				//Random Skin
+				if(newSkin != "") {
 
-                    block.SkinSubtypeId = newSkin;
+					block.SkinSubtypeId = newSkin;
 
-                }
+				}
 
-                
-                if(spawnGroup.RecolorGrid == true) {
+				
+				if(spawnGroup.RecolorGrid == true) {
 
-                    var blockColor = new Vector3(block.ColorMaskHSV.X, block.ColorMaskHSV.Y, block.ColorMaskHSV.Z);
+					var blockColor = new Vector3(block.ColorMaskHSV.X, block.ColorMaskHSV.Y, block.ColorMaskHSV.Z);
 
-                    if(block.SubtypeName.Contains("Round")) {
+					if(block.SubtypeName.Contains("Round")) {
 
-                        Logger.AddMsg(blockColor.ToString(), true);
+						Logger.AddMsg(blockColor.ToString(), true);
 
-                    }
+					}
 
-                    //Replace Colors
-                    if(replaceColorList.Contains(blockColor) == true) {
+					//Replace Colors
+					if(replaceColorList.Contains(blockColor) == true) {
 
-                        block.ColorMaskHSV = blockColor;
+						block.ColorMaskHSV = spawnGroup.ColorReferencePairs[blockColor];
+						blockColor = spawnGroup.ColorReferencePairs[blockColor];
 
-                    }
+					}
 
-                    //Replace Skins
-                    if(replaceSkinList.Contains(blockColor) == true) {
+					//Replace Skins
+					if(replaceSkinList.Contains(blockColor) == true) {
 
-                        block.SkinSubtypeId = spawnGroup.ColorSkinReferencePairs[blockColor];
+						block.SkinSubtypeId = spawnGroup.ColorSkinReferencePairs[blockColor];
 
-                    }
+					}
 
-                }
+				}
 
 				//Damage Modifier
 				if(spawnGroup.OverrideBlockDamageModifier == true){
@@ -1655,18 +1656,18 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-                    var battery = block as MyObjectBuilder_BatteryBlock;
+					var battery = block as MyObjectBuilder_BatteryBlock;
 
-                    if(battery != null) {
+					if(battery != null) {
 
-                        float maxStored = 0;
-                        BatteryMaxCapacity.TryGetValue(battery.SubtypeName, out maxStored);
-                        battery.CurrentStoredPower = maxStored;
-                        battery.MaxStoredPower = maxStored;
+						float maxStored = 0;
+						BatteryMaxCapacity.TryGetValue(battery.SubtypeName, out maxStored);
+						battery.CurrentStoredPower = maxStored;
+						battery.MaxStoredPower = maxStored;
 
-                    }
+					}
 
-                }
+				}
 				
 				if(spawnGroup.DisableTimerBlocks == true){
 
@@ -1822,90 +1823,90 @@ namespace ModularEncountersSpawner{
 			
 		}
 
-        public static void ProcessGlobalBlockReplacements(MyObjectBuilder_CubeGrid cubeGrid) {
+		public static void ProcessGlobalBlockReplacements(MyObjectBuilder_CubeGrid cubeGrid) {
 
-            List<MyDefinitionId> UnusedDefinitions = new List<MyDefinitionId>();
+			List<MyDefinitionId> UnusedDefinitions = new List<MyDefinitionId>();
 
-            foreach(var block in cubeGrid.CubeBlocks.ToList()) {
+			foreach(var block in cubeGrid.CubeBlocks.ToList()) {
 
-                var defIdBlock = block.GetId(); //Get MyDefinitionId from ObjectBuilder
+				var defIdBlock = block.GetId(); //Get MyDefinitionId from ObjectBuilder
 
-                if(UnusedDefinitions.Contains(defIdBlock) == true) {
+				if(UnusedDefinitions.Contains(defIdBlock) == true) {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                if(GlobalBlockReplacements.ContainsKey(defIdBlock) == false) {
+				if(GlobalBlockReplacements.ContainsKey(defIdBlock) == false) {
 
-                    Logger.AddMsg("Global Block Replacement Not Found For: " + defIdBlock.ToString(), true);
-                    UnusedDefinitions.Add(defIdBlock);
-                    continue;
+					Logger.AddMsg("Global Block Replacement Not Found For: " + defIdBlock.ToString(), true);
+					UnusedDefinitions.Add(defIdBlock);
+					continue;
 
-                }
+				}
 
-                var targetBlockDef = MyDefinitionManager.Static.GetCubeBlockDefinition(defIdBlock);
-                var newBlockDef = MyDefinitionManager.Static.GetCubeBlockDefinition(GlobalBlockReplacements[defIdBlock]);
+				var targetBlockDef = MyDefinitionManager.Static.GetCubeBlockDefinition(defIdBlock);
+				var newBlockDef = MyDefinitionManager.Static.GetCubeBlockDefinition(GlobalBlockReplacements[defIdBlock]);
 
-                if(targetBlockDef == null) {
+				if(targetBlockDef == null) {
 
-                    Logger.AddMsg("GBR Target Block Definition Null: " + defIdBlock.ToString(), true);
-                    continue;
+					Logger.AddMsg("GBR Target Block Definition Null: " + defIdBlock.ToString(), true);
+					continue;
 
-                }
+				}
 
-                if(newBlockDef == null) {
+				if(newBlockDef == null) {
 
-                    Logger.AddMsg("GBR New Block Definition Null: " + GlobalBlockReplacements[defIdBlock].ToString(), true);
-                    cubeGrid.CubeBlocks.Remove(block);
-                    continue;
+					Logger.AddMsg("GBR New Block Definition Null: " + GlobalBlockReplacements[defIdBlock].ToString(), true);
+					cubeGrid.CubeBlocks.Remove(block);
+					continue;
 
-                }
+				}
 
-                if(targetBlockDef.Size != newBlockDef.Size) {
+				if(targetBlockDef.Size != newBlockDef.Size) {
 
-                    Logger.AddMsg("GBR New Block Wrong Size: " + newBlockDef.Id.ToString(), true);
-                    continue;
+					Logger.AddMsg("GBR New Block Wrong Size: " + newBlockDef.Id.ToString(), true);
+					continue;
 
-                }
+				}
 
-                var newBuilder = MyObjectBuilderSerializer.CreateNewObject((SerializableDefinitionId)newBlockDef.Id);
-                var newBlockBuilder = newBuilder as MyObjectBuilder_CubeBlock;
+				var newBuilder = MyObjectBuilderSerializer.CreateNewObject((SerializableDefinitionId)newBlockDef.Id);
+				var newBlockBuilder = newBuilder as MyObjectBuilder_CubeBlock;
 
-                if(newBlockBuilder == null) {
+				if(newBlockBuilder == null) {
 
-                    Logger.AddMsg("GBR New Block OB Null: " + newBlockDef.Id.ToString(), true);
-                    continue;
+					Logger.AddMsg("GBR New Block OB Null: " + newBlockDef.Id.ToString(), true);
+					continue;
 
-                }
+				}
 
-                if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
+				if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
 
-                    (newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
-                    (newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
+					(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
+					(newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
 
-                }
+				}
 
-                if(defIdBlock.TypeId == typeof(MyObjectBuilder_RadioAntenna)) {
+				if(defIdBlock.TypeId == typeof(MyObjectBuilder_RadioAntenna)) {
 
-                    (newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
-                    (newBlockBuilder as MyObjectBuilder_RadioAntenna).BroadcastRadius = (block as MyObjectBuilder_RadioAntenna).BroadcastRadius;
+					(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
+					(newBlockBuilder as MyObjectBuilder_RadioAntenna).BroadcastRadius = (block as MyObjectBuilder_RadioAntenna).BroadcastRadius;
 
-                }
+				}
 
-                newBlockBuilder.BlockOrientation = block.BlockOrientation;
-                newBlockBuilder.Min = block.Min;
-                newBlockBuilder.ColorMaskHSV = block.ColorMaskHSV;
-                newBlockBuilder.Owner = block.Owner;
+				newBlockBuilder.BlockOrientation = block.BlockOrientation;
+				newBlockBuilder.Min = block.Min;
+				newBlockBuilder.ColorMaskHSV = block.ColorMaskHSV;
+				newBlockBuilder.Owner = block.Owner;
 
-                cubeGrid.CubeBlocks.Remove(block);
-                cubeGrid.CubeBlocks.Add(newBlockBuilder);
+				cubeGrid.CubeBlocks.Remove(block);
+				cubeGrid.CubeBlocks.Add(newBlockBuilder);
 
-            }
+			}
 
-        }
+		}
 
-        public static void ProcessBlockReplacements(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup){
+		public static void ProcessBlockReplacements(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup){
 			
 			List<MyDefinitionId> UnusedDefinitions = new List<MyDefinitionId>();
 			
@@ -1962,21 +1963,21 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
+				if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
 
-                    (newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
-                    (newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
+					(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
+					(newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
 
-                }
+				}
 
-                if(defIdBlock.TypeId == typeof(MyObjectBuilder_RadioAntenna)) {
+				if(defIdBlock.TypeId == typeof(MyObjectBuilder_RadioAntenna)) {
 
-                    (newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
-                    (newBlockBuilder as MyObjectBuilder_RadioAntenna).BroadcastRadius = (block as MyObjectBuilder_RadioAntenna).BroadcastRadius;
+					(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
+					(newBlockBuilder as MyObjectBuilder_RadioAntenna).BroadcastRadius = (block as MyObjectBuilder_RadioAntenna).BroadcastRadius;
 
-                }
+				}
 
-                newBlockBuilder.BlockOrientation = block.BlockOrientation;
+				newBlockBuilder.BlockOrientation = block.BlockOrientation;
 				newBlockBuilder.Min = block.Min;
 				newBlockBuilder.ColorMaskHSV = block.ColorMaskHSV;
 				newBlockBuilder.Owner = block.Owner;
@@ -1988,101 +1989,101 @@ namespace ModularEncountersSpawner{
 			
 		}
 
-        public static void ApplyGlobalBlockReplacementProfile(MyObjectBuilder_CubeGrid cubeGrid) {
+		public static void ApplyGlobalBlockReplacementProfile(MyObjectBuilder_CubeGrid cubeGrid) {
 
-            foreach(var name in Settings.General.GlobalBlockReplacerProfiles) {
+			foreach(var name in Settings.General.GlobalBlockReplacerProfiles) {
 
-                var replacementReference = new Dictionary<SerializableDefinitionId, SerializableDefinitionId>();
+				var replacementReference = new Dictionary<SerializableDefinitionId, SerializableDefinitionId>();
 
-                if(BlockReplacementProfiles.ContainsKey(name) == true) {
+				if(BlockReplacementProfiles.ContainsKey(name) == true) {
 
-                    replacementReference = BlockReplacementProfiles[name].ReplacementReferenceDict;
+					replacementReference = BlockReplacementProfiles[name].ReplacementReferenceDict;
 
-                } else {
+				} else {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                List<MyDefinitionId> UnusedDefinitions = new List<MyDefinitionId>();
+				List<MyDefinitionId> UnusedDefinitions = new List<MyDefinitionId>();
 
-                foreach(var block in cubeGrid.CubeBlocks.ToList()) {
+				foreach(var block in cubeGrid.CubeBlocks.ToList()) {
 
-                    var defIdBlock = block.GetId(); //Get MyDefinitionId from ObjectBuilder
+					var defIdBlock = block.GetId(); //Get MyDefinitionId from ObjectBuilder
 
-                    if(UnusedDefinitions.Contains(defIdBlock) == true) {
+					if(UnusedDefinitions.Contains(defIdBlock) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    if(replacementReference.ContainsKey((SerializableDefinitionId)defIdBlock) == false) {
+					if(replacementReference.ContainsKey((SerializableDefinitionId)defIdBlock) == false) {
 
-                        UnusedDefinitions.Add(defIdBlock);
-                        continue;
+						UnusedDefinitions.Add(defIdBlock);
+						continue;
 
-                    }
+					}
 
-                    var targetBlockDef = MyDefinitionManager.Static.GetCubeBlockDefinition(defIdBlock);
-                    var newBlockDef = MyDefinitionManager.Static.GetCubeBlockDefinition((MyDefinitionId)replacementReference[(SerializableDefinitionId)defIdBlock]);
+					var targetBlockDef = MyDefinitionManager.Static.GetCubeBlockDefinition(defIdBlock);
+					var newBlockDef = MyDefinitionManager.Static.GetCubeBlockDefinition((MyDefinitionId)replacementReference[(SerializableDefinitionId)defIdBlock]);
 
-                    if(targetBlockDef == null) {
+					if(targetBlockDef == null) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    if(newBlockDef == null) {
+					if(newBlockDef == null) {
 
-                        cubeGrid.CubeBlocks.Remove(block);
-                        continue;
+						cubeGrid.CubeBlocks.Remove(block);
+						continue;
 
-                    }
+					}
 
-                    if(targetBlockDef.Size != newBlockDef.Size) {
+					if(targetBlockDef.Size != newBlockDef.Size) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    var newBuilder = MyObjectBuilderSerializer.CreateNewObject((SerializableDefinitionId)newBlockDef.Id);
-                    var newBlockBuilder = newBuilder as MyObjectBuilder_CubeBlock;
+					var newBuilder = MyObjectBuilderSerializer.CreateNewObject((SerializableDefinitionId)newBlockDef.Id);
+					var newBlockBuilder = newBuilder as MyObjectBuilder_CubeBlock;
 
-                    if(newBlockBuilder == null) {
+					if(newBlockBuilder == null) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
+					if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
 
-                        (newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
-                        (newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
+						(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
+						(newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
 
-                    }
+					}
 
-                    if(defIdBlock.TypeId == typeof(MyObjectBuilder_RadioAntenna)) {
+					if(defIdBlock.TypeId == typeof(MyObjectBuilder_RadioAntenna)) {
 
-                        (newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
-                        (newBlockBuilder as MyObjectBuilder_RadioAntenna).BroadcastRadius = (block as MyObjectBuilder_RadioAntenna).BroadcastRadius;
+						(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
+						(newBlockBuilder as MyObjectBuilder_RadioAntenna).BroadcastRadius = (block as MyObjectBuilder_RadioAntenna).BroadcastRadius;
 
-                    }
+					}
 
-                    newBlockBuilder.BlockOrientation = block.BlockOrientation;
-                    newBlockBuilder.Min = block.Min;
-                    newBlockBuilder.ColorMaskHSV = block.ColorMaskHSV;
-                    newBlockBuilder.Owner = block.Owner;
+					newBlockBuilder.BlockOrientation = block.BlockOrientation;
+					newBlockBuilder.Min = block.Min;
+					newBlockBuilder.ColorMaskHSV = block.ColorMaskHSV;
+					newBlockBuilder.Owner = block.Owner;
 
-                    cubeGrid.CubeBlocks.Remove(block);
-                    cubeGrid.CubeBlocks.Add(newBlockBuilder);
+					cubeGrid.CubeBlocks.Remove(block);
+					cubeGrid.CubeBlocks.Add(newBlockBuilder);
 
-                }
+				}
 
-            }
+			}
 
-        }
+		}
 
-        public static void ApplyBlockReplacementProfile(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup){
+		public static void ApplyBlockReplacementProfile(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup){
 			
 			foreach(var name in spawnGroup.BlockReplacerProfileNames){
 
@@ -2153,21 +2154,21 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-                    if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
+					if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
 
-                        (newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
-                        (newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
+						(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
+						(newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
 
-                    }
+					}
 
-                    if(defIdBlock.TypeId == typeof(MyObjectBuilder_RadioAntenna)) {
+					if(defIdBlock.TypeId == typeof(MyObjectBuilder_RadioAntenna)) {
 
-                        (newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
-                        (newBlockBuilder as MyObjectBuilder_RadioAntenna).BroadcastRadius = (block as MyObjectBuilder_RadioAntenna).BroadcastRadius;
+						(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
+						(newBlockBuilder as MyObjectBuilder_RadioAntenna).BroadcastRadius = (block as MyObjectBuilder_RadioAntenna).BroadcastRadius;
 
-                    }
+					}
 
-                    newBlockBuilder.BlockOrientation = block.BlockOrientation;
+					newBlockBuilder.BlockOrientation = block.BlockOrientation;
 					newBlockBuilder.Min = block.Min;
 					newBlockBuilder.ColorMaskHSV = block.ColorMaskHSV;
 					newBlockBuilder.Owner = block.Owner;
@@ -2184,9 +2185,9 @@ namespace ModularEncountersSpawner{
 		public static bool RivalAiInitialize(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup, string behaviorName = null){
 			
 			MyObjectBuilder_RemoteControl primaryRemote = null;
-            MyObjectBuilder_RemoteControl rivalAiRemote = null;
+			MyObjectBuilder_RemoteControl rivalAiRemote = null;
 
-            foreach(var block in cubeGrid.CubeBlocks){
+			foreach(var block in cubeGrid.CubeBlocks){
 				
 				var thisRemote = block as MyObjectBuilder_RemoteControl;
 				
@@ -2196,12 +2197,12 @@ namespace ModularEncountersSpawner{
 					
 				}else{
 
-                    if(RivalAIHelper.RivalAiControlModules.Contains(thisRemote.SubtypeName) == true) {
+					if(RivalAIHelper.RivalAiControlModules.Contains(thisRemote.SubtypeName) == true) {
 
-                        rivalAiRemote = thisRemote;
-                        break;
+						rivalAiRemote = thisRemote;
+						break;
 
-                    }
+					}
 
 					if(primaryRemote == null){
 						
@@ -2219,104 +2220,104 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-            if(primaryRemote != null && rivalAiRemote == null && spawnGroup.RivalAiReplaceRemoteControl == true) {
+			if(primaryRemote != null && rivalAiRemote == null && spawnGroup.RivalAiReplaceRemoteControl == true) {
 
-                if(cubeGrid.GridSizeEnum == MyCubeSize.Large) {
+				if(cubeGrid.GridSizeEnum == MyCubeSize.Large) {
 
-                    primaryRemote.SubtypeName = "RivalAIRemoteControlLarge";
+					primaryRemote.SubtypeName = "RivalAIRemoteControlLarge";
 
-                } else {
+				} else {
 
-                    primaryRemote.SubtypeName = "RivalAIRemoteControlSmall";
+					primaryRemote.SubtypeName = "RivalAIRemoteControlSmall";
 
-                }
+				}
 
-                rivalAiRemote = primaryRemote;
+				rivalAiRemote = primaryRemote;
 				
 			}
 
-            if(rivalAiRemote != null && string.IsNullOrWhiteSpace(behaviorName) == false) {
+			if(rivalAiRemote != null && string.IsNullOrWhiteSpace(behaviorName) == false) {
 
-                string fullBehavior = "";
+				string fullBehavior = "";
 
-                if(RivalAIHelper.RivalAiBehaviorProfiles.TryGetValue(behaviorName, out fullBehavior) == false) {
+				if(RivalAIHelper.RivalAiBehaviorProfiles.TryGetValue(behaviorName, out fullBehavior) == false) {
 
-                    Logger.AddMsg("RivalAI Profile Does Not Exist For: " + behaviorName, true);
-                    return false;
+					Logger.AddMsg("RivalAI Profile Does Not Exist For: " + behaviorName, true);
+					return false;
 
-                }
+				}
 
-                Logger.AddMsg("Attempt Attach RivalAI CustomData", true);
-                if(rivalAiRemote.ComponentContainer == null) {
+				Logger.AddMsg("Attempt Attach RivalAI CustomData", true);
+				if(rivalAiRemote.ComponentContainer == null) {
 
-                    Logger.AddMsg(" - Container Created", true);
-                    rivalAiRemote.ComponentContainer = new MyObjectBuilder_ComponentContainer();
+					Logger.AddMsg(" - Container Created", true);
+					rivalAiRemote.ComponentContainer = new MyObjectBuilder_ComponentContainer();
 
-                }
+				}
 
-                if(rivalAiRemote.ComponentContainer.Components == null) {
+				if(rivalAiRemote.ComponentContainer.Components == null) {
 
-                    Logger.AddMsg(" - Components List Created", true);
-                    rivalAiRemote.ComponentContainer.Components = new List<VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData>();
+					Logger.AddMsg(" - Components List Created", true);
+					rivalAiRemote.ComponentContainer.Components = new List<VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData>();
 
-                }
+				}
 
-                bool foundModStorage = false;
+				bool foundModStorage = false;
 
-                Logger.AddMsg(" - Check Existing Components", true);
-                foreach(var component in rivalAiRemote.ComponentContainer.Components) {
+				Logger.AddMsg(" - Check Existing Components", true);
+				foreach(var component in rivalAiRemote.ComponentContainer.Components) {
 
-                    if(component.TypeId != "MyModStorageComponentBase") {
+					if(component.TypeId != "MyModStorageComponentBase") {
 
-                        Logger.AddMsg("   - Non ModStorage", true);
-                        continue;
+						Logger.AddMsg("   - Non ModStorage", true);
+						continue;
 
-                    }
+					}
 
-                    var storage = component.Component as MyObjectBuilder_ModStorageComponent;
+					var storage = component.Component as MyObjectBuilder_ModStorageComponent;
 
-                    if(storage == null) {
+					if(storage == null) {
 
-                        Logger.AddMsg("   - Created Storage Null", true);
-                        continue;
+						Logger.AddMsg("   - Created Storage Null", true);
+						continue;
 
-                    }
+					}
 
-                    foundModStorage = true;
+					foundModStorage = true;
 
-                    Logger.AddMsg("   - Checking If Storage Already Contains CustomData", true);
-                    if(storage.Storage.Dictionary.ContainsKey(new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1")) == true) {
+					Logger.AddMsg("   - Checking If Storage Already Contains CustomData", true);
+					if(storage.Storage.Dictionary.ContainsKey(new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1")) == true) {
 
-                        Logger.AddMsg("   - CustomData Exists, Updating", true);
-                        storage.Storage.Dictionary[new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1")] = fullBehavior;
+						Logger.AddMsg("   - CustomData Exists, Updating", true);
+						storage.Storage.Dictionary[new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1")] = fullBehavior;
 
-                    } else {
+					} else {
 
-                        Logger.AddMsg("   - CustomData Non-Exist, Creating", true);
-                        storage.Storage.Dictionary.Add(new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1"), fullBehavior);
+						Logger.AddMsg("   - CustomData Non-Exist, Creating", true);
+						storage.Storage.Dictionary.Add(new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1"), fullBehavior);
 
-                    }
+					}
 
-                }
+				}
 
-                if(foundModStorage == false) {
+				if(foundModStorage == false) {
 
-                    Logger.AddMsg(" - Storage Not Found, Creating Structure and Adding CustomData", true);
-                    var modStorage = new MyObjectBuilder_ModStorageComponent();
-                    var dictA = new Dictionary<Guid, string>();
-                    dictA.Add(new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1"), fullBehavior);
-                    var dictB = new SerializableDictionary<Guid, string>(dictA);
-                    modStorage.Storage = dictB;
-                    var componentData = new VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData();
-                    componentData.TypeId = "MyModStorageComponentBase";
-                    componentData.Component = modStorage;
-                    rivalAiRemote.ComponentContainer.Components.Add(componentData);
+					Logger.AddMsg(" - Storage Not Found, Creating Structure and Adding CustomData", true);
+					var modStorage = new MyObjectBuilder_ModStorageComponent();
+					var dictA = new Dictionary<Guid, string>();
+					dictA.Add(new Guid("74de02b3-27f9-4960-b1c4-27351f2b06d1"), fullBehavior);
+					var dictB = new SerializableDictionary<Guid, string>(dictA);
+					modStorage.Storage = dictB;
+					var componentData = new VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData();
+					componentData.TypeId = "MyModStorageComponentBase";
+					componentData.Component = modStorage;
+					rivalAiRemote.ComponentContainer.Components.Add(componentData);
 
-                }
+				}
 
-                return true;
+				return true;
 
-            }
+			}
 			
 			return false;
 			
@@ -2417,8 +2418,8 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-                    string oldWeaponId = defIdString;
-                    var weaponIds = WeaponProfiles.Keys.ToList();
+					string oldWeaponId = defIdString;
+					var weaponIds = WeaponProfiles.Keys.ToList();
 					bool isTurret = false;
 					bool targetNeutralSetting = false;
 					
@@ -2616,7 +2617,7 @@ namespace ModularEncountersSpawner{
 							
 						}
 
-                        Logger.AddMsg("Replaced " + oldWeaponId + " with new weapon " + weaponProfile.BlockDefinition.Id.ToString(), true);
+						Logger.AddMsg("Replaced " + oldWeaponId + " with new weapon " + weaponProfile.BlockDefinition.Id.ToString(), true);
 						break;
 						
 					}
@@ -2903,67 +2904,67 @@ namespace ModularEncountersSpawner{
 			
 		}
 
-        public static void ApplyCustomStorage(MyObjectBuilder_CubeGrid grid, ImprovedSpawnGroup spawnGroup) {
+		public static void ApplyCustomStorage(MyObjectBuilder_CubeGrid grid, ImprovedSpawnGroup spawnGroup) {
 
-            if(grid.ComponentContainer == null) {
+			if(grid.ComponentContainer == null) {
 
-                grid.ComponentContainer = new MyObjectBuilder_ComponentContainer();
+				grid.ComponentContainer = new MyObjectBuilder_ComponentContainer();
 
-            }
+			}
 
-            if(grid.ComponentContainer.Components == null) {
+			if(grid.ComponentContainer.Components == null) {
 
-                grid.ComponentContainer.Components = new List<VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData>();
+				grid.ComponentContainer.Components = new List<VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData>();
 
-            }
+			}
 
-            bool foundModStorage = false;
+			bool foundModStorage = false;
 
-            foreach(var component in grid.ComponentContainer.Components) {
+			foreach(var component in grid.ComponentContainer.Components) {
 
-                if(component.TypeId != "MyModStorageComponentBase") {
+				if(component.TypeId != "MyModStorageComponentBase") {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                var storage = component.Component as MyObjectBuilder_ModStorageComponent;
+				var storage = component.Component as MyObjectBuilder_ModStorageComponent;
 
-                if(storage == null) {
+				if(storage == null) {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                foundModStorage = true;
+				foundModStorage = true;
 
-                if(storage.Storage.Dictionary.ContainsKey(spawnGroup.StorageKey) == true) {
+				if(storage.Storage.Dictionary.ContainsKey(spawnGroup.StorageKey) == true) {
 
-                    storage.Storage.Dictionary[spawnGroup.StorageKey] = spawnGroup.StorageValue;
+					storage.Storage.Dictionary[spawnGroup.StorageKey] = spawnGroup.StorageValue;
 
-                } else {
+				} else {
 
-                    storage.Storage.Dictionary.Add(spawnGroup.StorageKey, spawnGroup.StorageValue);
+					storage.Storage.Dictionary.Add(spawnGroup.StorageKey, spawnGroup.StorageValue);
 
-                }
+				}
 
-            }
+			}
 
-            if(foundModStorage == false) {
+			if(foundModStorage == false) {
 
-                var modStorage = new MyObjectBuilder_ModStorageComponent();
-                var dictA = new Dictionary<Guid, string>();
-                dictA.Add(spawnGroup.StorageKey, spawnGroup.StorageValue);
-                var dictB = new SerializableDictionary<Guid, string>(dictA);
-                modStorage.Storage = dictB;
-                var componentData = new VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData();
-                componentData.TypeId = "MyModStorageComponentBase";
-                componentData.Component = modStorage;
-                grid.ComponentContainer.Components.Add(componentData);
+				var modStorage = new MyObjectBuilder_ModStorageComponent();
+				var dictA = new Dictionary<Guid, string>();
+				dictA.Add(spawnGroup.StorageKey, spawnGroup.StorageValue);
+				var dictB = new SerializableDictionary<Guid, string>(dictA);
+				modStorage.Storage = dictB;
+				var componentData = new VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData();
+				componentData.TypeId = "MyModStorageComponentBase";
+				componentData.Component = modStorage;
+				grid.ComponentContainer.Components.Add(componentData);
 
-            }
+			}
 
-        }
+		}
 		
 		public static Vector3I CalculateMinPosition(Vector3I size, Vector3I mountingCell, MatrixI mountingMatrix, bool isTurret){
 						

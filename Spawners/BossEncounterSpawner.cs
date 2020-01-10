@@ -79,7 +79,7 @@ namespace ModularEncountersSpawner.Spawners{
 			
 			var bossEncounter = new BossEncounter();
 			bossEncounter.SpawnGroup = spawnGroup;
-            bossEncounter.SpawnGroupName = spawnGroup.SpawnGroupName;
+			bossEncounter.SpawnGroupName = spawnGroup.SpawnGroupName;
 			bossEncounter.Position = spawnCoords;
 			
 			foreach(var player in MES_SessionCore.PlayerList){
@@ -106,7 +106,7 @@ namespace ModularEncountersSpawner.Spawners{
 					
 				}
 				
-                /*
+				/*
 				var syncData = new SyncData();
 				syncData.Instruction = "MESBossGPSCreate";
 				syncData.GpsName = spawnGroup.BossCustomGPSLabel;
@@ -117,34 +117,34 @@ namespace ModularEncountersSpawner.Spawners{
 
 			}
 
-            bossEncounter.CreateGpsForPlayers();
-            NPCWatcher.BossEncounters.Add(bossEncounter);
+			bossEncounter.CreateGpsForPlayers();
+			NPCWatcher.BossEncounters.Add(bossEncounter);
 
-            try {
+			try {
 
-                if(NPCWatcher.BossEncounters.Count > 0) {
+				if(NPCWatcher.BossEncounters.Count > 0) {
 
-                    BossEncounter[] encounterArray = NPCWatcher.BossEncounters.ToArray();
-                    var byteArray = MyAPIGateway.Utilities.SerializeToBinary<BossEncounter[]>(encounterArray);
-                    var storedBossData = Convert.ToBase64String(byteArray);
-                    MyAPIGateway.Utilities.SetVariable<string>("MES-ActiveBossEncounters", storedBossData);
+					BossEncounter[] encounterArray = NPCWatcher.BossEncounters.ToArray();
+					var byteArray = MyAPIGateway.Utilities.SerializeToBinary<BossEncounter[]>(encounterArray);
+					var storedBossData = Convert.ToBase64String(byteArray);
+					MyAPIGateway.Utilities.SetVariable<string>("MES-ActiveBossEncounters", storedBossData);
 
-                } else {
+				} else {
 
-                    MyAPIGateway.Utilities.SetVariable<string>("MES-ActiveBossEncounters", "");
+					MyAPIGateway.Utilities.SetVariable<string>("MES-ActiveBossEncounters", "");
 
-                }
+				}
 
-            } catch(Exception e) {
+			} catch(Exception e) {
 
-                Logger.AddMsg("Something went wrong while getting Boss Encounter Data from Storage.");
-                Logger.AddMsg(e.ToString(), true);
+				Logger.AddMsg("Something went wrong while getting Boss Encounter Data from Storage.");
+				Logger.AddMsg(e.ToString(), true);
 
-            }
+			}
 
-           
+		   
 
-            Logger.SkipNextMessage = false;
+			Logger.SkipNextMessage = false;
 			return "Boss Encounter GPS Created with Spawngroup: " + spawnGroup.SpawnGroup.Id.SubtypeName;
 		
 		}
@@ -416,7 +416,14 @@ namespace ModularEncountersSpawner.Spawners{
 				Logger.AddMsg("Boss Encounter SpawnGroup " + encounter.SpawnGroup.SpawnGroup.Id.SubtypeName + " Now Spawning.");
 				
 				foreach(var prefab in encounter.SpawnGroup.SpawnGroup.Prefabs){
-				
+
+					if (encounter.SpawnGroup.UseKnownPlayerLocations) {
+
+						KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(encounter.Position);
+
+
+					}
+
 					var options = SpawnGroupManager.CreateSpawningOptions(encounter.SpawnGroup, prefab);
 					var spawnPosition = Vector3D.Transform((Vector3D)prefab.Position, tempMatrix);
 					var speedL = prefab.Speed * (Vector3)tempMatrix.Forward;
@@ -462,10 +469,10 @@ namespace ModularEncountersSpawner.Spawners{
 					
 					var pendingNPC = new ActiveNPC();
 					pendingNPC.SpawnGroup = encounter.SpawnGroup;
-                    pendingNPC.SpawnGroupName = encounter.SpawnGroup.SpawnGroupName;
-                    pendingNPC.InitialFaction = encounter.SpawnGroup.FactionOwner;
-                    pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
-                    pendingNPC.Name = prefab.SubtypeId;
+					pendingNPC.SpawnGroupName = encounter.SpawnGroup.SpawnGroupName;
+					pendingNPC.InitialFaction = encounter.SpawnGroup.FactionOwner;
+					pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
+					pendingNPC.Name = prefab.SubtypeId;
 					pendingNPC.GridName = MyDefinitionManager.Static.GetPrefabDefinition(prefab.SubtypeId).CubeGrids[0].DisplayName;
 					pendingNPC.StartCoords = spawnPosition;
 					pendingNPC.CurrentCoords = spawnPosition;

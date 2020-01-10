@@ -53,9 +53,9 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-            KnownPlayerLocationManager.CleanExpiredLocations();
-            var validFactions = new Dictionary<string, List<string>>();
-            var spawnGroupList = GetRandomEncounters(startCoords, out validFactions);
+			KnownPlayerLocationManager.CleanExpiredLocations();
+			var validFactions = new Dictionary<string, List<string>>();
+			var spawnGroupList = GetRandomEncounters(startCoords, out validFactions);
 			
 			if(Settings.General.UseModIdSelectionForSpawning == true){
 				
@@ -95,28 +95,28 @@ namespace ModularEncountersSpawner.Spawners{
 					
 					try{
 
-                        var offsetCoords = Vector3D.Transform((Vector3D)voxel.Offset, spawnMatrix);
-                        var voxelSpawn = MyAPIGateway.Session.VoxelMaps.CreateVoxelMapFromStorageName(voxel.StorageName, voxel.StorageName, offsetCoords);
-                        var newVoxelMatrix = voxelSpawn.WorldMatrix;
-                        spawnMatrix.Translation = voxelSpawn.PositionComp.WorldAABB.Center;
-                        //newVoxelMatrix.Translation = voxelSpawningPosition;
-                        //voxelSpawn.SetWorldMatrix(newVoxelMatrix);
+						var offsetCoords = Vector3D.Transform((Vector3D)voxel.Offset, spawnMatrix);
+						var voxelSpawn = MyAPIGateway.Session.VoxelMaps.CreateVoxelMapFromStorageName(voxel.StorageName, voxel.StorageName, offsetCoords);
+						var newVoxelMatrix = voxelSpawn.WorldMatrix;
+						spawnMatrix.Translation = voxelSpawn.PositionComp.WorldAABB.Center;
+						//newVoxelMatrix.Translation = voxelSpawningPosition;
+						//voxelSpawn.SetWorldMatrix(newVoxelMatrix);
 
-                        Logger.CreateDebugGPS("Original SpawnCoords", voxelSpawningPosition);
-                        Logger.CreateDebugGPS("Original Translation", newVoxelMatrix.Translation);
-                        Logger.CreateDebugGPS("Original BottomCorner", voxelSpawn.PositionLeftBottomCorner);
-                        Logger.CreateDebugGPS("Original BBCenter", voxelSpawn.PositionComp.WorldAABB.Center);
-
-
+						Logger.CreateDebugGPS("Original SpawnCoords", voxelSpawningPosition);
+						Logger.CreateDebugGPS("Original Translation", newVoxelMatrix.Translation);
+						Logger.CreateDebugGPS("Original BottomCorner", voxelSpawn.PositionLeftBottomCorner);
+						Logger.CreateDebugGPS("Original BBCenter", voxelSpawn.PositionComp.WorldAABB.Center);
 
 
-                        if(Settings.RandomEncounters.RemoveVoxelsIfGridRemoved == true && spawnGroup.RemoveVoxelsIfGridRemoved == true) {
 
-                            NPCWatcher.SpawnedVoxels.Add(voxelSpawn.EntityId.ToString(), voxelSpawn as IMyEntity);
 
-                        }
+						if(Settings.RandomEncounters.RemoveVoxelsIfGridRemoved == true && spawnGroup.RemoveVoxelsIfGridRemoved == true) {
 
-                        successfulVoxelSpawn = true;
+							NPCWatcher.SpawnedVoxels.Add(voxelSpawn.EntityId.ToString(), voxelSpawn as IMyEntity);
+
+						}
+
+						successfulVoxelSpawn = true;
 						centerVoxelOffset = true;
 						
 						
@@ -132,13 +132,13 @@ namespace ModularEncountersSpawner.Spawners{
 						
 						var voxelSpawn = MyAPIGateway.Session.VoxelMaps.CreateVoxelMapFromStorageName(voxel.StorageName, voxel.StorageName, voxelSpawningPosition);
 
-                        if(Settings.RandomEncounters.RemoveVoxelsIfGridRemoved == true && spawnGroup.RemoveVoxelsIfGridRemoved == true) {
+						if(Settings.RandomEncounters.RemoveVoxelsIfGridRemoved == true && spawnGroup.RemoveVoxelsIfGridRemoved == true) {
 
-                            NPCWatcher.SpawnedVoxels.Add(voxelSpawn.EntityId.ToString(), voxelSpawn as IMyEntity);
+							NPCWatcher.SpawnedVoxels.Add(voxelSpawn.EntityId.ToString(), voxelSpawn as IMyEntity);
 
-                        }
+						}
 
-                        successfulVoxelSpawn = true;
+						successfulVoxelSpawn = true;
 						
 					}catch(Exception exc){
 						
@@ -158,27 +158,33 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-            long gridOwner = 0;
-            var randFactionTag = spawnGroup.FactionOwner;
+			long gridOwner = 0;
+			var randFactionTag = spawnGroup.FactionOwner;
 
-            if(validFactions.ContainsKey(spawnGroup.SpawnGroupName)) {
+			if(validFactions.ContainsKey(spawnGroup.SpawnGroupName)) {
 
-                randFactionTag = validFactions[spawnGroup.SpawnGroupName][SpawnResources.rnd.Next(0, validFactions[spawnGroup.SpawnGroupName].Count)];
+				randFactionTag = validFactions[spawnGroup.SpawnGroupName][SpawnResources.rnd.Next(0, validFactions[spawnGroup.SpawnGroupName].Count)];
 
-            }
+			}
 
-            if(NPCWatcher.NPCFactionTagToFounder.ContainsKey(randFactionTag) == true) {
+			if(NPCWatcher.NPCFactionTagToFounder.ContainsKey(randFactionTag) == true) {
 
-                gridOwner = NPCWatcher.NPCFactionTagToFounder[randFactionTag];
+				gridOwner = NPCWatcher.NPCFactionTagToFounder[randFactionTag];
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Could Not Find Faction Founder For: " + randFactionTag);
+				Logger.AddMsg("Could Not Find Faction Founder For: " + randFactionTag);
 
-            }
+			}
 
-            foreach(var prefab in spawnGroup.SpawnGroup.Prefabs){
-				
+			foreach(var prefab in spawnGroup.SpawnGroup.Prefabs){
+
+				if (spawnGroup.UseKnownPlayerLocations) {
+
+					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(startCoords);
+
+				}
+
 				var options = SpawnGroupManager.CreateSpawningOptions(spawnGroup, prefab);
 				var spawnPosition = Vector3D.Transform((Vector3D)prefab.Position, spawnMatrix);
 				Logger.CreateDebugGPS("Prefab Spawn Coords", spawnPosition);
@@ -200,11 +206,11 @@ namespace ModularEncountersSpawner.Spawners{
 				}
 				
 				var pendingNPC = new ActiveNPC();
-                pendingNPC.SpawnGroupName = spawnGroup.SpawnGroupName;
-                pendingNPC.SpawnGroup = spawnGroup;
-                pendingNPC.InitialFaction = randFactionTag;
-                pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
-                pendingNPC.Name = prefab.SubtypeId;
+				pendingNPC.SpawnGroupName = spawnGroup.SpawnGroupName;
+				pendingNPC.SpawnGroup = spawnGroup;
+				pendingNPC.InitialFaction = randFactionTag;
+				pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
+				pendingNPC.Name = prefab.SubtypeId;
 				pendingNPC.GridName = MyDefinitionManager.Static.GetPrefabDefinition(prefab.SubtypeId).CubeGrids[0].DisplayName;
 				pendingNPC.StartCoords = spawnCoords;
 				pendingNPC.CurrentCoords = spawnCoords;
@@ -244,8 +250,8 @@ namespace ModularEncountersSpawner.Spawners{
 			
 			MyPlanet planet = SpawnResources.GetNearestPlanet(playerCoords);
 			string specificGroup = "";
-            validFactions = new Dictionary<string, List<string>>();
-            SpawnGroupSublists.Clear();
+			validFactions = new Dictionary<string, List<string>>();
+			SpawnGroupSublists.Clear();
 			EligibleSpawnsByModId.Clear();
 			
 			bool specificSpawnRequest = false;
@@ -293,21 +299,21 @@ namespace ModularEncountersSpawner.Spawners{
 					
 				}
 
-                var validFactionsList = SpawnResources.ValidNpcFactions(spawnGroup, playerCoords);
+				var validFactionsList = SpawnResources.ValidNpcFactions(spawnGroup, playerCoords);
 
-                if(validFactionsList.Count == 0) {
+				if(validFactionsList.Count == 0) {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                if(validFactions.ContainsKey(spawnGroup.SpawnGroupName) == false) {
+				if(validFactions.ContainsKey(spawnGroup.SpawnGroupName) == false) {
 
-                    validFactions.Add(spawnGroup.SpawnGroupName, validFactionsList);
+					validFactions.Add(spawnGroup.SpawnGroupName, validFactionsList);
 
-                }
+				}
 
-                if(spawnGroup.Frequency > 0){
+				if(spawnGroup.Frequency > 0){
 					
 					string modID = spawnGroup.SpawnGroup.Context.ModId;
 					

@@ -104,12 +104,12 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-            KnownPlayerLocationManager.CleanExpiredLocations();
-            var smallStations = new List<ImprovedSpawnGroup>();
+			KnownPlayerLocationManager.CleanExpiredLocations();
+			var smallStations = new List<ImprovedSpawnGroup>();
 			var mediumStations = new List<ImprovedSpawnGroup>();
 			var largeStations = new List<ImprovedSpawnGroup>();
-            var validFactions = new Dictionary<string, List<string>>();
-            var spawnGroupList = GetPlanetaryInstallations(startCoords, out smallStations, out mediumStations, out largeStations, out validFactions);
+			var validFactions = new Dictionary<string, List<string>>();
+			var spawnGroupList = GetPlanetaryInstallations(startCoords, out smallStations, out mediumStations, out largeStations, out validFactions);
 			
 			if(Settings.General.UseModIdSelectionForSpawning == true){
 				
@@ -241,11 +241,11 @@ namespace ModularEncountersSpawner.Spawners{
 					
 					var voxelSpawn = MyAPIGateway.Session.VoxelMaps.CreateVoxelMapFromStorageName(voxel.StorageName, voxel.StorageName, voxelSpawningPosition);
 
-                    if(Settings.PlanetaryInstallations.RemoveVoxelsIfGridRemoved == true && spawnGroup.RemoveVoxelsIfGridRemoved == true) {
+					if(Settings.PlanetaryInstallations.RemoveVoxelsIfGridRemoved == true && spawnGroup.RemoveVoxelsIfGridRemoved == true) {
 
-                        NPCWatcher.SpawnedVoxels.Add(voxelSpawn.EntityId.ToString(), voxelSpawn as IMyEntity);
+						NPCWatcher.SpawnedVoxels.Add(voxelSpawn.EntityId.ToString(), voxelSpawn as IMyEntity);
 
-                    }
+					}
 
 					successfulVoxelSpawn = true;
 					
@@ -265,27 +265,33 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-            long gridOwner = 0;
-            var randFactionTag = spawnGroup.FactionOwner;
+			long gridOwner = 0;
+			var randFactionTag = spawnGroup.FactionOwner;
 
-            if(validFactions.ContainsKey(spawnGroup.SpawnGroupName)) {
+			if(validFactions.ContainsKey(spawnGroup.SpawnGroupName)) {
 
-                randFactionTag = validFactions[spawnGroup.SpawnGroupName][SpawnResources.rnd.Next(0, validFactions[spawnGroup.SpawnGroupName].Count)];
+				randFactionTag = validFactions[spawnGroup.SpawnGroupName][SpawnResources.rnd.Next(0, validFactions[spawnGroup.SpawnGroupName].Count)];
 
-            }
+			}
 
-            if(NPCWatcher.NPCFactionTagToFounder.ContainsKey(randFactionTag) == true) {
+			if(NPCWatcher.NPCFactionTagToFounder.ContainsKey(randFactionTag) == true) {
 
-                gridOwner = NPCWatcher.NPCFactionTagToFounder[randFactionTag];
+				gridOwner = NPCWatcher.NPCFactionTagToFounder[randFactionTag];
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Could Not Find Faction Founder For: " + randFactionTag);
+				Logger.AddMsg("Could Not Find Faction Founder For: " + randFactionTag);
 
-            }
+			}
 
-            for(int i = 0; i < spawnGroup.SpawnGroup.Prefabs.Count; i++){
-				
+			for(int i = 0; i < spawnGroup.SpawnGroup.Prefabs.Count; i++){
+
+				if (spawnGroup.UseKnownPlayerLocations) {
+
+					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(startCoords);
+
+				}
+
 				var prefab = spawnGroup.SpawnGroup.Prefabs[i];
 				var options = SpawnGroupManager.CreateSpawningOptions(spawnGroup, prefab);				
 				var spawnPosition = Vector3D.Transform((Vector3D)prefab.Position, spawnMatrix);
@@ -298,8 +304,8 @@ namespace ModularEncountersSpawner.Spawners{
 				var newForward = offsetSurfaceMatrix.Forward;
 				var newUp = offsetSurfaceMatrix.Up;
 
-                GetReversedForwardDirections(spawnGroup, i, ref newForward);
-                GetDerelictDirections(spawnGroup, i, finalCoords, ref newForward, ref newUp);
+				GetReversedForwardDirections(spawnGroup, i, ref newForward);
+				GetDerelictDirections(spawnGroup, i, finalCoords, ref newForward, ref newUp);
 				
 				var speedL = Vector3.Zero;
 				var speedA = Vector3.Zero;
@@ -318,13 +324,13 @@ namespace ModularEncountersSpawner.Spawners{
 					
 				}
 
-                Logger.AddMsg("Installation Forward Vector: " + newForward.ToString(), true);
+				Logger.AddMsg("Installation Forward Vector: " + newForward.ToString(), true);
 				var pendingNPC = new ActiveNPC();
 				pendingNPC.SpawnGroup = spawnGroup;
-                pendingNPC.SpawnGroupName = spawnGroup.SpawnGroupName;
-                pendingNPC.InitialFaction = randFactionTag;
-                pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
-                pendingNPC.Name = prefab.SubtypeId;
+				pendingNPC.SpawnGroupName = spawnGroup.SpawnGroupName;
+				pendingNPC.InitialFaction = randFactionTag;
+				pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
+				pendingNPC.Name = prefab.SubtypeId;
 				pendingNPC.GridName = MyDefinitionManager.Static.GetPrefabDefinition(prefab.SubtypeId).CubeGrids[0].DisplayName;
 				pendingNPC.StartCoords = finalCoords;
 				pendingNPC.CurrentCoords = finalCoords;
@@ -426,75 +432,75 @@ namespace ModularEncountersSpawner.Spawners{
 		
 		public static void GetDerelictDirections(ImprovedSpawnGroup spawnGroup, int index, Vector3D coords, ref Vector3D forward, ref Vector3D up){
 			
-            if(index >= spawnGroup.RotateInstallations.Count) {
+			if(index >= spawnGroup.RotateInstallations.Count) {
 
-                Logger.AddMsg("Installation Prefab Index Higher Than Rotation List Count", true);
-                return;
+				Logger.AddMsg("Installation Prefab Index Higher Than Rotation List Count", true);
+				return;
 
-            }
+			}
 
-            var rotationData = spawnGroup.RotateInstallations[index];
+			var rotationData = spawnGroup.RotateInstallations[index];
 
-            //Do Not Rotate
-            if(rotationData == Vector3D.Zero) {
+			//Do Not Rotate
+			if(rotationData == Vector3D.Zero) {
 
-                Logger.AddMsg("Installation Rotation Data is Zero", true);
-                return;
+				Logger.AddMsg("Installation Rotation Data is Zero", true);
+				return;
 
-            }
+			}
 
-            //Produce Random Rotation
-            if(rotationData == new Vector3D(100, 100, 100)) {
+			//Produce Random Rotation
+			if(rotationData == new Vector3D(100, 100, 100)) {
 
-                Logger.AddMsg("Installation Rotation Randomized", true);
-                double x = SpawnResources.rnd.Next(-100, 110);
-                double y = SpawnResources.rnd.Next(-100, 110);
-                double z = SpawnResources.rnd.Next(-100, 110);
-                var rotationVector = new Vector3D(x / 10.0, y / 10.0, z / 10.0);
-                var tempMatrix = MatrixD.CreateWorld(Vector3D.Zero, forward, up);
-                var rotationMatrix = CalculateDerelictSpawnMatrix(tempMatrix, rotationVector);
-                forward = rotationMatrix.Forward;
-                up = rotationMatrix.Up;
-                return;
+				Logger.AddMsg("Installation Rotation Randomized", true);
+				double x = SpawnResources.rnd.Next(-100, 110);
+				double y = SpawnResources.rnd.Next(-100, 110);
+				double z = SpawnResources.rnd.Next(-100, 110);
+				var rotationVector = new Vector3D(x / 10.0, y / 10.0, z / 10.0);
+				var tempMatrix = MatrixD.CreateWorld(Vector3D.Zero, forward, up);
+				var rotationMatrix = CalculateDerelictSpawnMatrix(tempMatrix, rotationVector);
+				forward = rotationMatrix.Forward;
+				up = rotationMatrix.Up;
+				return;
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Installation Rotation Set To Preset", true);
-                var tempMatrix = MatrixD.CreateWorld(Vector3D.Zero, forward, up);
-                var rotationMatrix = CalculateDerelictSpawnMatrix(tempMatrix, rotationData);
-                forward = rotationMatrix.Forward;
-                up = rotationMatrix.Up;
+				Logger.AddMsg("Installation Rotation Set To Preset", true);
+				var tempMatrix = MatrixD.CreateWorld(Vector3D.Zero, forward, up);
+				var rotationMatrix = CalculateDerelictSpawnMatrix(tempMatrix, rotationData);
+				forward = rotationMatrix.Forward;
+				up = rotationMatrix.Up;
 
-            }
+			}
 
 
-        }
+		}
 
-        public static void GetReversedForwardDirections(ImprovedSpawnGroup spawnGroup, int index, ref Vector3D forward) {
+		public static void GetReversedForwardDirections(ImprovedSpawnGroup spawnGroup, int index, ref Vector3D forward) {
 
-            if(index >= spawnGroup.ReverseForwardDirections.Count) {
+			if(index >= spawnGroup.ReverseForwardDirections.Count) {
 
-                Logger.AddMsg("Installation Prefab Index Higher Than Rotation List Count", true);
-                return;
+				Logger.AddMsg("Installation Prefab Index Higher Than Rotation List Count", true);
+				return;
 
-            }
+			}
 
-            if(spawnGroup.ReverseForwardDirections[index] == true) {
+			if(spawnGroup.ReverseForwardDirections[index] == true) {
 
-                forward *= -1;
+				forward *= -1;
 
-            }
+			}
 
-        }
+		}
 
-        public static List<ImprovedSpawnGroup> GetPlanetaryInstallations(Vector3D playerCoords, out List<ImprovedSpawnGroup> smallStations, out List<ImprovedSpawnGroup> mediumStations, out List<ImprovedSpawnGroup> largeStations, out Dictionary<string, List<string>> validFactions) {
+		public static List<ImprovedSpawnGroup> GetPlanetaryInstallations(Vector3D playerCoords, out List<ImprovedSpawnGroup> smallStations, out List<ImprovedSpawnGroup> mediumStations, out List<ImprovedSpawnGroup> largeStations, out Dictionary<string, List<string>> validFactions) {
 			
 			smallStations = new List<ImprovedSpawnGroup>();
 			mediumStations = new List<ImprovedSpawnGroup>();
 			largeStations = new List<ImprovedSpawnGroup>();
-            validFactions = new Dictionary<string, List<string>>();
+			validFactions = new Dictionary<string, List<string>>();
 
-            MyPlanet planet = SpawnResources.GetNearestPlanet(playerCoords);
+			MyPlanet planet = SpawnResources.GetNearestPlanet(playerCoords);
 			string specificGroup = "";
 			var planetRestrictions = new List<string>(Settings.General.PlanetSpawnsDisableList.ToList());
 			SpawnGroupSublists.Clear();
@@ -568,21 +574,21 @@ namespace ModularEncountersSpawner.Spawners{
 					
 				}
 
-                var validFactionsList = SpawnResources.ValidNpcFactions(spawnGroup, playerCoords);
+				var validFactionsList = SpawnResources.ValidNpcFactions(spawnGroup, playerCoords);
 
-                if(validFactionsList.Count == 0) {
+				if(validFactionsList.Count == 0) {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                if(validFactions.ContainsKey(spawnGroup.SpawnGroupName) == false) {
+				if(validFactions.ContainsKey(spawnGroup.SpawnGroupName) == false) {
 
-                    validFactions.Add(spawnGroup.SpawnGroupName, validFactionsList);
+					validFactions.Add(spawnGroup.SpawnGroupName, validFactionsList);
 
-                }
+				}
 
-                if(spawnGroup.Frequency > 0){
+				if(spawnGroup.Frequency > 0){
 					
 					string modID = spawnGroup.SpawnGroup.Context.ModId;
 					
@@ -851,50 +857,50 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 
-        public static MatrixD CalculateDerelictSpawnMatrix(MatrixD existingMatrix, Vector3D rotationValues) {
+		public static MatrixD CalculateDerelictSpawnMatrix(MatrixD existingMatrix, Vector3D rotationValues) {
 
-            //X: Pitch - Up/Forward | +Up -Down
-            //Y: Yaw   - Forward/Up | +Right -Left
-            //Z: Roll  - Up/Forward | +Right -Left
+			//X: Pitch - Up/Forward | +Up -Down
+			//Y: Yaw   - Forward/Up | +Right -Left
+			//Z: Roll  - Up/Forward | +Right -Left
 
-            var resultMatrix = existingMatrix;
+			var resultMatrix = existingMatrix;
 
-            if(rotationValues.X != 0) {
+			if(rotationValues.X != 0) {
 
-                var translation = resultMatrix.Translation;
-                var fowardPos = resultMatrix.Forward * 45;
-                var upPos = resultMatrix.Up * 45;
-                var pitchForward = Vector3D.Normalize(resultMatrix.Up * rotationValues.X + fowardPos);
-                var pitchUp = Vector3D.Normalize(resultMatrix.Backward * rotationValues.X + upPos);
-                resultMatrix = MatrixD.CreateWorld(translation, pitchForward, pitchUp);
+				var translation = resultMatrix.Translation;
+				var fowardPos = resultMatrix.Forward * 45;
+				var upPos = resultMatrix.Up * 45;
+				var pitchForward = Vector3D.Normalize(resultMatrix.Up * rotationValues.X + fowardPos);
+				var pitchUp = Vector3D.Normalize(resultMatrix.Backward * rotationValues.X + upPos);
+				resultMatrix = MatrixD.CreateWorld(translation, pitchForward, pitchUp);
 
-            }
+			}
 
-            if(rotationValues.Y != 0) {
+			if(rotationValues.Y != 0) {
 
-                var translation = resultMatrix.Translation;
-                var fowardPos = resultMatrix.Forward * 45;
-                var upPos = resultMatrix.Up * 45;
-                var yawForward = Vector3D.Normalize(resultMatrix.Right * rotationValues.Y + fowardPos);
-                var yawUp = resultMatrix.Up;
-                resultMatrix = MatrixD.CreateWorld(translation, yawForward, yawUp);
+				var translation = resultMatrix.Translation;
+				var fowardPos = resultMatrix.Forward * 45;
+				var upPos = resultMatrix.Up * 45;
+				var yawForward = Vector3D.Normalize(resultMatrix.Right * rotationValues.Y + fowardPos);
+				var yawUp = resultMatrix.Up;
+				resultMatrix = MatrixD.CreateWorld(translation, yawForward, yawUp);
 
-            }
+			}
 
-            if(rotationValues.Z != 0) {
+			if(rotationValues.Z != 0) {
 
-                var translation = resultMatrix.Translation;
-                var fowardPos = resultMatrix.Forward * 45;
-                var upPos = resultMatrix.Up * 45;
-                var rollForward = resultMatrix.Forward;
-                var rollUp = Vector3D.Normalize(resultMatrix.Right * rotationValues.Z + upPos);
-                resultMatrix = MatrixD.CreateWorld(translation, rollForward, rollUp);
+				var translation = resultMatrix.Translation;
+				var fowardPos = resultMatrix.Forward * 45;
+				var upPos = resultMatrix.Up * 45;
+				var rollForward = resultMatrix.Forward;
+				var rollUp = Vector3D.Normalize(resultMatrix.Right * rotationValues.Z + upPos);
+				resultMatrix = MatrixD.CreateWorld(translation, rollForward, rollUp);
 
-            }
+			}
 
-            return resultMatrix;
+			return resultMatrix;
 
-        }
+		}
 			
 	}
 	

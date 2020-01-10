@@ -146,7 +146,7 @@ namespace ModularEncountersSpawner {
 			"Purity",
 			"Fortitude",
 			"Discipline",
-            "Redemption",
+			"Redemption",
 			"Advantage"
 			
 		};
@@ -208,8 +208,8 @@ namespace ModularEncountersSpawner {
 
 			"Trickery",
 			"Stench",
-            "Aroma",
-            "Left-Overs",
+			"Aroma",
+			"Left-Overs",
 			"Dirty-Laundry",
 			"Private-Stash"
 			
@@ -272,7 +272,7 @@ namespace ModularEncountersSpawner {
 			"Vandal",
 			"Arsonist",
 			"Saboteur",
-            "Malcontent",
+			"Malcontent",
 			"Interloper"
 		};
 		
@@ -456,272 +456,272 @@ namespace ModularEncountersSpawner {
 			
 		};
 
-        public static string CreateRandomNameFromPattern(string pattern) {
+		public static string CreateRandomNameFromPattern(string pattern) {
 
-            string newPattern = pattern;
+			string newPattern = pattern;
 
-            if(newPattern.Contains("GoodAdjective") == true) {
+			if(newPattern.Contains("GoodAdjective") == true) {
 
-                var randString = GoodAdjectives[Rnd.Next(0, GoodAdjectives.Length)];
-                newPattern = newPattern.Replace("GoodAdjective", randString);
+				var randString = GoodAdjectives[Rnd.Next(0, GoodAdjectives.Length)];
+				newPattern = newPattern.Replace("GoodAdjective", randString);
 
-            }
+			}
 
-            if(newPattern.Contains("NeutralAdjective") == true) {
+			if(newPattern.Contains("NeutralAdjective") == true) {
 
-                var randString = NeutralAdjectives[Rnd.Next(0, NeutralAdjectives.Length)];
-                newPattern = newPattern.Replace("NeutralAdjective", randString);
+				var randString = NeutralAdjectives[Rnd.Next(0, NeutralAdjectives.Length)];
+				newPattern = newPattern.Replace("NeutralAdjective", randString);
 
-            }
+			}
 
-            if(newPattern.Contains("BadAdjective") == true) {
+			if(newPattern.Contains("BadAdjective") == true) {
 
-                var randString = BadAdjectives[Rnd.Next(0, BadAdjectives.Length)];
-                newPattern = newPattern.Replace("BadAdjective", randString);
+				var randString = BadAdjectives[Rnd.Next(0, BadAdjectives.Length)];
+				newPattern = newPattern.Replace("BadAdjective", randString);
 
-            }
+			}
 
-            if(newPattern.Contains("FunnyAdjective") == true) {
+			if(newPattern.Contains("FunnyAdjective") == true) {
 
-                var randString = FunnyAdjectives[Rnd.Next(0, FunnyAdjectives.Length)];
-                newPattern = newPattern.Replace("FunnyAdjective", randString);
+				var randString = FunnyAdjectives[Rnd.Next(0, FunnyAdjectives.Length)];
+				newPattern = newPattern.Replace("FunnyAdjective", randString);
 
-            }
+			}
 
-            if(newPattern.Contains("ColorAdjective") == true) {
+			if(newPattern.Contains("ColorAdjective") == true) {
 
-                var randString = ColorAdjectives[Rnd.Next(0, ColorAdjectives.Length)];
-                newPattern = newPattern.Replace("ColorAdjective", randString);
+				var randString = ColorAdjectives[Rnd.Next(0, ColorAdjectives.Length)];
+				newPattern = newPattern.Replace("ColorAdjective", randString);
 
-            }
+			}
 
-            if(newPattern.Contains("GoodNoun") == true) {
+			if(newPattern.Contains("GoodNoun") == true) {
 
-                var randString = GoodNouns[Rnd.Next(0, GoodNouns.Length)];
-                newPattern = newPattern.Replace("GoodNoun", randString);
+				var randString = GoodNouns[Rnd.Next(0, GoodNouns.Length)];
+				newPattern = newPattern.Replace("GoodNoun", randString);
 
-            }
+			}
 
-            if(newPattern.Contains("NeutralNoun") == true) {
+			if(newPattern.Contains("NeutralNoun") == true) {
 
-                var randString = NeutralNouns[Rnd.Next(0, NeutralNouns.Length)];
-                newPattern = newPattern.Replace("NeutralNoun", randString);
+				var randString = NeutralNouns[Rnd.Next(0, NeutralNouns.Length)];
+				newPattern = newPattern.Replace("NeutralNoun", randString);
 
-            }
+			}
 
-            if(newPattern.Contains("BadNoun") == true) {
+			if(newPattern.Contains("BadNoun") == true) {
 
-                var randString = BadNouns[Rnd.Next(0, BadNouns.Length)];
-                newPattern = newPattern.Replace("BadNoun", randString);
+				var randString = BadNouns[Rnd.Next(0, BadNouns.Length)];
+				newPattern = newPattern.Replace("BadNoun", randString);
 
-            }
+			}
 
-            if(newPattern.Contains("FunnyNoun") == true) {
+			if(newPattern.Contains("FunnyNoun") == true) {
 
-                var randString = FunnyNouns[Rnd.Next(0, FunnyNouns.Length)];
-                newPattern = newPattern.Replace("FunnyNoun", randString);
+				var randString = FunnyNouns[Rnd.Next(0, FunnyNouns.Length)];
+				newPattern = newPattern.Replace("FunnyNoun", randString);
 
-            }
+			}
 
-            if(newPattern.Contains("AuthorityNoun") == true) {
+			if(newPattern.Contains("AuthorityNoun") == true) {
 
-                var randString = AuthorityNouns[Rnd.Next(0, AuthorityNouns.Length)];
+				var randString = AuthorityNouns[Rnd.Next(0, AuthorityNouns.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("AuthorityNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("AuthorityNoun's")) {
 
-                    newPattern = newPattern.Replace("AuthorityNoun's", randString + "'");
+					newPattern = newPattern.Replace("AuthorityNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("AuthorityNoun", randString);
+					newPattern = newPattern.Replace("AuthorityNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("MilitaryNoun") == true) {
+			if(newPattern.Contains("MilitaryNoun") == true) {
 
-                var randString = MilitaryNouns[Rnd.Next(0, MilitaryNouns.Length)];
+				var randString = MilitaryNouns[Rnd.Next(0, MilitaryNouns.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("MilitaryNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("MilitaryNoun's")) {
 
-                    newPattern = newPattern.Replace("MilitaryNoun's", randString + "'");
+					newPattern = newPattern.Replace("MilitaryNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("MilitaryNoun", randString);
+					newPattern = newPattern.Replace("MilitaryNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("BaddieNoun") == true) {
+			if(newPattern.Contains("BaddieNoun") == true) {
 
-                var randString = BaddieNouns[Rnd.Next(0, BaddieNouns.Length)];
+				var randString = BaddieNouns[Rnd.Next(0, BaddieNouns.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("BaddieNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("BaddieNoun's")) {
 
-                    newPattern = newPattern.Replace("BaddieNoun's", randString + "'");
+					newPattern = newPattern.Replace("BaddieNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("BaddieNoun", randString);
+					newPattern = newPattern.Replace("BaddieNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("ExplorerNoun") == true) {
+			if(newPattern.Contains("ExplorerNoun") == true) {
 
-                var randString = ExplorerNouns[Rnd.Next(0, ExplorerNouns.Length)];
+				var randString = ExplorerNouns[Rnd.Next(0, ExplorerNouns.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("ExplorerNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("ExplorerNoun's")) {
 
-                    newPattern = newPattern.Replace("ExplorerNoun's", randString + "'");
+					newPattern = newPattern.Replace("ExplorerNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("ExplorerNoun", randString);
+					newPattern = newPattern.Replace("ExplorerNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("JobNoun") == true) {
+			if(newPattern.Contains("JobNoun") == true) {
 
-                var randString = JobNouns[Rnd.Next(0, JobNouns.Length)];
+				var randString = JobNouns[Rnd.Next(0, JobNouns.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("JobNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("JobNoun's")) {
 
-                    newPattern = newPattern.Replace("JobNoun's", randString + "'");
+					newPattern = newPattern.Replace("JobNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("JobNoun", randString);
+					newPattern = newPattern.Replace("JobNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("BirdNoun") == true) {
+			if(newPattern.Contains("BirdNoun") == true) {
 
-                var randString = BirdNouns[Rnd.Next(0, BirdNouns.Length)];
+				var randString = BirdNouns[Rnd.Next(0, BirdNouns.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("BirdNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("BirdNoun's")) {
 
-                    newPattern = newPattern.Replace("BirdNoun's", randString + "'");
+					newPattern = newPattern.Replace("BirdNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("BirdNoun", randString);
+					newPattern = newPattern.Replace("BirdNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("AnimalNoun") == true) {
+			if(newPattern.Contains("AnimalNoun") == true) {
 
-                var randString = AnimalNouns[Rnd.Next(0, AnimalNouns.Length)];
+				var randString = AnimalNouns[Rnd.Next(0, AnimalNouns.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("AnimalNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("AnimalNoun's")) {
 
-                    newPattern = newPattern.Replace("AnimalNoun's", randString + "'");
+					newPattern = newPattern.Replace("AnimalNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("AnimalNoun", randString);
+					newPattern = newPattern.Replace("AnimalNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("FishNoun") == true) {
+			if(newPattern.Contains("FishNoun") == true) {
 
-                var randString = FishNouns[Rnd.Next(0, FishNouns.Length)];
+				var randString = FishNouns[Rnd.Next(0, FishNouns.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("FishNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("FishNoun's")) {
 
-                    newPattern = newPattern.Replace("FishNoun's", randString + "'");
+					newPattern = newPattern.Replace("FishNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("FishNoun", randString);
+					newPattern = newPattern.Replace("FishNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("InsectNoun") == true) {
+			if(newPattern.Contains("InsectNoun") == true) {
 
-                var randString = InsectNouns[Rnd.Next(0, InsectNouns.Length)];
+				var randString = InsectNouns[Rnd.Next(0, InsectNouns.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("InsectNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("InsectNoun's")) {
 
-                    newPattern = newPattern.Replace("InsectNoun's", randString + "'");
+					newPattern = newPattern.Replace("InsectNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("InsectNoun", randString);
+					newPattern = newPattern.Replace("InsectNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("SurnamesNoun") == true) {
+			if(newPattern.Contains("SurnamesNoun") == true) {
 
-                var randString = Surnames[Rnd.Next(0, Surnames.Length)];
+				var randString = Surnames[Rnd.Next(0, Surnames.Length)];
 
-                if(randString.EndsWith("s") && newPattern.Contains("SurnamesNoun's")) {
+				if(randString.EndsWith("s") && newPattern.Contains("SurnamesNoun's")) {
 
-                    newPattern = newPattern.Replace("SurnamesNoun's", randString + "'");
+					newPattern = newPattern.Replace("SurnamesNoun's", randString + "'");
 
-                } else {
+				} else {
 
-                    newPattern = newPattern.Replace("SurnamesNoun", randString);
+					newPattern = newPattern.Replace("SurnamesNoun", randString);
 
-                }
+				}
 
-            }
+			}
 
-            if(newPattern.Contains("RandomLetter") == true) {
+			if(newPattern.Contains("RandomLetter") == true) {
 
-                string randString = CharStringLetters[Rnd.Next(0, CharStringLetters.Length)].ToString();
+				string randString = CharStringLetters[Rnd.Next(0, CharStringLetters.Length)].ToString();
 
-                newPattern = ReplaceFirstOccurence("RandomLetter", randString, newPattern);
+				newPattern = ReplaceFirstOccurence("RandomLetter", randString, newPattern);
 
-            }
+			}
 
-            if(newPattern.Contains("RandomNumber") == true) {
+			if(newPattern.Contains("RandomNumber") == true) {
 
-                string randString = CharStringNumbers[Rnd.Next(0, CharStringNumbers.Length)].ToString();
+				string randString = CharStringNumbers[Rnd.Next(0, CharStringNumbers.Length)].ToString();
 
-                newPattern = ReplaceFirstOccurence("RandomNumber", randString, newPattern);
+				newPattern = ReplaceFirstOccurence("RandomNumber", randString, newPattern);
 
-            }
+			}
 
-            if(newPattern.Contains("RandomChar") == true) {
+			if(newPattern.Contains("RandomChar") == true) {
 
-                string randString = CharStringAll[Rnd.Next(0, CharStringAll.Length)].ToString();
+				string randString = CharStringAll[Rnd.Next(0, CharStringAll.Length)].ToString();
 
-                newPattern = ReplaceFirstOccurence("RandomChar", randString, newPattern);
+				newPattern = ReplaceFirstOccurence("RandomChar", randString, newPattern);
 
-            }
+			}
 
-            return newPattern;
+			return newPattern;
 
-        }
+		}
 
-        //Following Method Found At This Source:
-        //https://social.msdn.microsoft.com/Forums/en-US/25936e13-6ae6-4234-b604-d68d3c798d68/replace-only-first-instance-of-each?forum=regexp
-        public static string ReplaceFirstOccurence(string wordToReplace, string replaceWith, string input) {
+		//Following Method Found At This Source:
+		//https://social.msdn.microsoft.com/Forums/en-US/25936e13-6ae6-4234-b604-d68d3c798d68/replace-only-first-instance-of-each?forum=regexp
+		public static string ReplaceFirstOccurence(string wordToReplace, string replaceWith, string input) {
 
-            Regex r = new Regex(wordToReplace, RegexOptions.IgnoreCase);
+			Regex r = new Regex(wordToReplace, RegexOptions.IgnoreCase);
 
-            return r.Replace(input, replaceWith, 1);
+			return r.Replace(input, replaceWith, 1);
 
-        }
+		}
 
 
-    }
+	}
 
 }

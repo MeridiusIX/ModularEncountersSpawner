@@ -139,23 +139,44 @@ namespace ModularEncountersSpawner {
 
             foreach(var location in Locations) {
 
-                if(matchFaction == true && faction != location.NpcFaction) {
-
-                    continue;
-
-                }
-
-                if(Vector3D.Distance(coords, location.Coords) > location.Radius) {
-
-                    continue;
-
-                }
-
-                return true;
+                if (IsPositionInKnownPlayerLocation(location, coords, matchFaction, faction))
+                    return true;
 
             }
 
             return false;
+
+        }
+
+        public static bool IsPositionInKnownPlayerLocation(KnownPlayerLocation location, Vector3D coords, bool matchFaction = false, string faction = "") {
+
+            if (matchFaction == true && faction != location.NpcFaction) {
+
+                return false;
+
+            }
+
+            if (Vector3D.Distance(coords, location.Coords) > location.Radius) {
+
+                return false;
+
+            }
+
+            return true;
+
+        }
+
+        public static void IncreaseSpawnCountOfLocations(Vector3D coords) {
+
+            foreach (var location in Locations) {
+
+                if (IsPositionInKnownPlayerLocation(location, coords, false)) {
+
+                    location.SpawnedEncounters++;
+
+                }
+
+            }
 
         }
 

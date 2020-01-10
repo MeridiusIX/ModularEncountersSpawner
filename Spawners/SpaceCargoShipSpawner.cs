@@ -53,9 +53,9 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-            KnownPlayerLocationManager.CleanExpiredLocations();
-            var validFactions = new Dictionary<string, List<string>>();
-            var spawnGroupList = GetSpaceCargoShips(startCoords, out validFactions);
+			KnownPlayerLocationManager.CleanExpiredLocations();
+			var validFactions = new Dictionary<string, List<string>>();
+			var spawnGroupList = GetSpaceCargoShips(startCoords, out validFactions);
 			
 			if(Settings.General.UseModIdSelectionForSpawning == true){
 				
@@ -95,27 +95,33 @@ namespace ModularEncountersSpawner.Spawners{
 			var spawnForwardDir = Vector3D.Normalize(endPathCoords - startPathCoords);
 			var spawnUpDir = Vector3D.CalculatePerpendicularVector(spawnForwardDir);
 			var spawnMatrix = MatrixD.CreateWorld(startPathCoords, spawnForwardDir, spawnUpDir);
-            long gridOwner = 0;
-            var randFactionTag = spawnGroup.FactionOwner;
+			long gridOwner = 0;
+			var randFactionTag = spawnGroup.FactionOwner;
 
-            if(validFactions.ContainsKey(spawnGroup.SpawnGroupName)) {
+			if(validFactions.ContainsKey(spawnGroup.SpawnGroupName)) {
 
-                randFactionTag = validFactions[spawnGroup.SpawnGroupName][SpawnResources.rnd.Next(0, validFactions[spawnGroup.SpawnGroupName].Count)];
+				randFactionTag = validFactions[spawnGroup.SpawnGroupName][SpawnResources.rnd.Next(0, validFactions[spawnGroup.SpawnGroupName].Count)];
 
-            }
+			}
 
-            if(NPCWatcher.NPCFactionTagToFounder.ContainsKey(randFactionTag) == true) {
+			if(NPCWatcher.NPCFactionTagToFounder.ContainsKey(randFactionTag) == true) {
 
-                gridOwner = NPCWatcher.NPCFactionTagToFounder[randFactionTag];
+				gridOwner = NPCWatcher.NPCFactionTagToFounder[randFactionTag];
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Could Not Find Faction Founder For: " + randFactionTag);
+				Logger.AddMsg("Could Not Find Faction Founder For: " + randFactionTag);
 
-            }
+			}
 
-            foreach(var prefab in spawnGroup.SpawnGroup.Prefabs){
-				
+			foreach(var prefab in spawnGroup.SpawnGroup.Prefabs){
+
+				if (spawnGroup.UseKnownPlayerLocations) {
+
+					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(startCoords);
+
+				}
+
 				var options = SpawnGroupManager.CreateSpawningOptions(spawnGroup, prefab);
 				var spawnPosition = Vector3D.Transform((Vector3D)prefab.Position, spawnMatrix);
 				var speedL = prefab.Speed * (Vector3)spawnForwardDir;
@@ -152,18 +158,18 @@ namespace ModularEncountersSpawner.Spawners{
 				}
 				
 				var pendingNPC = new ActiveNPC();
-                pendingNPC.SpawnGroupName = spawnGroup.SpawnGroupName;
-                pendingNPC.SpawnGroup = spawnGroup;
-                pendingNPC.InitialFaction = randFactionTag;
-                pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
-                pendingNPC.Name = prefab.SubtypeId;
+				pendingNPC.SpawnGroupName = spawnGroup.SpawnGroupName;
+				pendingNPC.SpawnGroup = spawnGroup;
+				pendingNPC.InitialFaction = randFactionTag;
+				pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
+				pendingNPC.Name = prefab.SubtypeId;
 				pendingNPC.GridName = MyDefinitionManager.Static.GetPrefabDefinition(prefab.SubtypeId).CubeGrids[0].DisplayName;
 				pendingNPC.StartCoords = startPathCoords;
 				pendingNPC.CurrentCoords = startPathCoords;
 				pendingNPC.EndCoords = endPathCoords;
 				pendingNPC.SpawnType = "SpaceCargoShip";
-                pendingNPC.AutoPilotSpeed = speedL.Length();
-                pendingNPC.CleanupIgnore = spawnGroup.IgnoreCleanupRules;
+				pendingNPC.AutoPilotSpeed = speedL.Length();
+				pendingNPC.CleanupIgnore = spawnGroup.IgnoreCleanupRules;
 				pendingNPC.ForceStaticGrid = spawnGroup.ForceStaticGrid;
 				pendingNPC.KeenAiName = prefab.Behaviour;
 				pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
@@ -420,8 +426,8 @@ namespace ModularEncountersSpawner.Spawners{
 			bool allowLunar = false;
 			string specificGroup = "";
 			var planetRestrictions = new List<string>(Settings.General.PlanetSpawnsDisableList.ToList());
-            validFactions = new Dictionary<string, List<string>>();
-            SpawnGroupSublists.Clear();
+			validFactions = new Dictionary<string, List<string>>();
+			SpawnGroupSublists.Clear();
 			EligibleSpawnsByModId.Clear();
 			
 			if(planet != null){
@@ -507,19 +513,19 @@ namespace ModularEncountersSpawner.Spawners{
 					
 				}
 
-                var validFactionsList = SpawnResources.ValidNpcFactions(spawnGroup, playerCoords);
+				var validFactionsList = SpawnResources.ValidNpcFactions(spawnGroup, playerCoords);
 
-                if(validFactionsList.Count == 0) {
+				if(validFactionsList.Count == 0) {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                if(validFactions.ContainsKey(spawnGroup.SpawnGroupName) == false) {
+				if(validFactions.ContainsKey(spawnGroup.SpawnGroupName) == false) {
 
-                    validFactions.Add(spawnGroup.SpawnGroupName, validFactionsList);
+					validFactions.Add(spawnGroup.SpawnGroupName, validFactionsList);
 
-                }
+				}
 				
 				if(spawnGroup.Frequency > 0){
 					

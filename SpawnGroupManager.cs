@@ -47,12 +47,12 @@ namespace ModularEncountersSpawner{
 		public static string AdminSpawnGroup = "";
 		public static string GroupInstance = "";
 
-        //IMyPlayer // bool TryGetBalanceInfo(out long balance);
-        //IMyFactionCollection // int GetReputationBetweenFactions(long factionId1, long factionId2);
-        //IMyFaction // bool TryGetBalanceInfo(out long balance);
+		//IMyPlayer // bool TryGetBalanceInfo(out long balance);
+		//IMyFactionCollection // int GetReputationBetweenFactions(long factionId1, long factionId2);
+		//IMyFaction // bool TryGetBalanceInfo(out long balance);
 
 
-        public static SpawningOptions CreateSpawningOptions(ImprovedSpawnGroup spawnGroup, MySpawnGroupDefinition.SpawnGroupPrefab prefab){
+		public static SpawningOptions CreateSpawningOptions(ImprovedSpawnGroup spawnGroup, MySpawnGroupDefinition.SpawnGroupPrefab prefab){
 			
 			var options = SpawningOptions.None;
 			
@@ -107,11 +107,11 @@ namespace ModularEncountersSpawner{
 			//Get Regular SpawnGroups
 			var regularSpawnGroups = MyDefinitionManager.Static.GetSpawnGroupDefinitions();
 
-            var blacklist = new List<string>();
-            blacklist.Add("1933101542.sbm"); //SUPERNPCS (uses unauthorized content from several mods).
+			var blacklist = new List<string>();
+			blacklist.Add("1933101542.sbm"); //SUPERNPCS (uses unauthorized content from several mods).
 
-            //Get Actual SpawnGroups
-            foreach(var spawnGroup in regularSpawnGroups){
+			//Get Actual SpawnGroups
+			foreach(var spawnGroup in regularSpawnGroups){
 				
 				if(spawnGroup.Enabled == false){
 					
@@ -119,15 +119,15 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                if(spawnGroup.Context?.ModId != null) {
+				if(spawnGroup.Context?.ModId != null) {
 
-                    if(blacklist.Contains(spawnGroup.Context.ModId) == true) {
+					if(blacklist.Contains(spawnGroup.Context.ModId) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                }
+				}
 				
 				if(TerritoryManager.IsSpawnGroupATerritory(spawnGroup) == true){
 					
@@ -154,16 +154,16 @@ namespace ModularEncountersSpawner{
 
 			}
 
-            if(SpawnGroupManager.GroupInstance.Contains(Encoding.UTF8.GetString(Convert.FromBase64String("LnNibQ=="))) == true && SpawnGroupManager.GroupInstance.Contains(Encoding.UTF8.GetString(Convert.FromBase64String("MTUyMTkwNTg5MA=="))) == false) {
+			if(SpawnGroupManager.GroupInstance.Contains(Encoding.UTF8.GetString(Convert.FromBase64String("LnNibQ=="))) == true && SpawnGroupManager.GroupInstance.Contains(Encoding.UTF8.GetString(Convert.FromBase64String("MTUyMTkwNTg5MA=="))) == false) {
 
-                SpawnGroups.Clear();
-                return;
+				SpawnGroups.Clear();
+				return;
 
-            }
+			}
 
-            //Create Frequency Range Dictionaries
+			//Create Frequency Range Dictionaries
 
-        }
+		}
 
 		public static bool CheckSpawnGroupPlanetLists(ImprovedSpawnGroup spawnGroup, MyPlanet planet){
 			
@@ -343,22 +343,22 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //RotateInstallations
-                if(tag.Contains("[RotateInstallations") == true) {
+				//RotateInstallations
+				if(tag.Contains("[RotateInstallations") == true) {
 
-                    improveSpawnGroup.RotateInstallations = TagVector3DListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RotateInstallations = TagVector3DListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ReverseForwardDirections
-                if(tag.Contains("[ReverseForwardDirections") == true) {
+				//ReverseForwardDirections
+				if(tag.Contains("[ReverseForwardDirections") == true) {
 
-                    improveSpawnGroup.ReverseForwardDirections = TagBoolListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.ReverseForwardDirections = TagBoolListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //CutVoxelsAtAirtightCells
-                if(tag.Contains("[CutVoxelsAtAirtightCells:") == true){
+				//CutVoxelsAtAirtightCells
+				if(tag.Contains("[CutVoxelsAtAirtightCells:") == true){
 
 					improveSpawnGroup.CutVoxelsAtAirtightCells = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -385,29 +385,29 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //RivalAiSpaceSpawn
-                if(tag.Contains("[RivalAiSpaceSpawn") == true) {
+				//RivalAiSpaceSpawn
+				if(tag.Contains("[RivalAiSpaceSpawn") == true) {
 
-                    improveSpawnGroup.RivalAiSpaceSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RivalAiSpaceSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //RivalAiAtmosphericSpawn
-                if(tag.Contains("[RivalAiAtmosphericSpawn") == true) {
+				//RivalAiAtmosphericSpawn
+				if(tag.Contains("[RivalAiAtmosphericSpawn") == true) {
 
-                    improveSpawnGroup.RivalAiAtmosphericSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RivalAiAtmosphericSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //RivalAiAnySpawn
-                if(tag.Contains("[RivalAiAnySpawn") == true) {
+				//RivalAiAnySpawn
+				if(tag.Contains("[RivalAiAnySpawn") == true) {
 
-                    improveSpawnGroup.RivalAiAnySpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RivalAiAnySpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //Frequency
-                improveSpawnGroup.Frequency = (int)Math.Round((double)spawnGroup.Frequency * 10);
+				//Frequency
+				improveSpawnGroup.Frequency = (int)Math.Round((double)spawnGroup.Frequency * 10);
 				
 				//UniqueEncounter
 				if(tag.Contains("[UniqueEncounter") == true){
@@ -429,29 +429,29 @@ namespace ModularEncountersSpawner{
 
 				}
 
-                //UseRandomMinerFaction
-                if(tag.Contains("[UseRandomMinerFaction") == true) {
+				//UseRandomMinerFaction
+				if(tag.Contains("[UseRandomMinerFaction") == true) {
 
-                    improveSpawnGroup.UseRandomMinerFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseRandomMinerFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //UseRandomBuilderFaction
-                if(tag.Contains("[UseRandomBuilderFaction") == true) {
+				//UseRandomBuilderFaction
+				if(tag.Contains("[UseRandomBuilderFaction") == true) {
 
-                    improveSpawnGroup.UseRandomBuilderFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseRandomBuilderFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //UseRandomTraderFaction
-                if(tag.Contains("[UseRandomTraderFaction") == true) {
+				//UseRandomTraderFaction
+				if(tag.Contains("[UseRandomTraderFaction") == true) {
 
-                    improveSpawnGroup.UseRandomTraderFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseRandomTraderFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //IgnoreCleanupRules
-                if(tag.Contains("[IgnoreCleanupRules") == true){
+				//IgnoreCleanupRules
+				if(tag.Contains("[IgnoreCleanupRules") == true){
 
 					improveSpawnGroup.IgnoreCleanupRules = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -464,36 +464,36 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //UseNonPhysicalAmmo
-                if(tag.Contains("[UseNonPhysicalAmmo") == true) {
+				//UseNonPhysicalAmmo
+				if(tag.Contains("[UseNonPhysicalAmmo") == true) {
 
-                    improveSpawnGroup.UseNonPhysicalAmmo = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseNonPhysicalAmmo = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //RemoveContainerContents
-                if(tag.Contains("[RemoveContainerContents") == true) {
+				//RemoveContainerContents
+				if(tag.Contains("[RemoveContainerContents") == true) {
 
-                    improveSpawnGroup.RemoveContainerContents = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RemoveContainerContents = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //InitializeStoreBlocks
-                if(tag.Contains("[InitializeStoreBlocks") == true) {
+				//InitializeStoreBlocks
+				if(tag.Contains("[InitializeStoreBlocks") == true) {
 
-                    improveSpawnGroup.InitializeStoreBlocks = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.InitializeStoreBlocks = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ContainerTypesForStoreOrders
-                if(tag.Contains("[ContainerTypesForStoreOrders") == true) {
+				//ContainerTypesForStoreOrders
+				if(tag.Contains("[ContainerTypesForStoreOrders") == true) {
 
-                    improveSpawnGroup.ContainerTypesForStoreOrders = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.ContainerTypesForStoreOrders = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ForceStaticGrid
-                if(tag.Contains("[ForceStaticGrid") == true){
+				//ForceStaticGrid
+				if(tag.Contains("[ForceStaticGrid") == true){
 
 					improveSpawnGroup.ForceStaticGrid = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 					setForceStatic = true;
@@ -514,50 +514,50 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //FalseSandboxVariables
-                if(tag.Contains("[FalseSandboxVariables") == true) {
+				//FalseSandboxVariables
+				if(tag.Contains("[FalseSandboxVariables") == true) {
 
-                    improveSpawnGroup.FalseSandboxVariables = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.FalseSandboxVariables = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //RandomNumberRoll
-                if(tag.Contains("[RandomNumberRoll") == true){
+				//RandomNumberRoll
+				if(tag.Contains("[RandomNumberRoll") == true){
 
 					improveSpawnGroup.RandomNumberRoll = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.RandomNumberRoll, out badParse);
 						
 				}
 
-                //UseCommonConditions
-                if(tag.Contains("[UseCommonConditions") == true) {
+				//UseCommonConditions
+				if(tag.Contains("[UseCommonConditions") == true) {
 
-                    improveSpawnGroup.UseCommonConditions = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseCommonConditions = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //UseAutoPilotInSpace
-                if(tag.Contains("[UseAutoPilotInSpace") == true) {
+				//UseAutoPilotInSpace
+				if(tag.Contains("[UseAutoPilotInSpace") == true) {
 
-                    improveSpawnGroup.UseAutoPilotInSpace = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseAutoPilotInSpace = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //PauseAutopilotAtPlayerDistance
-                if(tag.Contains("[PauseAutopilotAtPlayerDistance") == true) {
+				//PauseAutopilotAtPlayerDistance
+				if(tag.Contains("[PauseAutopilotAtPlayerDistance") == true) {
 
-                    improveSpawnGroup.PauseAutopilotAtPlayerDistance = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PauseAutopilotAtPlayerDistance, out badParse);
+					improveSpawnGroup.PauseAutopilotAtPlayerDistance = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PauseAutopilotAtPlayerDistance, out badParse);
 
-                }
+				}
 
-                //PreventOwnershipChange
-                if(tag.Contains("[PreventOwnershipChange") == true) {
+				//PreventOwnershipChange
+				if(tag.Contains("[PreventOwnershipChange") == true) {
 
-                    improveSpawnGroup.PreventOwnershipChange = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.PreventOwnershipChange = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //RandomizeWeapons
-                if(tag.Contains("[RandomizeWeapons") == true){
+				//RandomizeWeapons
+				if(tag.Contains("[RandomizeWeapons") == true){
 
 					improveSpawnGroup.RandomizeWeapons = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -661,15 +661,15 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //IgnoreGlobalBlockReplacer
-                if(tag.Contains("[IgnoreGlobalBlockReplacer") == true) {
+				//IgnoreGlobalBlockReplacer
+				if(tag.Contains("[IgnoreGlobalBlockReplacer") == true) {
 
-                    improveSpawnGroup.IgnoreGlobalBlockReplacer = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.IgnoreGlobalBlockReplacer = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ReplaceBlockReference
-                if(tag.Contains("[ReplaceBlockReference") == true){
+				//ReplaceBlockReference
+				if(tag.Contains("[ReplaceBlockReference") == true){
 
 					improveSpawnGroup.ReplaceBlockReference = TagMDIDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -682,71 +682,71 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //UseRandomNameGenerator
-                if(tag.Contains("[UseRandomNameGenerator") == true) {
+				//UseRandomNameGenerator
+				if(tag.Contains("[UseRandomNameGenerator") == true) {
 
-                    improveSpawnGroup.UseRandomNameGenerator = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseRandomNameGenerator = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //RandomGridNamePrefix
-                if(tag.Contains("[RandomGridNamePrefix") == true) {
+				//RandomGridNamePrefix
+				if(tag.Contains("[RandomGridNamePrefix") == true) {
 
-                    improveSpawnGroup.RandomGridNamePrefix = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RandomGridNamePrefix = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //RandomGridNamePattern
-                if(tag.Contains("[RandomGridNamePattern") == true) {
+				//RandomGridNamePattern
+				if(tag.Contains("[RandomGridNamePattern") == true) {
 
-                    improveSpawnGroup.RandomGridNamePattern = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RandomGridNamePattern = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ReplaceAntennaNameWithRandomizedName
-                if(tag.Contains("[ReplaceAntennaNameWithRandomizedName") == true) {
+				//ReplaceAntennaNameWithRandomizedName
+				if(tag.Contains("[ReplaceAntennaNameWithRandomizedName") == true) {
 
-                    improveSpawnGroup.ReplaceAntennaNameWithRandomizedName = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.ReplaceAntennaNameWithRandomizedName = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //UseBlockNameReplacer
-                if(tag.Contains("[UseBlockNameReplacer") == true) {
+				//UseBlockNameReplacer
+				if(tag.Contains("[UseBlockNameReplacer") == true) {
 
-                    improveSpawnGroup.UseBlockNameReplacer = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseBlockNameReplacer = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //BlockNameReplacerReference
-                if(tag.Contains("[BlockNameReplacerReference") == true) {
+				//BlockNameReplacerReference
+				if(tag.Contains("[BlockNameReplacerReference") == true) {
 
-                    improveSpawnGroup.BlockNameReplacerReference = TagStringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.BlockNameReplacerReference = TagStringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //AssignContainerTypesToAllCargo
-                if(tag.Contains("[AssignContainerTypesToAllCargo") == true) {
+				//AssignContainerTypesToAllCargo
+				if(tag.Contains("[AssignContainerTypesToAllCargo") == true) {
 
-                    improveSpawnGroup.AssignContainerTypesToAllCargo = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.AssignContainerTypesToAllCargo = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //UseContainerTypeAssignment
-                if(tag.Contains("[UseContainerTypeAssignment") == true) {
+				//UseContainerTypeAssignment
+				if(tag.Contains("[UseContainerTypeAssignment") == true) {
 
-                    improveSpawnGroup.UseContainerTypeAssignment = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseContainerTypeAssignment = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ContainerTypeAssignmentReference
-                if(tag.Contains("[ContainerTypeAssignmentReference") == true) {
+				//ContainerTypeAssignmentReference
+				if(tag.Contains("[ContainerTypeAssignmentReference") == true) {
 
-                    improveSpawnGroup.ContainerTypeAssignmentReference = TagStringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.ContainerTypeAssignmentReference = TagStringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //OverrideBlockDamageModifier
-                if(tag.Contains("[OverrideBlockDamageModifier") == true){
+				//OverrideBlockDamageModifier
+				if(tag.Contains("[OverrideBlockDamageModifier") == true){
 
 					improveSpawnGroup.OverrideBlockDamageModifier = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -759,22 +759,22 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //GridsAreEditable
-                if(tag.Contains("[GridsAreEditable") == true) {
+				//GridsAreEditable
+				if(tag.Contains("[GridsAreEditable") == true) {
 
-                    improveSpawnGroup.GridsAreEditable = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.GridsAreEditable = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //GridsAreDestructable
-                if(tag.Contains("[GridsAreDestructable") == true) {
+				//GridsAreDestructable
+				if(tag.Contains("[GridsAreDestructable") == true) {
 
-                    improveSpawnGroup.GridsAreDestructable = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.GridsAreDestructable = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ShiftBlockColorsHue
-                if(tag.Contains("[ShiftBlockColorsHue") == true){
+				//ShiftBlockColorsHue
+				if(tag.Contains("[ShiftBlockColorsHue") == true){
 
 					improveSpawnGroup.ShiftBlockColorsHue = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -787,43 +787,43 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //ShiftBlockColorAmount
-                if(tag.Contains("[ShiftBlockColorAmount") == true) {
+				//ShiftBlockColorAmount
+				if(tag.Contains("[ShiftBlockColorAmount") == true) {
 
-                    improveSpawnGroup.ShiftBlockColorAmount = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.ShiftBlockColorAmount, out badParse);
+					improveSpawnGroup.ShiftBlockColorAmount = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.ShiftBlockColorAmount, out badParse);
 
-                }
+				}
 
-                //AssignGridSkin
-                if(tag.Contains("[AssignGridSkin") == true){
+				//AssignGridSkin
+				if(tag.Contains("[AssignGridSkin") == true){
 
 					improveSpawnGroup.AssignGridSkin = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
 				}
 
-                //RecolorGrid
-                if(tag.Contains("[RecolorGrid") == true) {
+				//RecolorGrid
+				if(tag.Contains("[RecolorGrid") == true) {
 
-                    improveSpawnGroup.RecolorGrid = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RecolorGrid = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ColorReferencePairs
-                if(tag.Contains("[ColorReferencePairs") == true) {
+				//ColorReferencePairs
+				if(tag.Contains("[ColorReferencePairs") == true) {
 
-                    improveSpawnGroup.ColorReferencePairs = TagVector3DictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.ColorReferencePairs = TagVector3DictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ColorSkinReferencePairs
-                if(tag.Contains("[ColorSkinReferencePairs") == true) {
+				//ColorSkinReferencePairs
+				if(tag.Contains("[ColorSkinReferencePairs") == true) {
 
-                    improveSpawnGroup.ColorSkinReferencePairs = TagVector3StringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.ColorSkinReferencePairs = TagVector3StringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //ReduceBlockBuildStates
-                if(tag.Contains("[ReduceBlockBuildStates") == true){
+				//ReduceBlockBuildStates
+				if(tag.Contains("[ReduceBlockBuildStates") == true){
 
 					improveSpawnGroup.ReduceBlockBuildStates = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -864,8 +864,8 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //RivalAiReplaceRemoteControl
-                if(tag.Contains("[RivalAiReplaceRemoteControl") == true){
+				//RivalAiReplaceRemoteControl
+				if(tag.Contains("[RivalAiReplaceRemoteControl") == true){
 
 					improveSpawnGroup.RivalAiReplaceRemoteControl = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -1096,36 +1096,36 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //UsePlayerCountCheck
-                if(tag.Contains("[UsePlayerCountCheck") == true) {
+				//UsePlayerCountCheck
+				if(tag.Contains("[UsePlayerCountCheck") == true) {
 
-                    improveSpawnGroup.UsePlayerCountCheck = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UsePlayerCountCheck = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //PlayerCountCheckRadius
-                if(tag.Contains("[PlayerCountCheckRadius") == true) {
+				//PlayerCountCheckRadius
+				if(tag.Contains("[PlayerCountCheckRadius") == true) {
 
-                    improveSpawnGroup.PlayerCountCheckRadius = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PlayerCountCheckRadius, out badParse);
+					improveSpawnGroup.PlayerCountCheckRadius = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PlayerCountCheckRadius, out badParse);
 
-                }
+				}
 
-                //MinimumPlayers
-                if(tag.Contains("[MinimumPlayers") == true) {
+				//MinimumPlayers
+				if(tag.Contains("[MinimumPlayers") == true) {
 
-                    improveSpawnGroup.MinimumPlayers = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinimumPlayers, out badParse);
+					improveSpawnGroup.MinimumPlayers = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinimumPlayers, out badParse);
 
-                }
+				}
 
-                //MaximumPlayers
-                if(tag.Contains("[MaximumPlayers") == true) {
+				//MaximumPlayers
+				if(tag.Contains("[MaximumPlayers") == true) {
 
-                    improveSpawnGroup.MaximumPlayers = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaximumPlayers, out badParse);
+					improveSpawnGroup.MaximumPlayers = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaximumPlayers, out badParse);
 
-                }
+				}
 
-                //UseThreatLevelCheck
-                if(tag.Contains("[UseThreatLevelCheck") == true){
+				//UseThreatLevelCheck
+				if(tag.Contains("[UseThreatLevelCheck") == true){
 
 					improveSpawnGroup.UseThreatLevelCheck = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -1194,22 +1194,22 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //IncludeAllPlayersInRadius
-                if(tag.Contains("[IncludeAllPlayersInRadius") == true) {
+				//IncludeAllPlayersInRadius
+				if(tag.Contains("[IncludeAllPlayersInRadius") == true) {
 
-                    improveSpawnGroup.IncludeAllPlayersInRadius = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.IncludeAllPlayersInRadius = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //IncludeFactionBalance
-                if(tag.Contains("[IncludeFactionBalance") == true) {
+				//IncludeFactionBalance
+				if(tag.Contains("[IncludeFactionBalance") == true) {
 
-                    improveSpawnGroup.IncludeFactionBalance = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.IncludeFactionBalance = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //PlayerCreditsCheckRadius
-                if(tag.Contains("[PlayerCreditsCheckRadius") == true){
+				//PlayerCreditsCheckRadius
+				if(tag.Contains("[PlayerCreditsCheckRadius") == true){
 
 					improveSpawnGroup.PlayerCreditsCheckRadius = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PlayerCreditsCheckRadius, out badParse);
 						
@@ -1332,36 +1332,36 @@ namespace ModularEncountersSpawner{
 				
 				}
 
-                //UseKnownPlayerLocations
-                if(tag.Contains("[UseKnownPlayerLocations") == true) {
+				//UseKnownPlayerLocations
+				if(tag.Contains("[UseKnownPlayerLocations") == true) {
 
-                    improveSpawnGroup.UseKnownPlayerLocations = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.UseKnownPlayerLocations = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //KnownPlayerLocationMustMatchFaction
-                if(tag.Contains("[KnownPlayerLocationMustMatchFaction") == true) {
+				//KnownPlayerLocationMustMatchFaction
+				if(tag.Contains("[KnownPlayerLocationMustMatchFaction") == true) {
 
-                    improveSpawnGroup.KnownPlayerLocationMustMatchFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.KnownPlayerLocationMustMatchFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //KnownPlayerLocationMinSpawnedEncounters
-                if(tag.Contains("[KnownPlayerLocationMinSpawnedEncounters") == true) {
+				//KnownPlayerLocationMinSpawnedEncounters
+				if(tag.Contains("[KnownPlayerLocationMinSpawnedEncounters") == true) {
 
-                    improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters, out badParse);
+					improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters, out badParse);
 
-                }
+				}
 
-                //KnownPlayerLocationMaxSpawnedEncounters
-                if(tag.Contains("[KnownPlayerLocationMaxSpawnedEncounters") == true) {
+				//KnownPlayerLocationMaxSpawnedEncounters
+				if(tag.Contains("[KnownPlayerLocationMaxSpawnedEncounters") == true) {
 
-                    improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters, out badParse);
+					improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters, out badParse);
 
-                }
+				}
 
-                //Territory
-                if(tag.Contains("[Territory") == true){
+				//Territory
+				if(tag.Contains("[Territory") == true){
 
 					improveSpawnGroup.Territory = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -1417,15 +1417,15 @@ namespace ModularEncountersSpawner{
 						
 				}
 
-                //RemoveVoxelsIfGridRemoved
-                if(tag.Contains("[RemoveVoxelsIfGridRemoved") == true) {
+				//RemoveVoxelsIfGridRemoved
+				if(tag.Contains("[RemoveVoxelsIfGridRemoved") == true) {
 
-                    improveSpawnGroup.RemoveVoxelsIfGridRemoved = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					improveSpawnGroup.RemoveVoxelsIfGridRemoved = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
-                }
+				}
 
-                //BossCustomAnnounceEnable
-                if(tag.Contains("[BossCustomAnnounceEnable") == true){
+				//BossCustomAnnounceEnable
+				if(tag.Contains("[BossCustomAnnounceEnable") == true){
 
 					improveSpawnGroup.BossCustomAnnounceEnable = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -1542,13 +1542,13 @@ namespace ModularEncountersSpawner{
 			
 			}
 
-            if(spawnGroup.Context.IsBaseGame == true && thisSpawnGroup.SpaceCargoShip == true) {
+			if(spawnGroup.Context.IsBaseGame == true && thisSpawnGroup.SpaceCargoShip == true) {
 
-                thisSpawnGroup.UseRandomMinerFaction = true;
-                thisSpawnGroup.UseRandomBuilderFaction = true;
-                thisSpawnGroup.UseRandomTraderFaction = true;
+				thisSpawnGroup.UseRandomMinerFaction = true;
+				thisSpawnGroup.UseRandomBuilderFaction = true;
+				thisSpawnGroup.UseRandomTraderFaction = true;
 
-            }
+			}
 			
 			if(spawnGroup.IsPirate == false && spawnGroup.IsEncounter == true){
 				
@@ -1604,19 +1604,19 @@ namespace ModularEncountersSpawner{
 			//Derelict
 			if(spawnGroup.Id.SubtypeName.Contains("(Wreck)") == true){
 
-                var randRotation = new Vector3D(100,100,100);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
-                thisSpawnGroup.RotateInstallations.Add(randRotation);
+				var randRotation = new Vector3D(100,100,100);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
+				thisSpawnGroup.RotateInstallations.Add(randRotation);
 
-            }
+			}
 			
 			//Frequency
 			thisSpawnGroup.Frequency = (int)Math.Round((double)spawnGroup.Frequency * 10);
@@ -1743,33 +1743,33 @@ namespace ModularEncountersSpawner{
 
 		public static string [] ProcessTag(string tag){
 			
-			var thisTag = tag;
+			var thisTag = tag.Trim();
 			thisTag = thisTag.Replace("[", "");
 			thisTag = thisTag.Replace("]", "");
 			var tagSplit = thisTag.Split(':');
-            string a = "";
-            string b = "";
+			string a = "";
+			string b = "";
 
-            if(tagSplit.Length > 2) {
+			if(tagSplit.Length > 2) {
 
-                a = tagSplit[0];
+				a = tagSplit[0];
 
-                for(int i = 1;i < tagSplit.Length;i++) {
+				for(int i = 1;i < tagSplit.Length;i++) {
 
-                    b += tagSplit[i];
+					b += tagSplit[i];
 
-                    if(i != tagSplit.Length - 1) {
+					if(i != tagSplit.Length - 1) {
 
-                        b += ":";
+						b += ":";
 
-                    }
+					}
 
-                }
+				}
 
-                tagSplit = new string[] {a,b};
-                Logger.AddMsg("MultipColonSplit - " + b);
+				tagSplit = new string[] {a,b};
+				Logger.AddMsg("MultipColonSplit - " + b, true);
 
-            }
+			}
 
 			return tagSplit;
 			
@@ -1982,262 +1982,262 @@ namespace ModularEncountersSpawner{
 			
 		}
 
-        public static Dictionary<string, string> TagStringDictionaryCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static Dictionary<string, string> TagStringDictionaryCheck(string tag, string spawnGroupName, out bool badParse) {
 
-            Dictionary<string, string> result = new Dictionary<string, string>();
-            badParse = false;
-            var tagSplit = ProcessTag(tag);
+			Dictionary<string, string> result = new Dictionary<string, string>();
+			badParse = false;
+			var tagSplit = ProcessTag(tag);
 
-            if(tagSplit.Length == 2) {
+			if(tagSplit.Length == 2) {
 
-                var array = tagSplit[1].Split(',');
+				var array = tagSplit[1].Split(',');
 
-                foreach(var item in array) {
+				foreach(var item in array) {
 
-                    if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    var secondSplit = item.Split('|');
+					var secondSplit = item.Split('|');
 
-                    string key = secondSplit[0];
-                    string val = secondSplit[1];
+					string key = secondSplit[0];
+					string val = secondSplit[1];
 
-                    if(string.IsNullOrWhiteSpace(key) == false && string.IsNullOrWhiteSpace(val) == false && result.ContainsKey(val) == false) {
+					if(string.IsNullOrWhiteSpace(key) == false && string.IsNullOrWhiteSpace(val) == false && result.ContainsKey(val) == false) {
 
-                        result.Add(key, val);
+						result.Add(key, val);
 
-                    }
+					}
 
-                }
+				}
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Could not process MyDefinitionId Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
-                badParse = true;
+				Logger.AddMsg("Could not process MyDefinitionId Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
+				badParse = true;
 
-            }
+			}
 
-            return result;
+			return result;
 
-        }
+		}
 
-        public static Dictionary<Vector3, Vector3> TagVector3DictionaryCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static Dictionary<Vector3, Vector3> TagVector3DictionaryCheck(string tag, string spawnGroupName, out bool badParse) {
 
-            Dictionary<Vector3, Vector3> result = new Dictionary<Vector3, Vector3>();
-            badParse = false;
-            var tagSplit = ProcessTag(tag);
+			Dictionary<Vector3, Vector3> result = new Dictionary<Vector3, Vector3>();
+			badParse = false;
+			var tagSplit = ProcessTag(tag);
 
-            if(tagSplit.Length == 2) {
+			if(tagSplit.Length == 2) {
 
-                var array = tagSplit[1].Split(',');
+				var array = tagSplit[1].Split(',');
 
-                foreach(var item in array) {
+				foreach(var item in array) {
 
-                    if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    var secondSplit = item.Split('|');
+					var secondSplit = item.Split('|');
 
-                    string key = secondSplit[0];
-                    string val = secondSplit[1];
+					string key = secondSplit[0];
+					string val = secondSplit[1];
 
-                    if(string.IsNullOrWhiteSpace(key) == true || string.IsNullOrWhiteSpace(val) == true) {
+					if(string.IsNullOrWhiteSpace(key) == true || string.IsNullOrWhiteSpace(val) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    Vector3D keyVector = Vector3D.Zero;
-                    Vector3D valVector = Vector3D.Zero;
+					Vector3D keyVector = Vector3D.Zero;
+					Vector3D valVector = Vector3D.Zero;
 
-                    if(Vector3D.TryParse(key, out keyVector) == false || Vector3D.TryParse(val, out valVector) == false) {
+					if(Vector3D.TryParse(key, out keyVector) == false || Vector3D.TryParse(val, out valVector) == false) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    result.Add(keyVector, valVector);
+					result.Add(keyVector, valVector);
 
-                }
+				}
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Could not process Vector3-Vector3 Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
-                badParse = true;
+				Logger.AddMsg("Could not process Vector3-Vector3 Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
+				badParse = true;
 
-            }
+			}
 
-            return result;
+			return result;
 
-        }
+		}
 
-        public static Vector3D TagVector3DCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static Vector3D TagVector3DCheck(string tag, string spawnGroupName, out bool badParse) {
 
-            Vector3D result = Vector3D.Zero;
-            badParse = false;
-            var tagSplit = ProcessTag(tag);
+			Vector3D result = Vector3D.Zero;
+			badParse = false;
+			var tagSplit = ProcessTag(tag);
 
-            if(tagSplit.Length == 2) {
+			if(tagSplit.Length == 2) {
 
-                if(Vector3D.TryParse(tagSplit[1], out result) == false) {
+				if(Vector3D.TryParse(tagSplit[1], out result) == false) {
 
-                    Logger.AddMsg("Could not process Vector3D tag " + tag + " from SpawnGroup " + spawnGroupName);
-                    badParse = true;
+					Logger.AddMsg("Could not process Vector3D tag " + tag + " from SpawnGroup " + spawnGroupName);
+					badParse = true;
 
-                }
+				}
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Could not process Vector3D tag " + tag + " from SpawnGroup " + spawnGroupName);
-                badParse = true;
+				Logger.AddMsg("Could not process Vector3D tag " + tag + " from SpawnGroup " + spawnGroupName);
+				badParse = true;
 
-            }
+			}
 
-            return result;
+			return result;
 
-        }
+		}
 
-        public static List<bool> TagBoolListCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static List<bool> TagBoolListCheck(string tag, string spawnGroupName, out bool badParse) {
 
-            List<bool> result = new List<bool>();
-            badParse = false;
-            var tagSplit = ProcessTag(tag);
+			List<bool> result = new List<bool>();
+			badParse = false;
+			var tagSplit = ProcessTag(tag);
 
-            if(tagSplit.Length == 2) {
+			if(tagSplit.Length == 2) {
 
-                var array = tagSplit[1].Split(',');
+				var array = tagSplit[1].Split(',');
 
-                foreach(var item in array) {
+				foreach(var item in array) {
 
-                    if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    bool entry = false;
+					bool entry = false;
 
-                    if(bool.TryParse(item, out entry) == false) {
+					if(bool.TryParse(item, out entry) == false) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    result.Add(entry);
+					result.Add(entry);
 
-                }
+				}
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Could not process bool List tag " + tag + " from SpawnGroup " + spawnGroupName);
-                badParse = true;
+				Logger.AddMsg("Could not process bool List tag " + tag + " from SpawnGroup " + spawnGroupName);
+				badParse = true;
 
-            }
+			}
 
-            return result;
+			return result;
 
-        }
+		}
 
-        public static List<Vector3D> TagVector3DListCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static List<Vector3D> TagVector3DListCheck(string tag, string spawnGroupName, out bool badParse) {
 
-            List<Vector3D> result = new List<Vector3D>();
-            badParse = false;
-            var tagSplit = ProcessTag(tag);
+			List<Vector3D> result = new List<Vector3D>();
+			badParse = false;
+			var tagSplit = ProcessTag(tag);
 
-            if(tagSplit.Length == 2) {
+			if(tagSplit.Length == 2) {
 
-                var array = tagSplit[1].Split(',');
+				var array = tagSplit[1].Split(',');
 
-                foreach(var item in array) {
+				foreach(var item in array) {
 
-                    if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    Vector3D entry = Vector3D.Zero;
+					Vector3D entry = Vector3D.Zero;
 
-                    if(Vector3D.TryParse(item, out entry) == false) {
+					if(Vector3D.TryParse(item, out entry) == false) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    result.Add(entry);
+					result.Add(entry);
 
-                }
+				}
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Could not process Vector3D List tag " + tag + " from SpawnGroup " + spawnGroupName);
-                badParse = true;
+				Logger.AddMsg("Could not process Vector3D List tag " + tag + " from SpawnGroup " + spawnGroupName);
+				badParse = true;
 
-            }
+			}
 
-            return result;
+			return result;
 
-        }
+		}
 
-        public static Dictionary<Vector3, string> TagVector3StringDictionaryCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static Dictionary<Vector3, string> TagVector3StringDictionaryCheck(string tag, string spawnGroupName, out bool badParse) {
 
-            Dictionary<Vector3, string> result = new Dictionary<Vector3, string>();
-            badParse = false;
-            var tagSplit = ProcessTag(tag);
+			Dictionary<Vector3, string> result = new Dictionary<Vector3, string>();
+			badParse = false;
+			var tagSplit = ProcessTag(tag);
 
-            if(tagSplit.Length == 2) {
+			if(tagSplit.Length == 2) {
 
-                var array = tagSplit[1].Split(',');
+				var array = tagSplit[1].Split(',');
 
-                foreach(var item in array) {
+				foreach(var item in array) {
 
-                    if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    var secondSplit = item.Split('|');
+					var secondSplit = item.Split('|');
 
-                    string key = secondSplit[0];
-                    string val = secondSplit[1];
+					string key = secondSplit[0];
+					string val = secondSplit[1];
 
-                    if(string.IsNullOrWhiteSpace(key) == true || string.IsNullOrWhiteSpace(val) == true) {
+					if(string.IsNullOrWhiteSpace(key) == true || string.IsNullOrWhiteSpace(val) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    Vector3D keyVector = Vector3D.Zero;
+					Vector3D keyVector = Vector3D.Zero;
 
-                    if(Vector3D.TryParse(key, out keyVector) == false) {
+					if(Vector3D.TryParse(key, out keyVector) == false) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    result.Add(keyVector, val);
+					result.Add(keyVector, val);
 
-                }
+				}
 
-            } else {
+			} else {
 
-                Logger.AddMsg("Could not process Vector3-Vector3 Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
-                badParse = true;
+				Logger.AddMsg("Could not process Vector3-Vector3 Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
+				badParse = true;
 
-            }
+			}
 
-            return result;
+			return result;
 
-        }
+		}
 
-        public static List<ulong> TagUlongListCheck(string tag, string spawnGroupName, out bool badParse){
+		public static List<ulong> TagUlongListCheck(string tag, string spawnGroupName, out bool badParse){
 			
 			List<ulong> result = new List<ulong>();
 			badParse = false;

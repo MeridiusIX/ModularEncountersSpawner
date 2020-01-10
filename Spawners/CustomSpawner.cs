@@ -98,7 +98,14 @@ namespace ModularEncountersSpawner.Spawners{
 			}
 
 			foreach(var prefab in spawnGroup.SpawnGroup.Prefabs){
-				
+
+				if (spawnGroup.UseKnownPlayerLocations) {
+
+					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(spawnMatrix.Translation);
+
+
+				}
+
 				var options = SpawnGroupManager.CreateSpawningOptions(spawnGroup, prefab);
 				var spawnPosition = Vector3D.Transform((Vector3D)prefab.Position, spawningMatrix);
 				var speedL = velocity;
