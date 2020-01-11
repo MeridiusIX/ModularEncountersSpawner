@@ -173,7 +173,10 @@ namespace ModularEncountersSpawner.Templates{
 		
 		public double MinSpawnFromWorldCenter;
 		public double MaxSpawnFromWorldCenter;
-		
+		public Vector3D DirectionFromWorldCenter;
+		public double MinAngleFromDirection;
+		public double MaxAngleFromDirection;
+
 		public List<string> PlanetBlacklist;
 		public List<string> PlanetWhitelist;
 		public bool PlanetRequiresVacuum;
@@ -390,7 +393,10 @@ namespace ModularEncountersSpawner.Templates{
 			
 			MinSpawnFromWorldCenter = -1;
 			MaxSpawnFromWorldCenter = -1;
-			
+			DirectionFromWorldCenter = Vector3D.Zero;
+			MinAngleFromDirection = -1;
+			MaxAngleFromDirection = -1;
+
 			PlanetBlacklist = new List<string>();
 			PlanetWhitelist = new List<string>();
 			PlanetRequiresVacuum = false;

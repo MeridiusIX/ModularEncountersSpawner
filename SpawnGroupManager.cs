@@ -1045,9 +1045,30 @@ namespace ModularEncountersSpawner{
 					improveSpawnGroup.MaxSpawnFromWorldCenter = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxSpawnFromWorldCenter, out badParse);
 						
 				}
-				
+
+				//DirectionFromWorldCenter
+				if (tag.Contains("[DirectionFromWorldCenter") == true) {
+
+					improveSpawnGroup.DirectionFromWorldCenter = TagVector3DCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
+				//MinAngleFromDirection
+				if (tag.Contains("[MinAngleFromDirection") == true) {
+
+					improveSpawnGroup.MinAngleFromDirection = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinAngleFromDirection, out badParse);
+
+				}
+
+				//MaxAngleFromDirection
+				if (tag.Contains("[MaxAngleFromDirection") == true) {
+
+					improveSpawnGroup.MaxAngleFromDirection = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxAngleFromDirection, out badParse);
+
+				}
+
 				//PlanetBlacklist
-				if(tag.Contains("[PlanetBlacklist") == true){
+				if (tag.Contains("[PlanetBlacklist") == true){
 
 					improveSpawnGroup.PlanetBlacklist = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
