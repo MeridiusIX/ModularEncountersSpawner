@@ -771,14 +771,14 @@ namespace ModularEncountersSpawner {
 			
 			if(newPattern.Contains("NatoLetter") == true) {
 
-				var randString = NeutralNouns[Rnd.Next(0, NeutralNouns.Length)];
+				var randString = NatoLetter[Rnd.Next(0, NatoLetter.Length)];
 				newPattern = newPattern.Replace("NatoLetter", randString);
 
 			}
 			
 			if(newPattern.Contains("GreekLetter") == true) {
 
-				var randString = NeutralNouns[Rnd.Next(0, NeutralNouns.Length)];
+				var randString = GreekLetter[Rnd.Next(0, GreekLetter.Length)];
 				newPattern = newPattern.Replace("GreekLetter", randString);
 
 			}
