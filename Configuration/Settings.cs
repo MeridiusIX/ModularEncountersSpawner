@@ -36,10 +36,10 @@ namespace ModularEncountersSpawner.Configuration{
 		public static ConfigPlanetaryInstallations PlanetaryInstallations = new ConfigPlanetaryInstallations();
 		public static ConfigBossEncounters BossEncounters = new ConfigBossEncounters();
 		public static ConfigOtherNPCs OtherNPCs = new ConfigOtherNPCs();
-        public static ConfigCustomBlocks CustomBlocks = new ConfigCustomBlocks();
+		public static ConfigCustomBlocks CustomBlocks = new ConfigCustomBlocks();
 
 
-        public static void InitSettings(){
+		public static void InitSettings(){
 			
 			General = General.LoadSettings();
 			SpaceCargoShips = SpaceCargoShips.LoadSettings();
@@ -48,8 +48,8 @@ namespace ModularEncountersSpawner.Configuration{
 			PlanetaryInstallations = PlanetaryInstallations.LoadSettings();
 			BossEncounters = BossEncounters.LoadSettings();
 			OtherNPCs = OtherNPCs.LoadSettings();
-            CustomBlocks = CustomBlocks.LoadSettings();
-            CheckGlobalEvents();
+			CustomBlocks = CustomBlocks.LoadSettings();
+			CheckGlobalEvents();
 			
 		}
 		

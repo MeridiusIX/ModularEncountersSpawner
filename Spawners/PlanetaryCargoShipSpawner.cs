@@ -377,24 +377,24 @@ namespace ModularEncountersSpawner.Spawners{
 		}
 				
 		public static List<ImprovedSpawnGroup> GetPlanetaryCargoShips(Vector3D playerCoords, out Dictionary<string, List<string>> validFactions) {
-			
-			MyPlanet planet = SpawnResources.GetNearestPlanet(playerCoords);
+
 			string specificGroup = "";
 			var planetRestrictions = new List<string>(Settings.General.PlanetSpawnsDisableList.ToList());
 			validFactions = new Dictionary<string, List<string>>();
 			SpawnGroupSublists.Clear();
 			EligibleSpawnsByModId.Clear();
-			
-			if(planet != null){
-				
-				if(planetRestrictions.Contains(planet.Generator.Id.SubtypeName) == true){
-					
+			var environment = new EnvironmentEvaluation(playerCoords);
+
+			if (environment.NearestPlanet != null) {
+
+				if (planetRestrictions.Contains(environment.NearestPlanetName) == true) {
+
 					return new List<ImprovedSpawnGroup>();
-					
+
 				}
-				
+
 			}
-			
+
 			bool specificSpawnRequest = false;
 			
 			if(SpawnGroupManager.AdminSpawnGroup != ""){
@@ -404,23 +404,17 @@ namespace ModularEncountersSpawner.Spawners{
 				specificSpawnRequest = true;
 				
 			}
-			
-			if(SpawnResources.IsPositionInGravity(playerCoords, planet) == false){
-				
+
+			if (!environment.IsOnPlanet) {
+
 				return new List<ImprovedSpawnGroup>();
-				
+
 			}
-			
-			string planetName = "";
-			
-			if(planet != null){
-				
-				planetName = planet.Generator.Id.SubtypeId.ToString();
-				
-			}else{
-				
+
+			if(environment.NearestPlanet == null) {
+
 				return new List<ImprovedSpawnGroup>();
-				
+
 			}
 			
 			var eligibleGroups = new List<ImprovedSpawnGroup>();
@@ -446,7 +440,7 @@ namespace ModularEncountersSpawner.Spawners{
 					
 				}
 				
-				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, planet, specificSpawnRequest) == false){
+				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
 					
 					continue;
 					

@@ -40,25 +40,25 @@ namespace ModularEncountersSpawner{
 		
 		//Drop Container Names
 		public static List<string> DropContainerNames = new List<string>();
-        public static List<string> EconomyStationNames = new List<string>();
+		public static List<string> EconomyStationNames = new List<string>();
 
-        //NPC Parameter GUIDs
-        public static Guid GuidStartCoords = new Guid("CC27ADFD-A121-477A-94B1-FB1B4E2E3046");
+		//NPC Parameter GUIDs
+		public static Guid GuidStartCoords = new Guid("CC27ADFD-A121-477A-94B1-FB1B4E2E3046");
 		public static Guid GuidEndCoords = new Guid("513F6C90-E0D9-4A8F-972E-09757FE32C19");
 		public static Guid GuidSpawnType = new Guid("C9D22735-C76B-4DB4-AFB5-51D1E1516A05");
 		public static Guid GuidCleanupTimer = new Guid("8E5E70C9-9C7B-429A-9D5D-036465948175");
 		public static Guid GuidIgnoreCleanup = new Guid("7ADDED32-4069-4C52-891C-25F52478B2EB");
 		public static Guid GuidWeaponsReplaced = new Guid("C0CD2D13-AA56-466E-BA44-D840658A772B");
-        public static Guid GuidActiveNpcData = new Guid("AD4DBD09-359D-48F5-9F48-54D352B59171");
+		public static Guid GuidActiveNpcData = new Guid("AD4DBD09-359D-48F5-9F48-54D352B59171");
 		
 		//Pending Boss Encounters
 		public static List<BossEncounter> BossEncounters = new List<BossEncounter>();
 
-        //Pending NPC Deletion
-        public static bool DeleteGrids = false;
-        public static int DeletionTimer = 0;
-        public static List<IMyCubeGrid> DeleteGridList = new List<IMyCubeGrid>();
-        public static IMyCubeGrid LastDeletedGrid = null;
+		//Pending NPC Deletion
+		public static bool DeleteGrids = false;
+		public static int DeletionTimer = 0;
+		public static List<IMyCubeGrid> DeleteGridList = new List<IMyCubeGrid>();
+		public static IMyCubeGrid LastDeletedGrid = null;
 
 		//Pending NPC Spawns
 		public static List<ActiveNPC> PendingNPCs = new List<ActiveNPC>();
@@ -157,9 +157,9 @@ namespace ModularEncountersSpawner{
 			
 			if(SpawnedVoxelCheckTimer <= 0){
 
-                SpawnedVoxelCheck();
+				SpawnedVoxelCheck();
 
-            }
+			}
 
 			var grids = new List<IMyCubeGrid>(ActiveNPCs.Keys.ToList());
 			
@@ -197,8 +197,8 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                //NPC Ownership Check
-                if(NpcOwnershipCheckTimer <= 0){
+				//NPC Ownership Check
+				if(NpcOwnershipCheckTimer <= 0){
 
 					if(NpcOwnershipCheck(cubeGrid) == false){
 						
@@ -211,47 +211,47 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-                    //Economy Stations
-                    if(ActiveNPCs[cubeGrid].EconomyStationCheck == false) {
+					//Economy Stations
+					if(ActiveNPCs[cubeGrid].EconomyStationCheck == false) {
 
-                        ActiveNPCs[cubeGrid].EconomyStationCheck = true;
+						ActiveNPCs[cubeGrid].EconomyStationCheck = true;
 
-                        if(ActiveNPCs[cubeGrid].SpawnType == "Other") {
+						if(ActiveNPCs[cubeGrid].SpawnType == "Other") {
 
-                            if(IsEconomyStation(cubeGrid) == true) {
+							if(IsEconomyStation(cubeGrid) == true) {
 
-                                Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.", true);
-                                ActiveNPCs[cubeGrid].CleanupIgnore = true;
+								Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.", true);
+								ActiveNPCs[cubeGrid].CleanupIgnore = true;
 
 
-                            }
+							}
 
-                        }
+						}
 
-                    }
+					}
 
-                    
+					
 
-                    //Keen AI Handler
-                    if(ActiveNPCs[cubeGrid].KeenBehaviorCheck == false){
+					//Keen AI Handler
+					if(ActiveNPCs[cubeGrid].KeenBehaviorCheck == false){
 						
 						ActiveNPCs[cubeGrid].KeenBehaviorCheck = true;
 						
 						if(string.IsNullOrWhiteSpace(ActiveNPCs[cubeGrid].KeenAiName) == false){
 
-                            if(RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(ActiveNPCs[cubeGrid].KeenAiName) == false) {
+							if(RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(ActiveNPCs[cubeGrid].KeenAiName) == false) {
 
-                                //TODO: Attach AI Here.
-                                if(string.IsNullOrEmpty(cubeGrid.Name) == true) {
+								//TODO: Attach AI Here.
+								if(string.IsNullOrEmpty(cubeGrid.Name) == true) {
 
-                                    MyVisualScriptLogicProvider.SetName(cubeGrid.EntityId, cubeGrid.EntityId.ToString());
+									MyVisualScriptLogicProvider.SetName(cubeGrid.EntityId, cubeGrid.EntityId.ToString());
 
-                                }
+								}
 
-                                MyVisualScriptLogicProvider.SetDroneBehaviourFull(cubeGrid.EntityId.ToString(), ActiveNPCs[cubeGrid].KeenAiName, true, false, null, false, null, 10, ActiveNPCs[cubeGrid].KeenAiTriggerDistance);
-                                ActiveNPCs[cubeGrid].KeenBehaviorCheck = false;
+								MyVisualScriptLogicProvider.SetDroneBehaviourFull(cubeGrid.EntityId.ToString(), ActiveNPCs[cubeGrid].KeenAiName, true, false, null, false, null, 10, ActiveNPCs[cubeGrid].KeenAiTriggerDistance);
+								ActiveNPCs[cubeGrid].KeenBehaviorCheck = false;
 
-                            }
+							}
 
 						}else{
 							
@@ -261,42 +261,51 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-                    //Remove Container Inventory From NPCs
-                    if(ActiveNPCs[cubeGrid].EmptyInventoryCheck == false) {
+					//Defense Shield Provider Activation
+					if (ActiveNPCs[cubeGrid].DefenseShieldActivationCheck == false) {
 
-                        ActiveNPCs[cubeGrid].EmptyInventoryCheck = true;
+						ActiveNPCs[cubeGrid].DefenseShieldActivationCheck = true;
+						NPCShieldManager.ActivateShieldsForNPC(cubeGrid);
 
-                        if(ActiveNPCs[cubeGrid].SpawnGroup != null) {
+					
+					}
 
-                            if(ActiveNPCs[cubeGrid].SpawnGroup.RemoveContainerContents == true || Settings.General.RemoveContainerInventoryFromNPCs == true) {
+					//Remove Container Inventory From NPCs
+					if(ActiveNPCs[cubeGrid].EmptyInventoryCheck == false) {
 
-                                GridUtilities.RemoveGridContainerComponents(cubeGrid);
+						ActiveNPCs[cubeGrid].EmptyInventoryCheck = true;
 
-                            }
+						if(ActiveNPCs[cubeGrid].SpawnGroup != null) {
 
-                        }
+							if(ActiveNPCs[cubeGrid].SpawnGroup.RemoveContainerContents == true || Settings.General.RemoveContainerInventoryFromNPCs == true) {
 
-                    }
+								GridUtilities.RemoveGridContainerComponents(cubeGrid);
 
-                    //Store Blocks
-                    if(ActiveNPCs[cubeGrid].StoreBlocksInit == false) {
+							}
 
-                        ActiveNPCs[cubeGrid].StoreBlocksInit = true;
+						}
 
-                        if(ActiveNPCs[cubeGrid].SpawnGroup != null) {
+					}
 
-                            if(ActiveNPCs[cubeGrid].SpawnGroup.InitializeStoreBlocks == true) {
+					//Store Blocks
+					if(ActiveNPCs[cubeGrid].StoreBlocksInit == false) {
 
-                                EconomyHelper.InitNpcStoreBlock(cubeGrid, ActiveNPCs[cubeGrid].SpawnGroup);
+						ActiveNPCs[cubeGrid].StoreBlocksInit = true;
 
-                            }
+						if(ActiveNPCs[cubeGrid].SpawnGroup != null) {
 
-                        }
+							if(ActiveNPCs[cubeGrid].SpawnGroup.InitializeStoreBlocks == true) {
 
-                    }
+								EconomyHelper.InitNpcStoreBlock(cubeGrid, ActiveNPCs[cubeGrid].SpawnGroup);
 
-                    //Ammo Fill Check
-                    if(ActiveNPCs[cubeGrid].ReplenishedSystems == false){
+							}
+
+						}
+
+					}
+
+					//Ammo Fill Check
+					if(ActiveNPCs[cubeGrid].ReplenishedSystems == false){
 						
 						Logger.AddMsg("Restocking Grid Inventories", true);
 						ActiveNPCs[cubeGrid].ReplenishedSystems = true;
@@ -304,22 +313,22 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-                    //Non Physical Ammo Check
-                    if(ActiveNPCs[cubeGrid].NonPhysicalAmmoCheck == false) {
+					//Non Physical Ammo Check
+					if(ActiveNPCs[cubeGrid].NonPhysicalAmmoCheck == false) {
 
-                        ActiveNPCs[cubeGrid].NonPhysicalAmmoCheck = true;
+						ActiveNPCs[cubeGrid].NonPhysicalAmmoCheck = true;
 
-                        if(Settings.General.UseNonPhysicalAmmoForNPCs == true || ActiveNPCs[cubeGrid].SpawnGroup.UseNonPhysicalAmmo == true) {
+						if(Settings.General.UseNonPhysicalAmmoForNPCs == true || ActiveNPCs[cubeGrid].SpawnGroup.UseNonPhysicalAmmo == true) {
 
-                            Logger.AddMsg("Processing Non Physical Ammo For Grid: " + cubeGrid.CustomName, true);
-                            GridUtilities.NonPhysicalAmmoProcessing(cubeGrid);
+							Logger.AddMsg("Processing Non Physical Ammo For Grid: " + cubeGrid.CustomName, true);
+							GridUtilities.NonPhysicalAmmoProcessing(cubeGrid);
 
-                        }
+						}
 
-                    }
+					}
 
-                    //Voxel Cut Check
-                    if(ActiveNPCs[cubeGrid].VoxelCut == false && ActiveNPCs[cubeGrid].SpawnGroup != null) {
+					//Voxel Cut Check
+					if(ActiveNPCs[cubeGrid].VoxelCut == false && ActiveNPCs[cubeGrid].SpawnGroup != null) {
 						
 						ActiveNPCs[cubeGrid].VoxelCut = true;
 						
@@ -340,26 +349,26 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-                    if(ActiveNPCs[cubeGrid].SpawnType == "PlanetaryCargoShip"){
+					if(ActiveNPCs[cubeGrid].SpawnType == "PlanetaryCargoShip"){
 						
 						for(int i = ActiveNPCs[cubeGrid].GasGenerators.Count - 1; i >= 0; i--){
 
-                            var generator = ActiveNPCs[cubeGrid].GasGenerators[i];
+							var generator = ActiveNPCs[cubeGrid].GasGenerators[i];
 
-                            if(generator == null){
+							if(generator == null){
 								
 								ActiveNPCs[cubeGrid].HydrogenTanks.RemoveAt(i);
 								continue;
 								
 							}
 
-                            if(generator.IsFunctional == false || generator.IsWorking == false || (float)generator.GetInventory(0).CurrentVolume > (float)generator.GetInventory(0).MaxVolume / 2){
+							if(generator.IsFunctional == false || generator.IsWorking == false || (float)generator.GetInventory(0).CurrentVolume > (float)generator.GetInventory(0).MaxVolume / 2){
 								
 								continue;
 								
 							}
 
-                            var invToFill = generator.GetInventory(0).MaxVolume - generator.GetInventory(0).CurrentVolume;
+							var invToFill = generator.GetInventory(0).MaxVolume - generator.GetInventory(0).CurrentVolume;
 							invToFill *= 1000;
 							invToFill -= 10;
 							MyDefinitionId defId = new MyDefinitionId(typeof(MyObjectBuilder_Ore), "Ice");
@@ -371,23 +380,23 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-                }
+				}
 
-                //NPC Blacklist Check
-                if(NpcBlacklistCheckTimer == 0){
+				//NPC Blacklist Check
+				if(NpcBlacklistCheckTimer == 0){
 
-                    if(BlacklistCheck(cubeGrid) == true) {
+					if(BlacklistCheck(cubeGrid) == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                }
+				}
 				
 			}
 
-            //NPC Distance Check
-            if(NpcDistanceCheckTimer <= 0){
+			//NPC Distance Check
+			if(NpcDistanceCheckTimer <= 0){
 				
 				DistanceChecker();
 				
@@ -421,22 +430,22 @@ namespace ModularEncountersSpawner{
 			
 		}
 
-        public static bool BlacklistCheck(IMyCubeGrid cubeGrid) {
+		public static bool BlacklistCheck(IMyCubeGrid cubeGrid) {
 
-            var blacklistNames = new List<string>(Settings.General.NpcGridNameBlacklist.ToList());
+			var blacklistNames = new List<string>(Settings.General.NpcGridNameBlacklist.ToList());
 
-            if(blacklistNames.Contains(cubeGrid.CustomName) == true) {
+			if(blacklistNames.Contains(cubeGrid.CustomName) == true) {
 
-                Logger.AddMsg("Blacklisted NPC Ship Found and Removed: " + cubeGrid.CustomName);
-                ActiveNPCs.Remove(cubeGrid);
-                DeleteGrid(cubeGrid);
-                return true;
+				Logger.AddMsg("Blacklisted NPC Ship Found and Removed: " + cubeGrid.CustomName);
+				ActiveNPCs.Remove(cubeGrid);
+				DeleteGrid(cubeGrid);
+				return true;
 
-            }
+			}
 
-            return false;
+			return false;
 
-        }
+		}
 		
 		public static void BossSignalWatcher(){
 			
@@ -446,9 +455,9 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-            bool listChange = false;
+			bool listChange = false;
 
-            foreach(var player in MES_SessionCore.PlayerList){
+			foreach(var player in MES_SessionCore.PlayerList){
 				
 				if(player.IsBot == true || player.Character == null){
 					
@@ -458,25 +467,25 @@ namespace ModularEncountersSpawner{
 				
 				for(int i = BossEncounters.Count - 1; i >= 0; i--){
 
-                    if(BossEncounters[i].CheckPlayerDistance(player) == true) {
+					if(BossEncounters[i].CheckPlayerDistance(player) == true) {
 
-                        BossEncounters[i].SpawnAttempts++;
-                        Logger.AddMsg("Player " + player.DisplayName + " Is Within Signal Distance Of Boss Encounter. Attempting Spawn.");
-                        SpawnResources.RefreshEntityLists();
+						BossEncounters[i].SpawnAttempts++;
+						Logger.AddMsg("Player " + player.DisplayName + " Is Within Signal Distance Of Boss Encounter. Attempting Spawn.");
+						SpawnResources.RefreshEntityLists();
 
-                        if(BossEncounterSpawner.SpawnBossEncounter(BossEncounters[i]) == true || BossEncounters[i].SpawnAttempts > 5) {
+						if(BossEncounterSpawner.SpawnBossEncounter(BossEncounters[i]) == true || BossEncounters[i].SpawnAttempts > 5) {
 
-                            Logger.AddMsg("Removing Boss Encounter GPS", true);
-                            BossEncounters[i].RemoveGpsForPlayers();
-                            BossEncounters.RemoveAt(i);
+							Logger.AddMsg("Removing Boss Encounter GPS", true);
+							BossEncounters[i].RemoveGpsForPlayers();
+							BossEncounters.RemoveAt(i);
 							listChange = true;
-                            continue;
+							continue;
 
-                        }
+						}
 
-                    }
+					}
 
-                }
+				}
 				
 			}
 			
@@ -547,25 +556,25 @@ namespace ModularEncountersSpawner{
 				
 				foreach(var grid in gridGroups){
 
-                    if(DeleteGridList.Contains(grid) == false) {
+					if(DeleteGridList.Contains(grid) == false) {
 
-                        DeleteGridList.Add(grid);
+						DeleteGridList.Add(grid);
 
-                    }
-     
+					}
+	 
 				}
 
-                DeleteGrids = true;
+				DeleteGrids = true;
 				
 				/*if(cubeGrid != null && MyAPIGateway.Entities.Exist(cubeGrid) == true){
 
-                    if(cubeGrid.MarkedForClose == false) {
+					if(cubeGrid.MarkedForClose == false) {
 
-                        cubeGrid.Close();
+						cubeGrid.Close();
 
-                    }
+					}
 
-                }*/
+				}*/
 				
 			}catch(Exception exc){
 				
@@ -576,41 +585,41 @@ namespace ModularEncountersSpawner{
 
 		}
 
-        public static void DeleteGridsProcessing() {
+		public static void DeleteGridsProcessing() {
 
-            if(DeleteGridList.Count == 0) {
+			if(DeleteGridList.Count == 0) {
 
-                DeleteGrids = false;
-                return;
+				DeleteGrids = false;
+				return;
 
-            }
+			}
 
-            if(MyAPIGateway.Entities.Exist(LastDeletedGrid) == true) {
+			if(MyAPIGateway.Entities.Exist(LastDeletedGrid) == true) {
 
-                return;
+				return;
 
-            }
+			}
 
-            MyAPIGateway.Utilities.InvokeOnGameThread(() => {
+			MyAPIGateway.Utilities.InvokeOnGameThread(() => {
 
-                for(int i = DeleteGridList.Count - 1;i >= 0;i--) {
+				for(int i = DeleteGridList.Count - 1;i >= 0;i--) {
 
-                    if(MyAPIGateway.Entities.Exist(DeleteGridList[i]) == true) {
+					if(MyAPIGateway.Entities.Exist(DeleteGridList[i]) == true) {
 
-                        LastDeletedGrid = DeleteGridList[i];
-                        DeleteGridList[i].Close();
-                        DeleteGridList.RemoveAt(i);
-                        return;
+						LastDeletedGrid = DeleteGridList[i];
+						DeleteGridList[i].Close();
+						DeleteGridList.RemoveAt(i);
+						return;
 
-                    }
+					}
 
-                    DeleteGridList.RemoveAt(i);
+					DeleteGridList.RemoveAt(i);
 
-                }
+				}
 
-            });
+			});
 
-        }
+		}
 		
 		public static void DistanceChecker(){
 			
@@ -631,12 +640,12 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                var activeNPC = ActiveNPCs[cubeGrid];
+				var activeNPC = ActiveNPCs[cubeGrid];
 
 
-                if(activeNPC.FixTurrets == false && activeNPC.SpawnType != "Other"){
+				if(activeNPC.FixTurrets == false && activeNPC.SpawnType != "Other"){
 
-                    activeNPC.FixTurrets = true;
+					activeNPC.FixTurrets = true;
 					
 					try{
 
@@ -695,86 +704,86 @@ namespace ModularEncountersSpawner{
 						
 						if(Vector3D.Distance(cubeGrid.GetPosition(), activeNPC.EndCoords) < Settings.SpaceCargoShips.DespawnDistanceFromEndPath == activeNPC.FlagForDespawn == false){
 
-                            activeNPC.FlagForDespawn = true;
+							activeNPC.FlagForDespawn = true;
 							
 						}
 
-                        if(activeNPC.FlagForDespawn == true) {
+						if(activeNPC.FlagForDespawn == true) {
 
-                            var player = SpawnResources.GetNearestPlayer(cubeGrid.GetPosition());
+							var player = SpawnResources.GetNearestPlayer(cubeGrid.GetPosition());
 
-                            if(player == null || Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition()) > Settings.SpaceCargoShips.DespawnDistanceFromPlayer) {
+							if(player == null || Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition()) > Settings.SpaceCargoShips.DespawnDistanceFromPlayer) {
 
-                                Logger.AddMsg("NPC Cargo Ship " + cubeGrid.CustomName + " Has Reached End Of Travel Path And Has Been Despawned.");
-                                ActiveNPCs.Remove(cubeGrid);
-                                DeleteGrid(cubeGrid);
-                                continue;
+								Logger.AddMsg("NPC Cargo Ship " + cubeGrid.CustomName + " Has Reached End Of Travel Path And Has Been Despawned.");
+								ActiveNPCs.Remove(cubeGrid);
+								DeleteGrid(cubeGrid);
+								continue;
 
-                            }
+							}
 
-                        } else {
+						} else {
 
-                            if(activeNPC.SpawnGroup.UseAutoPilotInSpace == true) {
+							if(activeNPC.SpawnGroup.UseAutoPilotInSpace == true) {
 
-                                if(activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance > 0) {
+								if(activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance > 0) {
 
-                                    double closestPlayerDistance = -1;
+									double closestPlayerDistance = -1;
 
-                                    foreach(var player in MES_SessionCore.PlayerList) {
+									foreach(var player in MES_SessionCore.PlayerList) {
 
-                                        if(player == null) {
+										if(player == null) {
 
-                                            continue;
+											continue;
 
-                                        }
+										}
 
-                                        if(player.IsBot || player.Character == null) {
+										if(player.IsBot || player.Character == null) {
 
-                                            continue;
+											continue;
 
-                                        }
+										}
 
-                                        var dist = Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition());
+										var dist = Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition());
 
-                                        if(dist < closestPlayerDistance || closestPlayerDistance == -1) {
+										if(dist < closestPlayerDistance || closestPlayerDistance == -1) {
 
-                                            if(activeNPC.faction != null) {
+											if(activeNPC.faction != null) {
 
-                                                if(MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(player.IdentityId, activeNPC.faction.FactionId) <= -500) {
+												if(MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(player.IdentityId, activeNPC.faction.FactionId) <= -500) {
 
-                                                    continue;
+													continue;
 
-                                                }
+												}
 
-                                            }
+											}
 
-                                            closestPlayerDistance = dist;
+											closestPlayerDistance = dist;
 
-                                        }
+										}
 
-                                    }
+									}
 
-                                    if(activeNPC.RemoteControl != null) {
+									if(activeNPC.RemoteControl != null) {
 
-                                        if((activeNPC.RemoteControl.IsAutoPilotEnabled == false && activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance < closestPlayerDistance) || closestPlayerDistance == -1) {
+										if((activeNPC.RemoteControl.IsAutoPilotEnabled == false && activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance < closestPlayerDistance) || closestPlayerDistance == -1) {
 
-                                            activeNPC.RemoteControl.SetAutoPilotEnabled(true);
+											activeNPC.RemoteControl.SetAutoPilotEnabled(true);
 
-                                        }
+										}
 
-                                        if(activeNPC.RemoteControl.IsAutoPilotEnabled == true && activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance > closestPlayerDistance && closestPlayerDistance > -1) {
+										if(activeNPC.RemoteControl.IsAutoPilotEnabled == true && activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance > closestPlayerDistance && closestPlayerDistance > -1) {
 
-                                            activeNPC.RemoteControl.SetAutoPilotEnabled(false);
+											activeNPC.RemoteControl.SetAutoPilotEnabled(false);
 
-                                        }
+										}
 
-                                    }
+									}
 
-                                }
+								}
 
-                            }
+							}
 
-                        }
+						}
 						
 					}catch(Exception exc){
 						
@@ -802,7 +811,7 @@ namespace ModularEncountersSpawner{
 							
 							errorLogger.Append("Planet Missing").AppendLine();
 							Logger.AddMsg("Planet For Planetary Cargo Ship " + cubeGrid.CustomName + " / " + cubeGrid.EntityId + " No Longer Exists. The NPC Ship Will Be Despawned.");
-                            activeNPC.FlagForDespawn = true; 
+							activeNPC.FlagForDespawn = true; 
 							skip = true;
 							
 						}
@@ -811,7 +820,7 @@ namespace ModularEncountersSpawner{
 							
 							errorLogger.Append("Remote Missing").AppendLine();
 							Logger.AddMsg("Planetary Cargo Ship " + cubeGrid.CustomName + " Remote Control Damaged, Missing, Or Inactive. Ship Now Identified As \"Other\" NPC.");
-                            activeNPC.SpawnType = "Other";
+							activeNPC.SpawnType = "Other";
 							
 							if(cubeGrid.Storage != null){
 								
@@ -828,84 +837,84 @@ namespace ModularEncountersSpawner{
 							if(activeNPC.RemoteControl.IsFunctional == false){
 								
 								Logger.AddMsg("Planetary Cargo Ship " + cubeGrid.CustomName + " Remote Control Damaged, Missing, Or Inactive. Ship Now Identified As \"Other\" NPC.");
-                                activeNPC.SpawnType = "Other";
+								activeNPC.SpawnType = "Other";
 								
 								if(cubeGrid.Storage != null){
 
-                                    cubeGrid.Storage[GuidActiveNpcData] = activeNPC.ToString();
+									cubeGrid.Storage[GuidActiveNpcData] = activeNPC.ToString();
 
-                                }
+								}
 								
 								continue;
 								
 							}
 
-                            if(activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance > 0) {
+							if(activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance > 0) {
 
-                                double closestPlayerDistance = -1;
+								double closestPlayerDistance = -1;
 
-                                foreach(var player in MES_SessionCore.PlayerList) {
+								foreach(var player in MES_SessionCore.PlayerList) {
 
-                                    if(player == null) {
+									if(player == null) {
 
-                                        continue;
+										continue;
 
-                                    }
+									}
 
-                                    if(player.IsBot || player.Character == null) {
+									if(player.IsBot || player.Character == null) {
 
-                                        continue;
+										continue;
 
-                                    }
+									}
 
-                                    var dist = Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition());
+									var dist = Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition());
 
-                                    if(dist < closestPlayerDistance || closestPlayerDistance == -1) {
+									if(dist < closestPlayerDistance || closestPlayerDistance == -1) {
 
-                                        if(activeNPC.faction != null) {
+										if(activeNPC.faction != null) {
 
-                                            if(MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(player.IdentityId, activeNPC.faction.FactionId) <= -500) {
+											if(MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(player.IdentityId, activeNPC.faction.FactionId) <= -500) {
 
-                                                continue;
+												continue;
 
-                                            }
+											}
 
-                                        }
+										}
 
-                                        closestPlayerDistance = dist;
+										closestPlayerDistance = dist;
 
-                                    }
+									}
 
-                                }
+								}
 
-                                if((activeNPC.RemoteControl.IsAutoPilotEnabled == false && activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance < closestPlayerDistance) || closestPlayerDistance == -1) {
+								if((activeNPC.RemoteControl.IsAutoPilotEnabled == false && activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance < closestPlayerDistance) || closestPlayerDistance == -1) {
 
-                                    activeNPC.RemoteControl.SetAutoPilotEnabled(true);
+									activeNPC.RemoteControl.SetAutoPilotEnabled(true);
 
-                                }
+								}
 
-                                if(activeNPC.RemoteControl.IsAutoPilotEnabled == true && activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance > closestPlayerDistance && closestPlayerDistance > -1) {
+								if(activeNPC.RemoteControl.IsAutoPilotEnabled == true && activeNPC.SpawnGroup.PauseAutopilotAtPlayerDistance > closestPlayerDistance && closestPlayerDistance > -1) {
 
-                                    activeNPC.RemoteControl.SetAutoPilotEnabled(false);
+									activeNPC.RemoteControl.SetAutoPilotEnabled(false);
 
-                                }
+								}
 
-                            } else {
+							} else {
 
-                                if(activeNPC.RemoteControl.IsAutoPilotEnabled == false) {
+								if(activeNPC.RemoteControl.IsAutoPilotEnabled == false) {
 
-                                    Logger.AddMsg("Planetary Cargo Ship " + cubeGrid.CustomName + " Remote Control Autopilot Disabled. Ship Now Identified As \"Other\" NPC.");
-                                    activeNPC.SpawnType = "Other";
+									Logger.AddMsg("Planetary Cargo Ship " + cubeGrid.CustomName + " Remote Control Autopilot Disabled. Ship Now Identified As \"Other\" NPC.");
+									activeNPC.SpawnType = "Other";
 
-                                    if(cubeGrid.Storage != null) {
+									if(cubeGrid.Storage != null) {
 
-                                        cubeGrid.Storage[GuidActiveNpcData] = activeNPC.ToString();
+										cubeGrid.Storage[GuidActiveNpcData] = activeNPC.ToString();
 
-                                    }
+									}
 
-                                }
+								}
 
-                            }
+							}
 
 						}
 						
@@ -917,7 +926,7 @@ namespace ModularEncountersSpawner{
 								
 								errorLogger.Append("Too High From Ground").AppendLine();
 								Logger.AddMsg("Planetary Cargo Ship " + cubeGrid.CustomName + " Has Ascended Too High From Its Path And Will Be Despawned.");
-                                activeNPC.FlagForDespawn = true; 
+								activeNPC.FlagForDespawn = true; 
 								skip = true;
 								
 							}
@@ -926,13 +935,13 @@ namespace ModularEncountersSpawner{
 								
 								errorLogger.Append("Too Close To Ground").AppendLine();
 								Logger.AddMsg("Planetary Cargo Ship " + cubeGrid.CustomName + " Altitude Lower Than Allowed Threshold. Ship Now Identified As \"Other\" NPC.");
-                                activeNPC.SpawnType = "Other";
+								activeNPC.SpawnType = "Other";
 								
 								if(cubeGrid.Storage != null){
 
-                                    cubeGrid.Storage[GuidActiveNpcData] = activeNPC.ToString();
+									cubeGrid.Storage[GuidActiveNpcData] = activeNPC.ToString();
 
-                                }
+								}
 								
 								continue;
 								
@@ -949,7 +958,7 @@ namespace ModularEncountersSpawner{
 							
 							errorLogger.Append("Reached Path End").AppendLine();
 							Logger.AddMsg("Planetary Cargo Ship " + cubeGrid.CustomName + " Has Reached End Of Path And Will Be Despawned.");
-                            activeNPC.FlagForDespawn = true; 
+							activeNPC.FlagForDespawn = true; 
 							skip = true;
 							
 						}
@@ -969,7 +978,7 @@ namespace ModularEncountersSpawner{
 							}
 							
 						}
-                        						
+												
 					}catch(Exception exc){
 						
 						Logger.AddMsg("Unexpected exception in Planetary Cargo Ship Distance Checker");
@@ -1090,11 +1099,11 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                ActiveNPCs[cubeGrid] = activeNPC;
+				ActiveNPCs[cubeGrid] = activeNPC;
 
-            }
+			}
 
-        }
+		}
 				
 		public static void InitFactionData(){
 			
@@ -1110,7 +1119,7 @@ namespace ModularEncountersSpawner{
 					
 					if(MyAPIGateway.Players.TryGetSteamId(thisFaction.Members[id].PlayerId) > 0){
 
-                        Logger.AddMsg("Faction " + thisFaction.Tag + " has human with Steam ID " + MyAPIGateway.Players.TryGetSteamId(thisFaction.Members[id].PlayerId).ToString(), true);
+						Logger.AddMsg("Faction " + thisFaction.Tag + " has human with Steam ID " + MyAPIGateway.Players.TryGetSteamId(thisFaction.Members[id].PlayerId).ToString(), true);
 						foundHuman = true;
 						break;
 						
@@ -1158,114 +1167,114 @@ namespace ModularEncountersSpawner{
 
 		}
 
-        public static bool IsEconomyStation(IMyCubeGrid cubeGrid) {
+		public static bool IsEconomyStation(IMyCubeGrid cubeGrid) {
 
-            if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
+			if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
 
-                return false;
+				return false;
 
-            }
+			}
 
-            if(SpawnResources.IsPositionInSafeZone(cubeGrid.GetPosition()) == false) {
+			if(SpawnResources.IsPositionInSafeZone(cubeGrid.GetPosition()) == false) {
 
-                return false;
+				return false;
 
-            }
+			}
 
-            var blockList = new List<IMySlimBlock>();
-            cubeGrid.GetBlocks(blockList);
-            var gotStore = false;
-            var gotContract = false;
+			var blockList = new List<IMySlimBlock>();
+			cubeGrid.GetBlocks(blockList);
+			var gotStore = false;
+			var gotContract = false;
 
-            foreach(var block in blockList) {
+			foreach(var block in blockList) {
 
-                if(block.BlockDefinition.Id.TypeId == typeof(MyObjectBuilder_StoreBlock) == true) {
+				if(block.BlockDefinition.Id.TypeId == typeof(MyObjectBuilder_StoreBlock) == true) {
 
-                    gotStore = true;
-                    continue;
-                    
-                }
+					gotStore = true;
+					continue;
+					
+				}
 
-                if(block.BlockDefinition.Id.TypeId == typeof(MyObjectBuilder_ContractBlock) == true) {
+				if(block.BlockDefinition.Id.TypeId == typeof(MyObjectBuilder_ContractBlock) == true) {
 
-                    gotContract = true;
+					gotContract = true;
 
-                }
+				}
 
-            }
+			}
 
-            if(gotStore == false || gotContract == false) {
+			if(gotStore == false || gotContract == false) {
 
-                return false;
+				return false;
 
-            }
+			}
 
-            return true;
+			return true;
 
-        }
+		}
 
-        public static bool IsGridNameEconomyPattern(string gridName) {
+		public static bool IsGridNameEconomyPattern(string gridName) {
 
-            if(gridName.StartsWith("Economy_MiningStation_") == true) {
+			if(gridName.StartsWith("Economy_MiningStation_") == true) {
 
-                return true;
+				return true;
 
-            }
+			}
 
-            if(gridName.StartsWith("Economy_OrbitalStation_") == true) {
+			if(gridName.StartsWith("Economy_OrbitalStation_") == true) {
 
-                return true;
+				return true;
 
-            }
+			}
 
-            if(gridName.StartsWith("Economy_Outpost_") == true) {
+			if(gridName.StartsWith("Economy_Outpost_") == true) {
 
-                return true;
+				return true;
 
-            }
+			}
 
-            if(gridName.StartsWith("Economy_SpaceStation_") == true) {
+			if(gridName.StartsWith("Economy_SpaceStation_") == true) {
 
-                return true;
+				return true;
 
-            }
+			}
 
-            var nameSplit = gridName.Split(' ');
-            var stationTypes = new List<string>();
-            stationTypes.Add("MiningStation");
-            stationTypes.Add("OrbitalStation");
-            stationTypes.Add("Outpost");
-            stationTypes.Add("SpaceStation");
+			var nameSplit = gridName.Split(' ');
+			var stationTypes = new List<string>();
+			stationTypes.Add("MiningStation");
+			stationTypes.Add("OrbitalStation");
+			stationTypes.Add("Outpost");
+			stationTypes.Add("SpaceStation");
 
-            if(nameSplit.Length < 3) {
+			if(nameSplit.Length < 3) {
 
-                return false;
+				return false;
 
-            }
+			}
 
-            if(NPCFactionTagToFounder.ContainsKey(nameSplit[0]) == false) {
+			if(NPCFactionTagToFounder.ContainsKey(nameSplit[0]) == false) {
 
-                return false;
+				return false;
 
-            }
+			}
 
-            if(stationTypes.Contains(nameSplit[1]) == false) {
+			if(stationTypes.Contains(nameSplit[1]) == false) {
 
-                return false;
+				return false;
 
-            }
+			}
 
-            long stationId = 0;
+			long stationId = 0;
 
-            if(long.TryParse(nameSplit[2], out stationId) == false) {
+			if(long.TryParse(nameSplit[2], out stationId) == false) {
 
-                return false;
+				return false;
 
-            }
+			}
 
-            return true;
+			return true;
 
-        }
+		}
 		
 		public static IMyEntity MakeDummyContainer(){
 			
@@ -1335,7 +1344,7 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-            for(int i = 0; i < PendingNPCs.Count; i++){
+			for(int i = 0; i < PendingNPCs.Count; i++){
 				
 				//Named Grid - No Previous
 				if(PendingNPCs[i].GridName == cubeGrid.CustomName && closestDist == -1){
@@ -1364,13 +1373,13 @@ namespace ModularEncountersSpawner{
 				
 				PendingNPCs[closestIndex].CubeGrid = cubeGrid;
 
-                /*
-                if(PendingNPCs[closestIndex].SpawnType == "PlanetaryCargoShip" && string.IsNullOrWhiteSpace(PendingNPCs[closestIndex].KeenAiName) == false) {
+				/*
+				if(PendingNPCs[closestIndex].SpawnType == "PlanetaryCargoShip" && string.IsNullOrWhiteSpace(PendingNPCs[closestIndex].KeenAiName) == false) {
 
-                    PendingNPCs[closestIndex].SpawnType = "Other";
+					PendingNPCs[closestIndex].SpawnType = "Other";
 
-                }
-                */
+				}
+				*/
 
 				if(ActiveNPCs.ContainsKey(cubeGrid) == false){
 
@@ -1404,11 +1413,11 @@ namespace ModularEncountersSpawner{
 							
 							if(remoteControl == null){
 
-                                if(PendingNPCs[closestIndex].SpawnType != "SpaceCargoShip") {
+								if(PendingNPCs[closestIndex].SpawnType != "SpaceCargoShip") {
 
-                                    PendingNPCs[closestIndex].SpawnType = "Other";
+									PendingNPCs[closestIndex].SpawnType = "Other";
 
-                                }
+								}
 
 							}else{
 								
@@ -1440,20 +1449,21 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-                    if(IsGridNameEconomyPattern(cubeGrid.CustomName) == true) {
+					if(IsGridNameEconomyPattern(cubeGrid.CustomName) == true) {
 
-                        Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.");
-                        PendingNPCs[closestIndex].CleanupIgnore = true;
+						Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.");
+						PendingNPCs[closestIndex].CleanupIgnore = true;
 
-                    }
+					}
 
-                    ActiveNPCs.Add(cubeGrid, PendingNPCs[closestIndex]);
+					ActiveNPCs.Add(cubeGrid, PendingNPCs[closestIndex]);
 
 				}
 				
 				PendingNPCs.RemoveAt(closestIndex);
 
-			}else{
+
+			} else{
 				
 				var activeNPC = CheckIfGridWasActiveNPC(cubeGrid);
 				
@@ -1486,14 +1496,14 @@ namespace ModularEncountersSpawner{
 				
 				if(ActiveNPCs.ContainsKey(cubeGrid) == false){
 
-                    if(IsGridNameEconomyPattern(cubeGrid.CustomName) == true) {
+					if(IsGridNameEconomyPattern(cubeGrid.CustomName) == true) {
 
-                        Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.");
-                        activeNPC.CleanupIgnore = true;
+						Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.");
+						activeNPC.CleanupIgnore = true;
 
-                    }
+					}
 
-                    ActiveNPCs.Add(cubeGrid, activeNPC);
+					ActiveNPCs.Add(cubeGrid, activeNPC);
 					
 				}
 
@@ -1506,22 +1516,22 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-            //Active Npc Data
-            if(cubeGrid.Storage.ContainsKey(GuidActiveNpcData) == false) {
+			//Active Npc Data
+			if(cubeGrid.Storage.ContainsKey(GuidActiveNpcData) == false) {
 
-                cubeGrid.Storage.Add(GuidActiveNpcData, ActiveNPCs[cubeGrid].ToString());
+				cubeGrid.Storage.Add(GuidActiveNpcData, ActiveNPCs[cubeGrid].ToString());
 
-            } else {
+			} else {
 
-                cubeGrid.Storage[GuidActiveNpcData] = ActiveNPCs[cubeGrid].ToString();
+				cubeGrid.Storage[GuidActiveNpcData] = ActiveNPCs[cubeGrid].ToString();
 
-            }
+			}
 
-            if(ActiveNPCs[cubeGrid].SpawnType == "SpaceCargoShip") {
+			if(ActiveNPCs[cubeGrid].SpawnType == "SpaceCargoShip") {
 
-                CargoShipWatcher.NewlySpawnedGridSpeedCheck.Add(cubeGrid);
+				CargoShipWatcher.NewlySpawnedGridSpeedCheck.Add(cubeGrid);
 
-            }
+			}
 
 			NpcOwnershipCheckTimer = 2;
 			NpcBlacklistCheckTimer = Settings.General.NpcBlacklistCheckTimerTrigger;
@@ -1775,13 +1785,13 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                if(grid.Storage.ContainsKey(GuidActiveNpcData) == true) {
+				if(grid.Storage.ContainsKey(GuidActiveNpcData) == true) {
 
-                    grid.Storage.Remove(GuidActiveNpcData);
+					grid.Storage.Remove(GuidActiveNpcData);
 
-                }
+				}
 
-            }
+			}
 			
 		}
 		
@@ -1825,63 +1835,63 @@ namespace ModularEncountersSpawner{
 		
 		}
 
-        public static void SpawnedVoxelCheck() {
+		public static void SpawnedVoxelCheck() {
 
-            SpawnedVoxelCheckTimer = Settings.General.SpawnedVoxelCheckTimerTrigger;
-            bool listModified = false;
-            SpawnResources.RefreshEntityLists();
+			SpawnedVoxelCheckTimer = Settings.General.SpawnedVoxelCheckTimerTrigger;
+			bool listModified = false;
+			SpawnResources.RefreshEntityLists();
 
-            foreach(var voxelId in SpawnedVoxels.Keys.ToList()) {
+			foreach(var voxelId in SpawnedVoxels.Keys.ToList()) {
 
-                if(SpawnedVoxels[voxelId] == null || MyAPIGateway.Entities.Exist(SpawnedVoxels[voxelId]) == false) {
+				if(SpawnedVoxels[voxelId] == null || MyAPIGateway.Entities.Exist(SpawnedVoxels[voxelId]) == false) {
 
-                    listModified = true;
-                    SpawnedVoxels.Remove(voxelId);
-                    continue;
+					listModified = true;
+					SpawnedVoxels.Remove(voxelId);
+					continue;
 
-                }
+				}
 
-                bool closeGrid = false;
+				bool closeGrid = false;
 
-                foreach(var entity in SpawnResources.EntityList) {
+				foreach(var entity in SpawnResources.EntityList) {
 
-                    if(entity as IMyCubeGrid == null && entity as IMyCharacter == null) {
+					if(entity as IMyCubeGrid == null && entity as IMyCharacter == null) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    if(Vector3D.Distance(entity.GetPosition(), SpawnedVoxels[voxelId].GetPosition()) < Settings.General.SpawnedVoxelMinimumGridDistance) {
+					if(Vector3D.Distance(entity.GetPosition(), SpawnedVoxels[voxelId].GetPosition()) < Settings.General.SpawnedVoxelMinimumGridDistance) {
 
-                        closeGrid = true;
-                        break;
+						closeGrid = true;
+						break;
 
-                    }
+					}
 
-                }
+				}
 
-                if(closeGrid == true) {
+				if(closeGrid == true) {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                Logger.AddMsg("Removed Voxels Spawned From NPC At Coords " + SpawnedVoxels[voxelId].GetPosition().ToString() + ". No Grids Within Range.");
-                SpawnedVoxels[voxelId].Delete();
-                SpawnedVoxels.Remove(voxelId);
-                listModified = true;
+				Logger.AddMsg("Removed Voxels Spawned From NPC At Coords " + SpawnedVoxels[voxelId].GetPosition().ToString() + ". No Grids Within Range.");
+				SpawnedVoxels[voxelId].Delete();
+				SpawnedVoxels.Remove(voxelId);
+				listModified = true;
 
-            }
+			}
 
-            if(listModified == true) {
+			if(listModified == true) {
 
-                var voxelIdList = new List<string>(SpawnedVoxels.Keys.ToList());
-                string[] voxelIdArray = voxelIdList.ToArray();
-                MyAPIGateway.Utilities.SetVariable<string[]>("MES-SpawnedVoxels", voxelIdArray);
+				var voxelIdList = new List<string>(SpawnedVoxels.Keys.ToList());
+				string[] voxelIdArray = voxelIdList.ToArray();
+				MyAPIGateway.Utilities.SetVariable<string[]>("MES-SpawnedVoxels", voxelIdArray);
 
-            }
+			}
 
-        }
+		}
 		
 		public static void StartupScan(){
 			
@@ -1917,22 +1927,23 @@ namespace ModularEncountersSpawner{
 				
 				//Check For NPC by Spawner Tags
 				var activeNPC = CheckIfGridWasActiveNPC(cubeGrid);
-				
-				if(activeNPC.StartupScanValid == true){
+				activeNPC.VoxelCut = true; //No Matter What, This Check Shouldn't Happen At Startup
+
+				if (activeNPC.StartupScanValid == true){
 					
 					if(NPCWatcher.NpcOwnershipCheck(cubeGrid, true, true) == true){
 						
 						Logger.SkipNextMessage = true;
 						Logger.AddMsg(cubeGrid.CustomName + " / " + cubeGrid.EntityId.ToString() + " Identified as an NPC Grid: " + activeNPC.SpawnType);
 
-                        if(IsGridNameEconomyPattern(cubeGrid.CustomName) == true) {
+						if(IsGridNameEconomyPattern(cubeGrid.CustomName) == true) {
 
-                            Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.");
-                            activeNPC.CleanupIgnore = true;
+							Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.");
+							activeNPC.CleanupIgnore = true;
 
-                        }
+						}
 
-                        ActiveNPCs.Add(cubeGrid, activeNPC);
+						ActiveNPCs.Add(cubeGrid, activeNPC);
 						
 						if(activeNPC.SpawnType == "PlanetaryCargoShip"){
 							
@@ -1956,14 +1967,14 @@ namespace ModularEncountersSpawner{
 				
 				if(NPCWatcher.NpcOwnershipCheck(cubeGrid, true, true) == true){
 
-                    if(IsGridNameEconomyPattern(cubeGrid.CustomName) == true) {
+					if(IsGridNameEconomyPattern(cubeGrid.CustomName) == true) {
 
-                        Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.");
-                        activeNPC.CleanupIgnore = true;
+						Logger.AddMsg(cubeGrid.CustomName + " is Keen Economy Station and will not be cleaned by MES.");
+						activeNPC.CleanupIgnore = true;
 
-                    }
+					}
 
-                    Logger.SkipNextMessage = true;
+					Logger.SkipNextMessage = true;
 					Logger.AddMsg(cubeGrid.CustomName + " / " + cubeGrid.EntityId.ToString() + " Identified as an UnknownSource NPC Grid");
 					activeNPC = new ActiveNPC();
 					activeNPC.Name = cubeGrid.CustomName;
@@ -2007,138 +2018,137 @@ namespace ModularEncountersSpawner{
 		public static ActiveNPC CheckIfGridWasActiveNPC(IMyCubeGrid cubeGrid){
 			
 			var activeNPC = new ActiveNPC();
-            bool gotNpcDataStorage = false;
+			bool gotNpcDataStorage = false;
 			
 			if(cubeGrid.Storage != null){
 
-                string activeNpcDataString = "";
+				string activeNpcDataString = "";
 
-                if(cubeGrid.Storage.TryGetValue(GuidActiveNpcData, out activeNpcDataString) == true) {
+				if(cubeGrid.Storage.TryGetValue(GuidActiveNpcData, out activeNpcDataString) == true) {
 
-                    activeNPC = new ActiveNPC(activeNpcDataString);
+					activeNPC = new ActiveNPC(activeNpcDataString);
 
-                    if(activeNPC.ModStorageRetrieveFail == false && string.IsNullOrWhiteSpace(activeNpcDataString) == false) {
+					if(activeNPC.ModStorageRetrieveFail == false && string.IsNullOrWhiteSpace(activeNpcDataString) == false) {
 
-                        Logger.AddMsg("Got Serialized NPC Data From " + cubeGrid.CustomName);
-                        Logger.AddMsg("SpawnType: " + activeNPC.SpawnType);
-                        activeNPC.StartupScanValid = true;
-                        gotNpcDataStorage = true;
+						Logger.AddMsg("Got Serialized NPC Data From " + cubeGrid.CustomName);
+						Logger.AddMsg("SpawnType: " + activeNPC.SpawnType);
+						activeNPC.StartupScanValid = true;
+						gotNpcDataStorage = true;
 
-                    }
+					}
 
 
-                }
+				}
 
 				if(cubeGrid.Storage.ContainsKey(GuidSpawnType) == true || gotNpcDataStorage == true) {
 
-                    if(gotNpcDataStorage == false) {
+					if(gotNpcDataStorage == false) {
 
-                        activeNPC.StartupScanValid = true;
-                        activeNPC.Name = cubeGrid.CustomName;
-                        activeNPC.GridName = cubeGrid.CustomName;
-                        activeNPC.CubeGrid = cubeGrid;
-                        activeNPC.SpawnType = cubeGrid.Storage[GuidSpawnType];
-                        activeNPC.KeenBehaviorCheck = true;
-                        activeNPC.FixTurrets = true;
-                        activeNPC.DisabledBlocks = true;
-                        activeNPC.ReplacedWeapons = true;
-                        activeNPC.AddedCrew = true;
-                        activeNPC.ReplenishedSystems = true;
-                        activeNPC.StoreBlocksInit = true;
+						activeNPC.StartupScanValid = true;
+						activeNPC.Name = cubeGrid.CustomName;
+						activeNPC.GridName = cubeGrid.CustomName;
+						activeNPC.CubeGrid = cubeGrid;
+						activeNPC.SpawnType = cubeGrid.Storage[GuidSpawnType];
+						activeNPC.KeenBehaviorCheck = true;
+						activeNPC.FixTurrets = true;
+						activeNPC.DisabledBlocks = true;
+						activeNPC.ReplacedWeapons = true;
+						activeNPC.AddedCrew = true;
+						activeNPC.ReplenishedSystems = true;
+						activeNPC.StoreBlocksInit = true;
 
+						if (cubeGrid.Storage.ContainsKey(GuidStartCoords) == true) {
 
-                        if(cubeGrid.Storage.ContainsKey(GuidStartCoords) == true) {
+							var StartCoords = cubeGrid.GetPosition();
+							Vector3D.TryParse(cubeGrid.Storage[GuidStartCoords], out StartCoords);
+							activeNPC.StartCoords = StartCoords;
 
-                            var StartCoords = cubeGrid.GetPosition();
-                            Vector3D.TryParse(cubeGrid.Storage[GuidStartCoords], out StartCoords);
-                            activeNPC.StartCoords = StartCoords;
+						}
 
-                        }
+						if(cubeGrid.Storage.ContainsKey(GuidEndCoords) == true) {
 
-                        if(cubeGrid.Storage.ContainsKey(GuidEndCoords) == true) {
+							var EndCoords = cubeGrid.GetPosition();
+							Vector3D.TryParse(cubeGrid.Storage[GuidEndCoords], out EndCoords);
+							activeNPC.EndCoords = EndCoords;
 
-                            var EndCoords = cubeGrid.GetPosition();
-                            Vector3D.TryParse(cubeGrid.Storage[GuidEndCoords], out EndCoords);
-                            activeNPC.EndCoords = EndCoords;
+						}
 
-                        }
+						if(cubeGrid.Storage.ContainsKey(GuidCleanupTimer) == true) {
 
-                        if(cubeGrid.Storage.ContainsKey(GuidCleanupTimer) == true) {
+							int timer = 0;
+							int.TryParse(cubeGrid.Storage[GuidCleanupTimer], out timer);
+							activeNPC.CleanupTime = timer;
 
-                            int timer = 0;
-                            int.TryParse(cubeGrid.Storage[GuidCleanupTimer], out timer);
-                            activeNPC.CleanupTime = timer;
+						}
 
-                        }
+						if(cubeGrid.Storage.ContainsKey(GuidIgnoreCleanup) == true) {
 
-                        if(cubeGrid.Storage.ContainsKey(GuidIgnoreCleanup) == true) {
+							var cleanIgnore = false;
+							bool.TryParse(cubeGrid.Storage[GuidIgnoreCleanup], out cleanIgnore);
+							activeNPC.CleanupIgnore = cleanIgnore;
 
-                            var cleanIgnore = false;
-                            bool.TryParse(cubeGrid.Storage[GuidIgnoreCleanup], out cleanIgnore);
-                            activeNPC.CleanupIgnore = cleanIgnore;
+						}
 
-                        }
+						if(cubeGrid.Storage.ContainsKey(GuidWeaponsReplaced) == true) {
 
-                        if(cubeGrid.Storage.ContainsKey(GuidWeaponsReplaced) == true) {
+							var weaponsReplaced = false;
+							bool.TryParse(cubeGrid.Storage[GuidWeaponsReplaced], out weaponsReplaced);
+							activeNPC.ReplacedWeapons = weaponsReplaced;
 
-                            var weaponsReplaced = false;
-                            bool.TryParse(cubeGrid.Storage[GuidWeaponsReplaced], out weaponsReplaced);
-                            activeNPC.ReplacedWeapons = weaponsReplaced;
+						}
 
-                        }
+					}
 
-                    }
+					if(activeNPC.SpawnType == "SpaceCargoShip") {
 
-                    if(activeNPC.SpawnType == "SpaceCargoShip") {
+						if(activeNPC.SpawnGroup != null) {
 
-                        if(activeNPC.SpawnGroup != null) {
+							if(activeNPC.SpawnGroup.UseAutoPilotInSpace == true) {
 
-                            if(activeNPC.SpawnGroup.UseAutoPilotInSpace == true) {
+								var gts = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid(cubeGrid);
+								var blockList = new List<IMyRemoteControl>();
+								gts.GetBlocksOfType<IMyRemoteControl>(blockList);
 
-                                var gts = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid(cubeGrid);
-                                var blockList = new List<IMyRemoteControl>();
-                                gts.GetBlocksOfType<IMyRemoteControl>(blockList);
+								foreach(var block in blockList) {
 
-                                foreach(var block in blockList) {
+									if(block.IsFunctional == true) {
 
-                                    if(block.IsFunctional == true) {
+										if(block.IsAutoPilotEnabled == true) {
 
-                                        if(block.IsAutoPilotEnabled == true) {
+											activeNPC.RemoteControl = block;
 
-                                            activeNPC.RemoteControl = block;
+										} else {
 
-                                        } else {
+											var ob = (MyObjectBuilder_RemoteControl)block.SlimBlock.GetObjectBuilder();
 
-                                            var ob = (MyObjectBuilder_RemoteControl)block.SlimBlock.GetObjectBuilder();
+											if(ob != null) {
 
-                                            if(ob != null) {
+												if(ob.CurrentWaypointIndex > -1 && ob.Waypoints.Count - 1 >= ob.CurrentWaypointIndex) {
 
-                                                if(ob.CurrentWaypointIndex > -1 && ob.Waypoints.Count - 1 >= ob.CurrentWaypointIndex) {
+													if(Vector3D.Distance(activeNPC.EndCoords, ob.Waypoints[ob.CurrentWaypointIndex].Coords) <= 5) {
 
-                                                    if(Vector3D.Distance(activeNPC.EndCoords, ob.Waypoints[ob.CurrentWaypointIndex].Coords) <= 5) {
+														activeNPC.RemoteControl = block;
+														break;
 
-                                                        activeNPC.RemoteControl = block;
-                                                        break;
+													}
 
-                                                    }
+												}
 
-                                                }
+											}
 
-                                            }
+										}
 
-                                        }
+									}
 
-                                    }
+								}
 
-                                }
+							}
 
-                            }
+						}
 
-                        }
+					}
 
-                    }
-
-                    if(activeNPC.SpawnType == "PlanetaryCargoShip"){
+					if(activeNPC.SpawnType == "PlanetaryCargoShip"){
 						
 						var gts = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid(cubeGrid);
 						var blockList = new List<IMyRemoteControl>();
@@ -2148,31 +2158,31 @@ namespace ModularEncountersSpawner{
 							
 							if(block.IsFunctional == true){
 
-                                if(block.IsAutoPilotEnabled == true) {
+								if(block.IsAutoPilotEnabled == true) {
 
-                                    activeNPC.RemoteControl = block;
-                                    break;
+									activeNPC.RemoteControl = block;
+									break;
 
-                                } else {
+								} else {
 
-                                    var ob = (MyObjectBuilder_RemoteControl)block.SlimBlock.GetObjectBuilder();
+									var ob = (MyObjectBuilder_RemoteControl)block.SlimBlock.GetObjectBuilder();
 
-                                    if(ob != null) {
+									if(ob != null) {
 
-                                        if(ob.CurrentWaypointIndex > -1 && ob.Waypoints.Count - 1 >= ob.CurrentWaypointIndex) {
+										if(ob.CurrentWaypointIndex > -1 && ob.Waypoints.Count - 1 >= ob.CurrentWaypointIndex) {
 
-                                            if(Vector3D.Distance(activeNPC.EndCoords, ob.Waypoints[ob.CurrentWaypointIndex].Coords) <= 5) {
+											if(Vector3D.Distance(activeNPC.EndCoords, ob.Waypoints[ob.CurrentWaypointIndex].Coords) <= 5) {
 
-                                                activeNPC.RemoteControl = block;
-                                                break;
+												activeNPC.RemoteControl = block;
+												break;
 
-                                            }
+											}
 
-                                        }
+										}
 
-                                    }
+									}
 
-                                }
+								}
 								
 							}
 							

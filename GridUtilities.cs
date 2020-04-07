@@ -35,113 +35,113 @@ namespace ModularEncountersSpawner{
 	
 	public static class GridUtilities{
 
-        public static void NonPhysicalAmmoProcessing(IMyCubeGrid cubeGrid) {
+		public static void NonPhysicalAmmoProcessing(IMyCubeGrid cubeGrid) {
 
-            if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
+			if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
 
-                return;
+				return;
 
-            }
+			}
 
-            var gts = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid(cubeGrid);
-            var blockList = new List<IMyUserControllableGun>();
-            gts.GetBlocksOfType<IMyUserControllableGun>(blockList);
+			var gts = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid(cubeGrid);
+			var blockList = new List<IMyUserControllableGun>();
+			gts.GetBlocksOfType<IMyUserControllableGun>(blockList);
 
-            foreach(var block in blockList) {
+			foreach(var block in blockList) {
 
-                try {
+				try {
 
-                    if(block.GetInventory().Empty() == true) {
+					if(block.GetInventory().Empty() == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    var firstItem = block.GetInventory().GetItems()[0];
-                    var ammoMagId = new MyDefinitionId(firstItem.Content.TypeId, firstItem.Content.SubtypeName);
-                    var ammoMagDefinition = MyDefinitionManager.Static.GetAmmoMagazineDefinition(ammoMagId);
+					var firstItem = block.GetInventory().GetItems()[0];
+					var ammoMagId = new MyDefinitionId(firstItem.Content.TypeId, firstItem.Content.SubtypeName);
+					var ammoMagDefinition = MyDefinitionManager.Static.GetAmmoMagazineDefinition(ammoMagId);
 
-                    if(ammoMagDefinition == null) {
+					if(ammoMagDefinition == null) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    int amount = (int)ammoMagDefinition.Capacity * (int)firstItem.Amount;
+					int amount = (int)ammoMagDefinition.Capacity * (int)firstItem.Amount;
 
-                    var gunbase = (IMyGunObject<MyGunBase>)block;
+					var gunbase = (IMyGunObject<MyGunBase>)block;
 
-                    if(gunbase?.GunBase == null) {
+					if(gunbase?.GunBase == null) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    block.GetInventory().Clear();
-                    gunbase.GunBase.CurrentAmmo = amount;
+					block.GetInventory().Clear();
+					gunbase.GunBase.CurrentAmmo = amount;
 
-                } catch(Exception e) {
+				} catch(Exception e) {
 
-                    Logger.AddMsg("Issue Processing Non-Physical Ammo For Grid: " + cubeGrid.CustomName + " - Block: " + block.CustomName);
+					Logger.AddMsg("Issue Processing Non-Physical Ammo For Grid: " + cubeGrid.CustomName + " - Block: " + block.CustomName);
 
-                }
+				}
 
-            }
+			}
 
-        }
+		}
 
-        public static void RemoveGridContainerComponents(IMyCubeGrid cubeGrid) {
+		public static void RemoveGridContainerComponents(IMyCubeGrid cubeGrid) {
 
-            if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
+			if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
 
-                return;
+				return;
 
-            }
+			}
 
-            var gts = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid(cubeGrid);
-            var blockList = new List<IMyTerminalBlock>();
-            gts.GetBlocksOfType<IMyTerminalBlock>(blockList);
+			var gts = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid(cubeGrid);
+			var blockList = new List<IMyTerminalBlock>();
+			gts.GetBlocksOfType<IMyTerminalBlock>(blockList);
 
-            foreach(var block in blockList) {
+			foreach(var block in blockList) {
 
-                bool targetBlock = false;
+				bool targetBlock = false;
 
-                if(block as IMyCargoContainer != null) {
+				if(block as IMyCargoContainer != null) {
 
-                    targetBlock = true;
+					targetBlock = true;
 
-                } else if(block as IMyShipConnector != null) {
+				} else if(block as IMyShipConnector != null) {
 
-                    targetBlock = true;
+					targetBlock = true;
 
-                } else if(block as IMyCollector != null) {
+				} else if(block as IMyCollector != null) {
 
-                    targetBlock = true;
+					targetBlock = true;
 
-                } else if(block as IMyCockpit != null) {
+				} else if(block as IMyCockpit != null) {
 
-                    targetBlock = true;
+					targetBlock = true;
 
-                }
+				}
 
-                if(targetBlock == false) {
+				if(targetBlock == false) {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                if(block.HasInventory == true) {
+				if(block.HasInventory == true) {
 
-                    block.GetInventory().Clear();
+					block.GetInventory().Clear();
 
-                }
+				}
 
-            }
+			}
 
-        }
+		}
 
 
-        public static void ReplenishGridSystems(IMyCubeGrid cubeGrid, bool randomReplaced){
+		public static void ReplenishGridSystems(IMyCubeGrid cubeGrid, bool randomReplaced){
 			
 			var errorLogBuilder = new StringBuilder();
 			errorLogBuilder.Append("Error: Something has gone wrong with Spawner Inventory Replenishment.").AppendLine();
@@ -157,10 +157,17 @@ namespace ModularEncountersSpawner{
 				
 				errorLogBuilder.Append(" - Iterate Through Blocks").AppendLine();
 				foreach(var block in blockList){
+
+					//WeaponCore Replenishing
+					if (MES_SessionCore.Instance.WeaponCoreLoaded && GridBuilderManipulation.AllWeaponCoreIDs.Contains(block.SlimBlock.BlockDefinition.Id)) {
+
+						WeaponCoreReplenishment(block);
+						continue;
 					
+					}
+
 					//Weapon Replenishing
-					
-					if((block as IMyUserControllableGun) != null){
+					if ((block as IMyUserControllableGun) != null){
 																		
 						var weaponBlockDefinition = block.SlimBlock.BlockDefinition as MyWeaponBlockDefinition;
 						
@@ -352,6 +359,75 @@ namespace ModularEncountersSpawner{
 			//Logger.AddMsg(errorLogBuilder.ToString(), true);
 			
 		}
+
+		public static void WeaponCoreReplenishment(IMyTerminalBlock block) {
+
+			var weaponDefs = new Dictionary<string, int>();
+			MES_SessionCore.Instance.WeaponCore.GetBlockWeaponMap(block, weaponDefs);
+			MES_SessionCore.Instance.WeaponCore.DisableRequiredPower(block);
+			var ammoList = new Dictionary<MyDefinitionId, int>();
+
+			foreach (var weaponName in weaponDefs.Keys) {
+
+				var currentAmmo = MES_SessionCore.Instance.WeaponCore.GetActiveAmmo(block, weaponDefs[weaponName]);
+
+				if (!string.IsNullOrWhiteSpace(currentAmmo)) {
+
+					if (currentAmmo == "Energy")
+						continue;
+
+					var ammoMagId = new MyDefinitionId(typeof(MyObjectBuilder_AmmoMagazine), currentAmmo);
+
+					if (!ammoList.ContainsKey(ammoMagId)) {
+
+						ammoList.Add(ammoMagId, weaponDefs[weaponName]);
+
+					}
+
+				}
+
+			}
+
+			//Fill Ammos - 
+			int totalMagazines = 0;
+			int totalLoopRuns = 0;
+			int maxMagazines = 100; //Until Moved To Config;
+			int maxLoopRuns = 100;
+
+			if (ammoList.Keys.Count == 0)
+				return;
+
+			while (totalMagazines < maxMagazines && totalLoopRuns < maxLoopRuns) {
+
+				totalLoopRuns++;
+				bool breakNow = false;
+				bool noLoop = true;
+
+				foreach (var ammoId in ammoList.Keys) {
+
+					noLoop = false;
+					var content = (MyObjectBuilder_PhysicalObject)MyObjectBuilderSerializer.CreateNewObject(ammoId);
+					MyObjectBuilder_InventoryItem inventoryItem = new MyObjectBuilder_InventoryItem { Amount = 1, Content = content };
+
+					if (block.GetInventory().CanItemsBeAdded(1, ammoId) == true) {
+
+						block.GetInventory().AddItems(1, inventoryItem.Content);
+						totalMagazines++;
+
+					} else {
+
+						breakNow = true;
+
+					}
+
+				}
+
+				if (breakNow || noLoop)
+					break;
+			
+			}
+
+		}
 		
 		public static bool FixUnfinishedBlock(IMyInventory inv, IMySlimBlock slimBlock, long owner){
 			
@@ -398,16 +474,55 @@ namespace ModularEncountersSpawner{
 			
 		}
 
-        public static Vector3 RoundColorHSV(Vector3D originalColor) {
+		public static Vector3 RoundColorHSV(Vector3D originalColor) {
 
-            var newColor = originalColor;
-            newColor.X = Math.Round(newColor.X, 4);
-            newColor.Y = Math.Round(newColor.Y, 4);
-            newColor.Z = Math.Round(newColor.Z, 4);
-            return (Vector3)newColor;
+			var newColor = originalColor;
+			newColor.X = Math.Round(newColor.X, 4);
+			newColor.Y = Math.Round(newColor.Y, 4);
+			newColor.Z = Math.Round(newColor.Z, 4);
+			return (Vector3)newColor;
 
-        }
-		
+		}
+
+		public static List<IMyTerminalBlock> GetBlocksOfType<T>(IMyCubeGrid cubeGrid) where T : class {
+
+			var blockList = GetAllBlocks(cubeGrid);
+			var resultList = new List<IMyTerminalBlock>();
+
+			foreach (IMySlimBlock block in blockList.Where(x => x.FatBlock != null)) {
+
+				IMyTerminalBlock terminalBlock = block.FatBlock as IMyTerminalBlock;
+
+				if (terminalBlock == null || terminalBlock as T == null)
+					continue;
+
+				resultList.Add(terminalBlock);
+
+			}
+
+			return resultList;
+
+		}
+
+		public static List<IMySlimBlock> GetAllBlocks(IMyCubeGrid cubeGrid) {
+
+			List<IMySlimBlock> totalList = new List<IMySlimBlock>();
+			cubeGrid.GetBlocks(totalList);
+			var gridGroup = MyAPIGateway.GridGroups.GetGroup(cubeGrid, GridLinkTypeEnum.Physical);
+
+			foreach (var grid in gridGroup) {
+
+				List<IMySlimBlock> blockList = new List<IMySlimBlock>();
+				cubeGrid.GetBlocks(blockList);
+				blockList = new List<IMySlimBlock>(blockList.Except(totalList).ToList());
+				totalList = new List<IMySlimBlock>(blockList.Concat(totalList).ToList());
+
+			}
+
+			return totalList;
+
+		}
+
 	}
 	
 }

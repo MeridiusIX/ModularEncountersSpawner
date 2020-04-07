@@ -30,9 +30,9 @@ namespace ModularEncountersSpawner.Spawners{
 	
 	public static class CustomSpawner {
 		
-		public static bool CustomSpawnRequest(List<string> spawnGroups, MatrixD spawningMatrix, Vector3 velocity, bool ignoreSafetyCheck) {
+		public static bool CustomSpawnRequest(List<string> spawnGroups, MatrixD spawningMatrix, Vector3 velocity, bool ignoreSafetyCheck, string factionOverride, string spawnProfileId) {
 
-			Logger.AddMsg("Custom Spawn Request Received", true);
+			Logger.AddMsg("Custom Spawn Request Received by ID: " + spawnProfileId);
 
 			if(Settings.General.UseMaxNpcGrids == true){
 				
@@ -49,7 +49,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 			KnownPlayerLocationManager.CleanExpiredLocations();
 			var validFactions = new Dictionary<string, List<string>>();
-			var spawnGroupList = GetSpawnGroups(spawnGroups, spawningMatrix.Translation, out validFactions);
+			var spawnGroupList = GetSpawnGroups(spawnGroups, spawningMatrix.Translation, factionOverride, out validFactions);
 			
 			if(spawnGroupList.Count == 0){
 
@@ -135,7 +135,7 @@ namespace ModularEncountersSpawner.Spawners{
 				pendingNPC.StartCoords = startPathCoords;
 				pendingNPC.CurrentCoords = startPathCoords;
 				pendingNPC.EndCoords = endPathCoords;
-				pendingNPC.SpawnType = "CustomSpawn";
+				pendingNPC.SpawnType = "Other";
 				pendingNPC.AutoPilotSpeed = speedL.Length();
 				pendingNPC.CleanupIgnore = spawnGroup.IgnoreCleanupRules;
 				pendingNPC.ForceStaticGrid = spawnGroup.ForceStaticGrid;
@@ -174,31 +174,22 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 		
-		public static List<ImprovedSpawnGroup> GetSpawnGroups(List<string> spawnGroups, Vector3D coords, out Dictionary<string, List<string>> validFactions){
-			
+		public static List<ImprovedSpawnGroup> GetSpawnGroups(List<string> spawnGroups, Vector3D coords, string factionOverride, out Dictionary<string, List<string>> validFactions){
 
-			MyPlanet planet = SpawnResources.GetNearestPlanet(coords);
 			var planetRestrictions = new List<string>(Settings.General.PlanetSpawnsDisableList.ToList());
 			validFactions = new Dictionary<string, List<string>>();
-			
-			if(planet != null){
-				
-				if(planetRestrictions.Contains(planet.Generator.Id.SubtypeName) == true){
-					
+			var environment = new EnvironmentEvaluation(coords);
+
+			if (environment.NearestPlanet != null) {
+
+				if (planetRestrictions.Contains(environment.NearestPlanetName) && environment.IsOnPlanet) {
+
 					return new List<ImprovedSpawnGroup>();
-					
+
 				}
-				
+
 			}
-			
-			string planetName = "";
-			
-			if(planet != null){
-				
-				planetName = planet.Generator.Id.SubtypeId.ToString();
-				
-			}
-			
+
 			var eligibleGroups = new List<ImprovedSpawnGroup>();
 			
 			//Filter Eligible Groups To List
@@ -212,17 +203,15 @@ namespace ModularEncountersSpawner.Spawners{
 
 				if(spawnGroup.RivalAiAnySpawn == false) {
 
-					if(planet == null && spawnGroup.RivalAiSpaceSpawn == false) {
+					if(environment.NearestPlanet == null && spawnGroup.RivalAiSpaceSpawn == false) {
 
 						continue;
 
 					}
 
-					if(planet != null) {
+					if(environment.NearestPlanet != null) {
 
-						var airDensity = planet.GetAirDensity(coords);
-
-						if(spawnGroup.RivalAiAtmosphericSpawn == false || planet.HasAtmosphere == false || airDensity < 0.4f) {
+						if(spawnGroup.RivalAiAtmosphericSpawn == false || environment.NearestPlanet.HasAtmosphere == false || environment.AtmosphereAtPosition < 0.4f) {
 
 							continue;
 
@@ -232,13 +221,13 @@ namespace ModularEncountersSpawner.Spawners{
 
 				}
 
-				if(SpawnResources.CheckCommonConditions(spawnGroup, coords, planet, false) == false){
+				if(SpawnResources.CheckCommonConditions(spawnGroup, coords, environment, false) == false){
 					
 					continue;
 					
 				}
 
-				var validFactionsList = SpawnResources.ValidNpcFactions(spawnGroup, coords);
+				var validFactionsList = SpawnResources.ValidNpcFactions(spawnGroup, coords, factionOverride);
 
 				if(validFactionsList.Count == 0) {
 

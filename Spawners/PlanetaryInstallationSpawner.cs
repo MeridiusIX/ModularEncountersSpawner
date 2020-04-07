@@ -500,7 +500,6 @@ namespace ModularEncountersSpawner.Spawners{
 			largeStations = new List<ImprovedSpawnGroup>();
 			validFactions = new Dictionary<string, List<string>>();
 
-			MyPlanet planet = SpawnResources.GetNearestPlanet(playerCoords);
 			string specificGroup = "";
 			var planetRestrictions = new List<string>(Settings.General.PlanetSpawnsDisableList.ToList());
 			SpawnGroupSublists.Clear();
@@ -511,17 +510,19 @@ namespace ModularEncountersSpawner.Spawners{
 			EligibleSmallSpawnsByModId.Clear();
 			EligibleMediumSpawnsByModId.Clear();
 			EligibleLargeSpawnsByModId.Clear();
-			
-			if(planet != null){
-				
-				if(planetRestrictions.Contains(planet.Generator.Id.SubtypeName) == true){
-					
+
+			var environment = new EnvironmentEvaluation(playerCoords);
+
+			if (environment.NearestPlanet != null) {
+
+				if (planetRestrictions.Contains(environment.NearestPlanetName) == true) {
+
 					return new List<ImprovedSpawnGroup>();
-					
+
 				}
-				
+
 			}
-			
+
 			bool specificSpawnRequest = false;
 			
 			if(SpawnGroupManager.AdminSpawnGroup != ""){
@@ -532,7 +533,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 			
-			if(SpawnResources.IsPositionInGravity(playerCoords, planet) == false){
+			if(!environment.IsOnPlanet){
 				
 				return new List<ImprovedSpawnGroup>();
 				
@@ -568,7 +569,7 @@ namespace ModularEncountersSpawner.Spawners{
 					
 				}
 				
-				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, planet, specificSpawnRequest) == false){
+				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
 					
 					continue;
 					

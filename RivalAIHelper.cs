@@ -42,6 +42,9 @@ namespace ModularEncountersSpawner {
 
 			RivalAiControlModules.Add("K_Imperial_Dropship_Guild_RC");
 			RivalAiControlModules.Add("K_TIE_Fighter_RC");
+			RivalAiControlModules.Add("K_NewRepublic_EWing_RC");
+			RivalAiControlModules.Add("K_Imperial_RC_Largegrid");
+			RivalAiControlModules.Add("K_TIE_Drone_Core");
 			RivalAiControlModules.Add("K_Imperial_SpeederBike_FakePilot");
 			RivalAiControlModules.Add("K_Imperial_ProbeDroid_Top_II");
 			RivalAiControlModules.Add("K_Imperial_DroidCarrier_DroidBrain");

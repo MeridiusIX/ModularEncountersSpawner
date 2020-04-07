@@ -253,7 +253,8 @@ namespace ModularEncountersSpawner.Spawners{
 			validFactions = new Dictionary<string, List<string>>();
 			SpawnGroupSublists.Clear();
 			EligibleSpawnsByModId.Clear();
-			
+			var environment = new EnvironmentEvaluation(playerCoords);
+
 			bool specificSpawnRequest = false;
 			
 			if(SpawnGroupManager.AdminSpawnGroup != ""){
@@ -293,7 +294,7 @@ namespace ModularEncountersSpawner.Spawners{
 					
 				}
 				
-				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, planet, specificSpawnRequest) == false){
+				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
 					
 					continue;
 					

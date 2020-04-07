@@ -51,39 +51,39 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-                if(NPCWatcher.ActiveNPCs[cubeGrid].CleanupIgnore == true) {
+				if(NPCWatcher.ActiveNPCs[cubeGrid].CleanupIgnore == true) {
 
-                    continue;
+					continue;
 
-                } else {
+				} else {
 
-                    var gridGroups = MyAPIGateway.GridGroups.GetGroup(cubeGrid, GridLinkTypeEnum.Mechanical);
-                    bool ignore = false;
+					var gridGroups = MyAPIGateway.GridGroups.GetGroup(cubeGrid, GridLinkTypeEnum.Mechanical);
+					bool ignore = false;
 
-                    foreach(var grid in gridGroups) {
+					foreach(var grid in gridGroups) {
 
-                        if(NPCWatcher.ActiveNPCs.ContainsKey(grid) == true) {
+						if(NPCWatcher.ActiveNPCs.ContainsKey(grid) == true) {
 
-                            if(NPCWatcher.ActiveNPCs[grid].CleanupIgnore == true) {
+							if(NPCWatcher.ActiveNPCs[grid].CleanupIgnore == true) {
 
-                                ignore = true;
-                                break;
+								ignore = true;
+								break;
 
-                            }
+							}
 
-                        }
+						}
 
-                    }
+					}
 
-                    if(ignore == true) {
+					if(ignore == true) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                }
+				}
 
-                if(HasLegacyIgnoreTag(cubeGrid) == true){
+				if(HasLegacyIgnoreTag(cubeGrid) == true){
 						
 					continue;
 						
@@ -1043,7 +1043,7 @@ namespace ModularEncountersSpawner{
 				thisSettings.DisableUpgradeModule = Settings.PlanetaryInstallations.DisableUpgradeModule;
 			}
 			
-			if(spawnType == "Other"){
+			if(spawnType == "Other") {
 				
 				thisSettings.UseCleanupSettings = Settings.OtherNPCs.UseCleanupSettings;
 				thisSettings.CleanupUseDistance = Settings.OtherNPCs.CleanupUseDistance;

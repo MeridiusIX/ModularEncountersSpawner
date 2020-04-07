@@ -165,30 +165,16 @@ namespace ModularEncountersSpawner{
 
 		}
 
-		public static bool CheckSpawnGroupPlanetLists(ImprovedSpawnGroup spawnGroup, MyPlanet planet){
-			
-			string planetName = "";
-				
-			if(planet != null){
-				
-				planetName = planet.Generator.Id.SubtypeId.ToString();
-				
-			}else{
-				
-				if(spawnGroup.AtmosphericCargoShip == true){
-					
-					return false;
-					
-				}
-				
+		public static bool CheckSpawnGroupPlanetLists(ImprovedSpawnGroup spawnGroup, EnvironmentEvaluation environment){
+
+			if (!environment.IsOnPlanet)
 				return true;
+
+			if (spawnGroup.PlanetBlacklist.Count > 0 && Settings.General.IgnorePlanetBlacklists == false){
 				
-			}
-			
-			if(spawnGroup.PlanetBlacklist.Count > 0 && Settings.General.IgnorePlanetBlacklists == false){
-				
-				if(spawnGroup.PlanetBlacklist.Contains(planetName) == true){
-					
+				if(spawnGroup.PlanetBlacklist.Contains(environment.NearestPlanetName) == true){
+
+					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Planet Blacklisted");
 					return false;
 					
 				}
@@ -197,43 +183,46 @@ namespace ModularEncountersSpawner{
 			
 			if(spawnGroup.PlanetWhitelist.Count > 0 && Settings.General.IgnorePlanetWhitelists == false){
 				
-				if(spawnGroup.PlanetWhitelist.Contains(planetName) == false){
-					
+				if(spawnGroup.PlanetWhitelist.Contains(environment.NearestPlanetName) == false){
+
+					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Not On Whitelisted Planet");
 					return false;
 					
 				}
 				
 			}
 			
-			var planetEntity = planet as IMyEntity;
-			var sealevel = Vector3D.Up * (double)planet.MinimumRadius + planetEntity.GetPosition();
+			if(spawnGroup.PlanetRequiresVacuum == true && environment.AtmosphereAtPosition > 0){
 
-			if(spawnGroup.PlanetRequiresVacuum == true && planet.GetAirDensity(sealevel) > 0){
-				
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Planet Requires Vacuum");
 				return false;
 				
 			}
 
-			if(spawnGroup.PlanetRequiresAtmo == true && planet.GetAirDensity(sealevel) == 0){
-				
+			if(spawnGroup.PlanetRequiresAtmo == true && environment.AtmosphereAtPosition == 0){
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Planet Requires Atmo");
 				return false;
 				
 			}
 
-			if(spawnGroup.PlanetRequiresOxygen == true && planet.GetOxygenForPosition(sealevel) == 0){
-				
+			if(spawnGroup.PlanetRequiresOxygen == true && environment.OxygenAtPosition == 0){
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Planet Requires Oxygen");
 				return false;
 				
 			}
 
-			if(spawnGroup.PlanetMinimumSize > 0 && planet.MinimumRadius * 2 < spawnGroup.PlanetMinimumSize){
-				
+			if(spawnGroup.PlanetMinimumSize > 0 && environment.PlanetDiameter < spawnGroup.PlanetMinimumSize){
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Planet Min Size Fail");
 				return false;
 				
 			}
 
-			if(spawnGroup.PlanetMaximumSize > 0 && planet.MaximumRadius * 2 < spawnGroup.PlanetMaximumSize){
-				
+			if(spawnGroup.PlanetMaximumSize > 0 && environment.PlanetDiameter < spawnGroup.PlanetMaximumSize){
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Planet Max Size Fail");
 				return false;
 				
 			}
@@ -242,11 +231,11 @@ namespace ModularEncountersSpawner{
 			
 		}
 		
-		public static bool DistanceFromCenterCheck(ImprovedSpawnGroup spawnGroup, Vector3D checkCoords){
+		public static bool DistanceFromCenterCheck(ImprovedSpawnGroup spawnGroup, EnvironmentEvaluation environment){
 			
 			if(spawnGroup.MinSpawnFromWorldCenter > 0){
 				
-				if(Vector3D.Distance(Vector3D.Zero, checkCoords) < spawnGroup.MinSpawnFromWorldCenter){
+				if(environment.DistanceFromWorldCenter < spawnGroup.MinSpawnFromWorldCenter){
 					
 					return false;
 					
@@ -256,18 +245,91 @@ namespace ModularEncountersSpawner{
 			
 			if(spawnGroup.MaxSpawnFromWorldCenter > 0){
 				
-				if(Vector3D.Distance(Vector3D.Zero, checkCoords) > spawnGroup.MaxSpawnFromWorldCenter){
+				if(environment.DistanceFromWorldCenter > spawnGroup.MaxSpawnFromWorldCenter){
 					
 					return false;
 					
 				}
 				
 			}
+
+			if (spawnGroup.DirectionFromWorldCenter != Vector3D.Zero) {
+
+				var normalizedDirection = Vector3D.Normalize(spawnGroup.DirectionFromWorldCenter);
+				var angleFromCoords = SpawnResources.GetAngleBetweenDirections(normalizedDirection, environment.DirectionFromWorldCenter);
+
+				if (spawnGroup.MinAngleFromDirection > 0 && angleFromCoords < spawnGroup.MinAngleFromDirection)
+					return false;
+
+				if (spawnGroup.MaxAngleFromDirection > 0 && angleFromCoords > spawnGroup.MinAngleFromDirection)
+					return false;
+
+			}
 			
 			return true;
 			
 		}
+
+		public static bool DistanceFromSurfaceCheck(ImprovedSpawnGroup spawnGroup, EnvironmentEvaluation environment) {
+
+			if (spawnGroup.MinSpawnFromPlanetSurface < 0 && spawnGroup.MaxSpawnFromPlanetSurface < 0) {
+
+				return true;
+
+			}
+
+			if (environment.NearestPlanet == null && spawnGroup.MinSpawnFromPlanetSurface > 0)
+				return true;
+
+			if (environment.NearestPlanet == null && spawnGroup.MaxSpawnFromPlanetSurface > 0)
+				return false;
+
+			if (spawnGroup.MinSpawnFromPlanetSurface > 0 && spawnGroup.MinSpawnFromPlanetSurface < environment.AltitudeAtPosition)
+				return false;
+
+			if (spawnGroup.MaxSpawnFromPlanetSurface > 0 && spawnGroup.MaxSpawnFromPlanetSurface > environment.AltitudeAtPosition)
+				return false;
+
+			return true;
+
+		}
+
+		public static bool EnvironmentChecks(ImprovedSpawnGroup spawnGroup, EnvironmentEvaluation environment) {
+
+			if (spawnGroup.UseDayOrNightOnly) {
+
+				if (spawnGroup.SpawnOnlyAtNight != environment.IsNight) {
+
+					return false;
+				
+				}
+			
+			}
+
+			if (spawnGroup.UseWeatherSpawning) {
+
+				if (!spawnGroup.AllowedWeatherSystems.Contains(environment.WeatherAtPosition)) {
+
+					return false;
+				
+				}		
+			
+			}
+
+			if (spawnGroup.UseTerrainTypeValidation) {
+
+				if (!spawnGroup.AllowedTerrainTypes.Contains(environment.CommonTerrainAtPosition)) {
+
+					return false;
+
+				}
+
+			}
+
+			return true;
 		
+		}
+
 		public static ImprovedSpawnGroup GetNewSpawnGroupDetails(MySpawnGroupDefinition spawnGroup){
 			
 			var improveSpawnGroup = new ImprovedSpawnGroup();
@@ -625,9 +687,23 @@ namespace ModularEncountersSpawner{
 					improveSpawnGroup.WeaponRandomizerWhitelist = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
 				}
-				
+
+				//AddDefenseShieldBlocks
+				if (tag.Contains("[AddDefenseShieldBlocks:") == true) {
+
+					improveSpawnGroup.AddDefenseShieldBlocks = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
+				//IgnoreShieldProviderMod
+				if (tag.Contains("[IgnoreShieldProviderMod:") == true) {
+
+					improveSpawnGroup.IgnoreShieldProviderMod = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
 				//UseBlockReplacerProfile
-				if(tag.Contains("[UseBlockReplacerProfile") == true){
+				if (tag.Contains("[UseBlockReplacerProfile") == true){
 
 					improveSpawnGroup.UseBlockReplacerProfile = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
@@ -812,6 +888,7 @@ namespace ModularEncountersSpawner{
 				if(tag.Contains("[ColorReferencePairs") == true) {
 
 					improveSpawnGroup.ColorReferencePairs = TagVector3DictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					//Logger.AddMsg(improveSpawnGroup.ColorReferencePairs.Keys.Count.ToString() + " Color Reference Pairs");
 
 				}
 
@@ -819,6 +896,7 @@ namespace ModularEncountersSpawner{
 				if(tag.Contains("[ColorSkinReferencePairs") == true) {
 
 					improveSpawnGroup.ColorSkinReferencePairs = TagVector3StringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					//Logger.AddMsg(improveSpawnGroup.ColorReferencePairs.Keys.Count.ToString() + " Color-Skin Reference Pairs");
 
 				}
 
@@ -1064,6 +1142,20 @@ namespace ModularEncountersSpawner{
 				if (tag.Contains("[MaxAngleFromDirection") == true) {
 
 					improveSpawnGroup.MaxAngleFromDirection = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxAngleFromDirection, out badParse);
+
+				}
+
+				//MinSpawnFromPlanetSurface
+				if (tag.Contains("[MinSpawnFromPlanetSurface") == true) {
+
+					improveSpawnGroup.MinSpawnFromPlanetSurface = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinSpawnFromPlanetSurface, out badParse);
+
+				}
+
+				//MaxSpawnFromPlanetSurface
+				if (tag.Contains("[MaxSpawnFromPlanetSurface") == true) {
+
+					improveSpawnGroup.MaxSpawnFromPlanetSurface = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxSpawnFromPlanetSurface, out badParse);
 
 				}
 
@@ -1795,7 +1887,27 @@ namespace ModularEncountersSpawner{
 			return tagSplit;
 			
 		}
-		
+
+		public static string FixVectorString(string source) {
+
+			string newString = source;
+
+			if (newString.Length == 0)
+				return source;
+
+			if (newString[0] == '{')
+				newString = newString.Remove(0, 1);
+
+			if (newString.Length == 0)
+				return source;
+
+			if (newString[newString.Length - 1] == '}')
+				newString = newString.Remove(newString.Length - 1, 1);
+
+			return newString;
+
+		}
+
 		public static bool TagBoolCheck(string tag, string spawnGroupName, out bool badParse){
 			
 			bool result = false;
@@ -2068,7 +2180,10 @@ namespace ModularEncountersSpawner{
 					string key = secondSplit[0];
 					string val = secondSplit[1];
 
-					if(string.IsNullOrWhiteSpace(key) == true || string.IsNullOrWhiteSpace(val) == true) {
+					key = FixVectorString(key);
+					val = FixVectorString(val);
+
+					if (string.IsNullOrWhiteSpace(key) == true || string.IsNullOrWhiteSpace(val) == true) {
 
 						continue;
 
@@ -2106,7 +2221,7 @@ namespace ModularEncountersSpawner{
 
 			if(tagSplit.Length == 2) {
 
-				if(Vector3D.TryParse(tagSplit[1], out result) == false) {
+				if(Vector3D.TryParse(FixVectorString(tagSplit[1]), out result) == false) {
 
 					Logger.AddMsg("Could not process Vector3D tag " + tag + " from SpawnGroup " + spawnGroupName);
 					badParse = true;
@@ -2185,7 +2300,7 @@ namespace ModularEncountersSpawner{
 
 					Vector3D entry = Vector3D.Zero;
 
-					if(Vector3D.TryParse(item, out entry) == false) {
+					if(Vector3D.TryParse(FixVectorString(item), out entry) == false) {
 
 						continue;
 
@@ -2227,6 +2342,7 @@ namespace ModularEncountersSpawner{
 					var secondSplit = item.Split('|');
 
 					string key = secondSplit[0];
+					key = FixVectorString(key);
 					string val = secondSplit[1];
 
 					if(string.IsNullOrWhiteSpace(key) == true || string.IsNullOrWhiteSpace(val) == true) {

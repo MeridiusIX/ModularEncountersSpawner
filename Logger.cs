@@ -36,7 +36,9 @@ namespace ModularEncountersSpawner{
 		public static bool SkipNextMessage = false;
 		public static string LogDefaultIdentifier = "Modular Encounters Spawner: ";
 		public static Stopwatch PerformanceTimer = new Stopwatch();
-		
+
+		public static string DebugSpawnGroup = "(NPC-SDE) SuperDuperEasyCargoShipNo";
+
 		public static void AddMsg(string message, bool debugOnly = false, string identifier = ""){
 			
 			if(LoggerDebugMode == false && debugOnly == true){
@@ -63,7 +65,8 @@ namespace ModularEncountersSpawner{
 			}
 			
 			MyLog.Default.WriteLineAndConsole(thisIdentifier + message);
-			
+			return;
+
 			if(LoggerDebugMode == true){
 				
 				foreach(var player in MES_SessionCore.PlayerList){
@@ -79,7 +82,16 @@ namespace ModularEncountersSpawner{
 			}
 			
 		}
+
+		public static void SpawnGroupDebug(string spawnGroup, string msg) {
+
+			if (spawnGroup != DebugSpawnGroup)
+				return;
+
+			Logger.AddMsg(spawnGroup + ": " + msg, true);
 		
+		}
+
 		public static void StartTimer(){
 			
 			if(LoggerDebugMode == false){
@@ -161,41 +173,41 @@ namespace ModularEncountersSpawner{
 			
 		}
 
-        public static string GetBlockDefinitionInfo() {
+		public static string GetBlockDefinitionInfo() {
 
-            var sb = new StringBuilder();
+			var sb = new StringBuilder();
 
-            foreach(var def in ChatCommand.BlockDefinitionList) {
+			foreach(var def in ChatCommand.BlockDefinitionList) {
 
-                if(def == null) {
+				if(def == null) {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                sb.Append("Block Name: ").Append(def.DisplayNameText).AppendLine();
-                sb.Append("Block ID:   ").Append(def.Id.ToString()).AppendLine();
+				sb.Append("Block Name: ").Append(def.DisplayNameText).AppendLine();
+				sb.Append("Block ID:   ").Append(def.Id.ToString()).AppendLine();
 
-                if(def.Context?.ModId != null) {
+				if(def.Context?.ModId != null) {
 
-                    if(string.IsNullOrWhiteSpace(def.Context.ModId) == false) {
+					if(string.IsNullOrWhiteSpace(def.Context.ModId) == false) {
 
-                        sb.Append("Mod ID:     ").Append(def.Context.ModId).AppendLine();
+						sb.Append("Mod ID:     ").Append(def.Context.ModId).AppendLine();
 
-                    }
+					}
 
-                }
-                
-                sb.Append("Is Public:  ").Append(def.Public.ToString()).AppendLine();
-                sb.Append("Size:       ").Append(def.CubeSize.ToString()).AppendLine();
+				}
+				
+				sb.Append("Is Public:  ").Append(def.Public.ToString()).AppendLine();
+				sb.Append("Size:       ").Append(def.CubeSize.ToString()).AppendLine();
 
-                sb.AppendLine();
+				sb.AppendLine();
 
-            }
+			}
 
-            return sb.ToString();
+			return sb.ToString();
 
-        }
+		}
 		
 		public static string GetColorListFromGrid(IMyPlayer player){
 			
@@ -210,8 +222,8 @@ namespace ModularEncountersSpawner{
 			
 			if(player?.Controller?.ControlledEntity?.Entity == null){
 
-                MyVisualScriptLogicProvider.ShowNotification("Player Must Be Seated On Grid To Get Color List.", 5000, "White", player.IdentityId);
-                sb.Append(" ");
+				MyVisualScriptLogicProvider.ShowNotification("Player Must Be Seated On Grid To Get Color List.", 5000, "White", player.IdentityId);
+				sb.Append(" ");
 				return sb.ToString();
 				
 			}
@@ -220,8 +232,8 @@ namespace ModularEncountersSpawner{
 			
 			if(seat == null){
 
-                MyVisualScriptLogicProvider.ShowNotification("Player Using Invalid Ship Controller / Seat.", 5000, "White", player.IdentityId);
-                sb.Append(" ");
+				MyVisualScriptLogicProvider.ShowNotification("Player Using Invalid Ship Controller / Seat.", 5000, "White", player.IdentityId);
+				sb.Append(" ");
 				return sb.ToString();
 				
 			}
@@ -251,8 +263,8 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-            MyVisualScriptLogicProvider.ShowNotification("Grid Color List Sent To Clipboard", 5000, "White", player.IdentityId);
-            return sb.ToString();
+			MyVisualScriptLogicProvider.ShowNotification("Grid Color List Sent To Clipboard", 5000, "White", player.IdentityId);
+			return sb.ToString();
 			
 		}
 		
@@ -504,7 +516,7 @@ namespace ModularEncountersSpawner{
 		public static string EligibleSpawnGroupsAtPosition(Vector3D coords){
 			
 			var sb = new StringBuilder();
-            var validFactions = new Dictionary<string, List<string>>();
+			var validFactions = new Dictionary<string, List<string>>();
 
 
 			

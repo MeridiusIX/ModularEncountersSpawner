@@ -27,38 +27,38 @@ using ModularEncountersSpawner.Configuration;
 
 namespace ModularEncountersSpawner.Configuration{
 
-    //SpaceCargoShips
+	//SpaceCargoShips
 
-    /*
-      
-      Hello Stranger!
-     
-      If you are in here because you want to change settings
-      for how this mod behaves, you are in the wrong place.
+	/*
+	  
+	  Hello Stranger!
+	 
+	  If you are in here because you want to change settings
+	  for how this mod behaves, you are in the wrong place.
 
-      All the settings in this file, along with the other
-      configuration files, are created as XML files in the
-      \Storage\1521905890.sbm_ModularEncountersSpawner folder
-      of your Save File. This means you do not need to edit
-      the mod files here to tune the settings to your liking.
+	  All the settings in this file, along with the other
+	  configuration files, are created as XML files in the
+	  \Storage\1521905890.sbm_ModularEncountersSpawner folder
+	  of your Save File. This means you do not need to edit
+	  the mod files here to tune the settings to your liking.
 
-      The workshop page for this mod also has a link to a
-      guide that explains what all the configuration options
-      do, along with how to activate them in-game via chat
-      commands if desired.
-      
-      If you plan to edit the values here anyway, I ask that
-      you do not reupload this mod to the Steam Workshop. If
-      this is not respected and I find out about it, I'll
-      exercise my rights as the creator and file a DMCA
-      takedown on any infringing copies. This warning can be
-      found on the workshop page for this mod as well.
+	  The workshop page for this mod also has a link to a
+	  guide that explains what all the configuration options
+	  do, along with how to activate them in-game via chat
+	  commands if desired.
+	  
+	  If you plan to edit the values here anyway, I ask that
+	  you do not reupload this mod to the Steam Workshop. If
+	  this is not respected and I find out about it, I'll
+	  exercise my rights as the creator and file a DMCA
+	  takedown on any infringing copies. This warning can be
+	  found on the workshop page for this mod as well.
 
-      Thank you.
-         
-    */
+	  Thank you.
+		 
+	*/
 
-    public class ConfigSpaceCargoShips{
+	public class ConfigSpaceCargoShips{
 		
 		public float ModVersion {get; set;}
 		public int FirstSpawnTime {get; set;} //Time Until Spawn When World Starts

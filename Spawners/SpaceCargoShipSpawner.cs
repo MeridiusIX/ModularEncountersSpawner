@@ -421,25 +421,26 @@ namespace ModularEncountersSpawner.Spawners{
 		}
 		
 		public static List<ImprovedSpawnGroup> GetSpaceCargoShips(Vector3D playerCoords, out Dictionary<string, List<string>> validFactions){
-			
-			MyPlanet planet = SpawnResources.GetNearestPlanet(playerCoords);
+
 			bool allowLunar = false;
 			string specificGroup = "";
 			var planetRestrictions = new List<string>(Settings.General.PlanetSpawnsDisableList.ToList());
 			validFactions = new Dictionary<string, List<string>>();
 			SpawnGroupSublists.Clear();
 			EligibleSpawnsByModId.Clear();
-			
-			if(planet != null){
-				
-				if(planetRestrictions.Contains(planet.Generator.Id.SubtypeName) == true){
-					
+			var environment = new EnvironmentEvaluation(playerCoords);
+
+			if (environment.NearestPlanet != null) {
+
+				if (planetRestrictions.Contains(environment.NearestPlanetName) && environment.IsOnPlanet) {
+
+					Logger.SpawnGroupDebug(Logger.DebugSpawnGroup, "Restricted Planet, No Spawns Allowed");
 					return new List<ImprovedSpawnGroup>();
-					
+
 				}
-				
+
 			}
-			
+
 			bool specificSpawnRequest = false;
 			
 			if(SpawnGroupManager.AdminSpawnGroup != ""){
@@ -450,25 +451,18 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 			
-			if(SpawnResources.IsPositionInGravity(playerCoords, planet) == true){
+			if(environment.IsOnPlanet) {
 				
 				if(SpawnResources.LunarSpawnEligible(playerCoords) == true){
 					
 					allowLunar = true;
 					
 				}else{
-					
+
+					Logger.SpawnGroupDebug("[No Spawn Group]", "On Planet and Cannot Spawn As Lunar, No Spawns Allowed");
 					return new List<ImprovedSpawnGroup>();
 					
 				}
-				
-			}
-			
-			string planetName = "";
-			
-			if(planet != null){
-				
-				planetName = planet.Generator.Id.SubtypeId.ToString();
 				
 			}
 			
@@ -478,13 +472,15 @@ namespace ModularEncountersSpawner.Spawners{
 			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
 				
 				if(specificGroup != "" && spawnGroup.SpawnGroup.Id.SubtypeName != specificGroup){
-					
+
+					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Doesn't Match Admin Spawn");
 					continue;
 					
 				}
 				
 				if(specificGroup == "" && spawnGroup.AdminSpawnOnly == true){
-					
+
+					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Only Admin Spawn Allowed");
 					continue;
 					
 				}
@@ -494,21 +490,24 @@ namespace ModularEncountersSpawner.Spawners{
 					if(allowLunar == true){
 						
 						if(spawnGroup.LunarCargoShip == false){
-							
+
+							Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Is Not Space Cargo Ship Or Lunar");
 							continue;
 							
 						}
 						
 					}else{
-						
+
+						Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Is Not Space Cargo Ship");
 						continue;
 						
 					}
 					
 				}
 				
-				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, planet, specificSpawnRequest) == false){
-					
+				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
+
+					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Common Conditions Failed");
 					continue;
 					
 				}
@@ -517,6 +516,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 				if(validFactionsList.Count == 0) {
 
+					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "No Valid Faction");
 					continue;
 
 				}

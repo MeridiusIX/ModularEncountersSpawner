@@ -63,10 +63,10 @@ namespace ModularEncountersSpawner.Templates{
 		[ProtoMember(11)]
 		public bool KeenBehaviorCheck;
 
-        [ProtoMember(12)]
-        public string SpawnType;
+		[ProtoMember(12)]
+		public string SpawnType;
 
-        [ProtoIgnore]
+		[ProtoIgnore]
 		public string KeenAiName;
 		
 		[ProtoIgnore]
@@ -123,26 +123,29 @@ namespace ModularEncountersSpawner.Templates{
 		[ProtoIgnore]
 		public bool ReplenishedSystems;
 
-        [ProtoIgnore]
-        public bool StoreBlocksInit;
+		[ProtoIgnore]
+		public bool StoreBlocksInit;
 
-        [ProtoIgnore]
-        public bool ModStorageRetrieveFail;
+		[ProtoIgnore]
+		public bool ModStorageRetrieveFail;
 
-        [ProtoIgnore]
-        public IMyFaction faction;
+		[ProtoIgnore]
+		public IMyFaction faction;
 
-        [ProtoIgnore]
-        public bool EconomyStationCheck;
+		[ProtoIgnore]
+		public bool EconomyStationCheck;
 
-        [ProtoIgnore]
-        public bool NonPhysicalAmmoCheck;
+		[ProtoIgnore]
+		public bool NonPhysicalAmmoCheck;
 
-        [ProtoIgnore]
-        public bool EmptyInventoryCheck;
+		[ProtoIgnore]
+		public bool EmptyInventoryCheck;
+
+		[ProtoIgnore]
+		public bool DefenseShieldActivationCheck;
 
 
-        public ActiveNPC(){
+		public ActiveNPC(){
 			
 			SpawnGroupName = "";
 			Name = "";
@@ -180,82 +183,82 @@ namespace ModularEncountersSpawner.Templates{
 			VoxelCut = false;
 			CheckedBlockCount = false;
 			ReplenishedSystems = true;
-            StoreBlocksInit = false;
-            ModStorageRetrieveFail = false;
-            faction = null;
-            EconomyStationCheck = false;
-            NonPhysicalAmmoCheck = false;
-            EmptyInventoryCheck = false;
+			StoreBlocksInit = false;
+			ModStorageRetrieveFail = false;
+			faction = null;
+			EconomyStationCheck = false;
+			NonPhysicalAmmoCheck = false;
+			EmptyInventoryCheck = false;
+			DefenseShieldActivationCheck = false;
 
+		}
 
-        }
+		public ActiveNPC(string dataStorage) {
 
-        public ActiveNPC(string dataStorage) {
+			try {
 
-            try {
+				var byteData = Convert.FromBase64String(dataStorage);
+				var npcData = MyAPIGateway.Utilities.SerializeFromBinary<ActiveNPC>(byteData);
 
-                var byteData = Convert.FromBase64String(dataStorage);
-                var npcData = MyAPIGateway.Utilities.SerializeFromBinary<ActiveNPC>(byteData);
+				if(npcData != null) {
 
-                if(npcData != null) {
+					this.SpawnGroupName = npcData.SpawnGroupName;
+					this.Name = npcData.Name;
+					this.GridName = npcData.GridName;
+					this.InitialFaction = npcData.InitialFaction;
+					this.StartCoords = npcData.StartCoords;
+					this.EndCoords = npcData.EndCoords;
+					this.CurrentCoords = npcData.CurrentCoords;
+					this.AutoPilotSpeed = npcData.AutoPilotSpeed;
+					this.CleanupIgnore = npcData.CleanupIgnore;
+					this.CleanupTime = npcData.CleanupTime;
+					this.KeenBehaviorCheck = npcData.KeenBehaviorCheck;
+					this.SpawnType = npcData.SpawnType;
+					this.SpawnGroup = new ImprovedSpawnGroup();
 
-                    this.SpawnGroupName = npcData.SpawnGroupName;
-                    this.Name = npcData.Name;
-                    this.GridName = npcData.GridName;
-                    this.InitialFaction = npcData.InitialFaction;
-                    this.StartCoords = npcData.StartCoords;
-                    this.EndCoords = npcData.EndCoords;
-                    this.CurrentCoords = npcData.CurrentCoords;
-                    this.AutoPilotSpeed = npcData.AutoPilotSpeed;
-                    this.CleanupIgnore = npcData.CleanupIgnore;
-                    this.CleanupTime = npcData.CleanupTime;
-                    this.KeenBehaviorCheck = npcData.KeenBehaviorCheck;
-                    this.SpawnType = npcData.SpawnType;
-                    this.SpawnGroup = new ImprovedSpawnGroup();
+					foreach(var spawnGroup in SpawnGroupManager.SpawnGroups) {
 
-                    foreach(var spawnGroup in SpawnGroupManager.SpawnGroups) {
+						if(spawnGroup.SpawnGroupName == this.SpawnGroupName) {
 
-                        if(spawnGroup.SpawnGroupName == this.SpawnGroupName) {
+							this.SpawnGroup = spawnGroup;
+							break;
 
-                            this.SpawnGroup = spawnGroup;
-                            break;
+						}
 
-                        }
+					}
 
-                    }
+					this.HydrogenTanks = new List<IMyGasTank>();
+					this.GasGenerators = new List<IMyGasGenerator>();
+					this.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(npcData.InitialFaction);
 
-                    this.HydrogenTanks = new List<IMyGasTank>();
-                    this.GasGenerators = new List<IMyGasGenerator>();
-                    this.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(npcData.InitialFaction);
+				}
 
-                }
+			} catch(Exception exc) {
 
-            } catch(Exception exc) {
+				this.ModStorageRetrieveFail = true;
+				Logger.AddMsg("Failed To Load ActiveNPC Data from ModStorageComponent");
 
-                this.ModStorageRetrieveFail = true;
-                Logger.AddMsg("Failed To Load ActiveNPC Data from ModStorageComponent");
+			}
 
-            }
+		}
 
-        }
+		public string ToString() {
 
-        public string ToString() {
+			try {
 
-            try {
+				var byteData = MyAPIGateway.Utilities.SerializeToBinary<ActiveNPC>(this);
+				var stringData = Convert.ToBase64String(byteData);
+				return stringData;
 
-                var byteData = MyAPIGateway.Utilities.SerializeToBinary<ActiveNPC>(this);
-                var stringData = Convert.ToBase64String(byteData);
-                return stringData;
+			} catch(Exception exc) {
 
-            } catch(Exception exc) {
+				Logger.AddMsg("Failed To Save ActiveNPC Data to ModStorageComponent for " + GridName);
 
-                Logger.AddMsg("Failed To Save ActiveNPC Data to ModStorageComponent for " + GridName);
+			}
 
-            }
+			return "";
 
-            return "";
-
-        }
+		}
 		
 	}
 	

@@ -25,6 +25,7 @@ using VRageMath;
 using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using VRage.Game.ObjectBuilders;
 
 namespace ModularEncountersSpawner.Spawners{
 
@@ -36,18 +37,18 @@ namespace ModularEncountersSpawner.Spawners{
 		public static DateTime LastEntityRefresh = DateTime.Now;
 		public static DateTime GameStartTime = DateTime.Now;
 
-        private static List<string> _checkedDefinitions = new List<string>();
-        private static bool _checkedDefinitionsInitialized = false;
+		private static List<string> _checkedDefinitions = new List<string>();
+		private static bool _checkedDefinitionsInitialized = false;
 
-        public static List<IMyFaction> NpcFactions = new List<IMyFaction>();
-        public static List<IMyFaction> NpcBuilderFactions = new List<IMyFaction>();
-        public static List<IMyFaction> NpcMinerFactions = new List<IMyFaction>();
-        public static List<IMyFaction> NpcTraderFactions = new List<IMyFaction>();
+		public static List<IMyFaction> NpcFactions = new List<IMyFaction>();
+		public static List<IMyFaction> NpcBuilderFactions = new List<IMyFaction>();
+		public static List<IMyFaction> NpcMinerFactions = new List<IMyFaction>();
+		public static List<IMyFaction> NpcTraderFactions = new List<IMyFaction>();
 
-        public static Dictionary<IMyCubeGrid, float> GridThreatLevels = new Dictionary<IMyCubeGrid, float>();
+		public static Dictionary<IMyCubeGrid, float> GridThreatLevels = new Dictionary<IMyCubeGrid, float>();
 		public static Dictionary<IMyCubeGrid, int> GridPCULevels = new Dictionary<IMyCubeGrid, int>();
 
-        public static List<KnownPlayerLocation> KnownPlayerLocations = new List<KnownPlayerLocation>();
+		public static List<KnownPlayerLocation> KnownPlayerLocations = new List<KnownPlayerLocation>();
 
 		public static List<string> BlockDefinitionIdList = new List<string>();
 		
@@ -92,20 +93,13 @@ namespace ModularEncountersSpawner.Spawners{
 	
 		}
 		
-		public static bool CheckCommonConditions(ImprovedSpawnGroup spawnGroup, Vector3D playerCoords, MyPlanet planet, bool specificSpawnRequest) {
-
-			string planetName = "";
-
-			if(planet != null){
-				
-				planetName = planet.Generator.Id.SubtypeName;
-				
-			}
+		public static bool CheckCommonConditions(ImprovedSpawnGroup spawnGroup, Vector3D playerCoords, EnvironmentEvaluation environment, bool specificSpawnRequest) {
 
 			if(spawnGroup.SpawnGroupEnabled == false){
 				
 				if(spawnGroup.AdminSpawnOnly == false){
-					
+
+					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Spawngroup Disabled");
 					return false;
 					
 				}
@@ -117,7 +111,8 @@ namespace ModularEncountersSpawner.Spawners{
 				var roll = rnd.Next(0, spawnGroup.RandomNumberRoll);
 				
 				if(roll != 0){
-					
+
+					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Random Roll Failed");
 					return false;
 					
 				}
@@ -125,33 +120,52 @@ namespace ModularEncountersSpawner.Spawners{
 			}
 			
 			if(SpawnGroupManager.ModRestrictionCheck(spawnGroup) == false){
-				
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Mod Restriction Check Failed");
 				return false;
 				
 			}
 			
 			if(SpawnGroupManager.IsSpawnGroupInBlacklist(spawnGroup.SpawnGroup.Id.SubtypeName) == true){
-				
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Spawngroup Blacklisted");
 				return false;
 				
 			}
 			
 			if(spawnGroup.UniqueEncounter == true && SpawnGroupManager.UniqueGroupsSpawned.Contains(spawnGroup.SpawnGroup.Id.SubtypeName) == true){
-				
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Unique Encounter Already Spawned");
 				return false;
 				
 			}
 			
-			if(SpawnGroupManager.DistanceFromCenterCheck(spawnGroup, playerCoords) == false){
-				
+			if(SpawnGroupManager.DistanceFromCenterCheck(spawnGroup, environment) == false){
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Distance From Center Check Failed");
 				return false;
 				
 			}
-			
-			if(planetName != ""){
+
+			if (SpawnGroupManager.DistanceFromSurfaceCheck(spawnGroup, environment) == false) {
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Distance From Surface Check Failed");
+				return false;
+
+			}
+
+			if (SpawnGroupManager.EnvironmentChecks(spawnGroup, environment) == false) {
+
+				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Environment Check Failed");
+				return false;
+
+			}
+
+			if (!string.IsNullOrWhiteSpace(environment.NearestPlanetName)){
 				
-				if(SpawnGroupManager.CheckSpawnGroupPlanetLists(spawnGroup, planet) == false){
-				
+				if(SpawnGroupManager.CheckSpawnGroupPlanetLists(spawnGroup, environment) == false){
+
+					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Planet Whitelist/Blacklist failed");
 					return false;
 					
 				}
@@ -184,15 +198,15 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-            if(spawnGroup.UseKnownPlayerLocations == true) {
+			if(spawnGroup.UseKnownPlayerLocations == true) {
 
-                if(KnownPlayerLocationManager.IsPositionInKnownPlayerLocation(playerCoords, spawnGroup.KnownPlayerLocationMustMatchFaction, spawnGroup.FactionOwner) == false) {
+				if(KnownPlayerLocationManager.IsPositionInKnownPlayerLocation(playerCoords, spawnGroup.KnownPlayerLocationMustMatchFaction, spawnGroup.FactionOwner) == false) {
 
-                    return false;
+					return false;
 
-                }
+				}
 
-            }
+			}
 
 			if(TerritoryValidation(spawnGroup, playerCoords) == false){
 				
@@ -233,41 +247,41 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-            if(spawnGroup.UsePlayerCountCheck == true) {
+			if(spawnGroup.UsePlayerCountCheck == true) {
 
-                int totalPlayers = 0;
+				int totalPlayers = 0;
 
-                foreach(var player in MES_SessionCore.PlayerList) {
+				foreach(var player in MES_SessionCore.PlayerList) {
 
-                    if(player.IsBot || player.Character == null) {
+					if(player.IsBot || player.Character == null) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    if(Vector3D.Distance(playerCoords, player.GetPosition()) < spawnGroup.PlayerCountCheckRadius || spawnGroup.PlayerCountCheckRadius < 0) {
+					if(Vector3D.Distance(playerCoords, player.GetPosition()) < spawnGroup.PlayerCountCheckRadius || spawnGroup.PlayerCountCheckRadius < 0) {
 
-                        totalPlayers++;
+						totalPlayers++;
 
-                    }
+					}
 
-                }
+				}
 
-                if(totalPlayers < spawnGroup.MinimumPlayers && spawnGroup.MinimumPlayers > 0) {
+				if(totalPlayers < spawnGroup.MinimumPlayers && spawnGroup.MinimumPlayers > 0) {
 
-                    return false;
+					return false;
 
-                }
+				}
 
-                if(totalPlayers > spawnGroup.MaximumPlayers && spawnGroup.MaximumPlayers > 0) {
+				if(totalPlayers > spawnGroup.MaximumPlayers && spawnGroup.MaximumPlayers > 0) {
 
-                    return false;
+					return false;
 
-                }
+				}
 
-                return true;
+				return true;
 
-            }
+			}
 			
 			if(spawnGroup.UsePCUCheck == true){
 				
@@ -306,90 +320,90 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-            if(spawnGroup.UsePlayerCredits == true){
+			if(spawnGroup.UsePlayerCredits == true){
 
-                long totalCredits = 0;
-                long highestPlayerCredits = 0;
-                List<string> CheckedFactions = new List<string>();
+				long totalCredits = 0;
+				long highestPlayerCredits = 0;
+				List<string> CheckedFactions = new List<string>();
 
-                foreach(var player in MES_SessionCore.PlayerList) {
+				foreach(var player in MES_SessionCore.PlayerList) {
 
-                    if(player.IsBot == true || player.Character == null) {
+					if(player.IsBot == true || player.Character == null) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    if(Vector3D.Distance(player.GetPosition(), playerCoords) > spawnGroup.PlayerCreditsCheckRadius) {
+					if(Vector3D.Distance(player.GetPosition(), playerCoords) > spawnGroup.PlayerCreditsCheckRadius) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    IMyFaction faction = null;
-                    long factionBalance = 0;
+					IMyFaction faction = null;
+					long factionBalance = 0;
 
-                    if(spawnGroup.IncludeFactionBalance == true) {
+					if(spawnGroup.IncludeFactionBalance == true) {
 
-                        faction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(player.IdentityId);
+						faction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(player.IdentityId);
 
-                        if(faction != null) {
+						if(faction != null) {
 
 
 
-                        }
+						}
 
-                    }
+					}
 
-                    long playerBalance = 0;
-                    player.TryGetBalanceInfo(out playerBalance);
+					long playerBalance = 0;
+					player.TryGetBalanceInfo(out playerBalance);
 
-                    if(spawnGroup.IncludeAllPlayersInRadius == false) {
+					if(spawnGroup.IncludeAllPlayersInRadius == false) {
 
-                        if(factionBalance + playerBalance > totalCredits) {
+						if(factionBalance + playerBalance > totalCredits) {
 
-                            totalCredits = factionBalance + playerBalance;
+							totalCredits = factionBalance + playerBalance;
 
-                        }
+						}
 
-                    } else {
+					} else {
 
-                        if(faction != null) {
+						if(faction != null) {
 
-                            if(CheckedFactions.Contains(faction.Tag) == false) {
+							if(CheckedFactions.Contains(faction.Tag) == false) {
 
-                                totalCredits += factionBalance;
-                                CheckedFactions.Add(faction.Tag);
+								totalCredits += factionBalance;
+								CheckedFactions.Add(faction.Tag);
 
-                            }
+							}
 
-                            totalCredits += playerBalance;
+							totalCredits += playerBalance;
 
-                        }
+						}
 
-                    }
+					}
 
-                }
+				}
 
-                if(totalCredits < spawnGroup.MinimumPlayerCredits && spawnGroup.MinimumPlayerCredits != -1) {
+				if(totalCredits < spawnGroup.MinimumPlayerCredits && spawnGroup.MinimumPlayerCredits != -1) {
 
-                    return false;
+					return false;
 
-                }
+				}
 
-                if(totalCredits > spawnGroup.MaximumPlayerCredits && spawnGroup.MaximumPlayerCredits != -1) {
+				if(totalCredits > spawnGroup.MaximumPlayerCredits && spawnGroup.MaximumPlayerCredits != -1) {
 
-                    return false;
+					return false;
 
-                }
+				}
 
-            }
+			}
 
-            return true;
+			return true;
 
 		}
 
-        
+		
 
 		public static bool CheckSandboxVariables(List<string> variableNames, List<string> falseVariableNames){
 			
@@ -406,20 +420,20 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-            foreach(var name in falseVariableNames) {
+			foreach(var name in falseVariableNames) {
 
-                bool varValue = false;
-                bool foundVariable = MyAPIGateway.Utilities.GetVariable<bool>(name, out varValue);
+				bool varValue = false;
+				bool foundVariable = MyAPIGateway.Utilities.GetVariable<bool>(name, out varValue);
 
-                if(varValue == true) {
+				if(varValue == true) {
 
-                    return false;
+					return false;
 
-                }
+				}
 
-            }
+			}
 
-            return true;
+			return true;
 		
 		}
 		
@@ -447,20 +461,20 @@ namespace ModularEncountersSpawner.Spawners{
 		
 		public static void GetGridThreatLevels(bool overrideTime = false){
 
-            if(overrideTime == false) {
+			if(overrideTime == false) {
 
-                var currentTime = DateTime.Now;
-                TimeSpan threatTimeDifference = currentTime - LastThreatRefresh;
+				var currentTime = DateTime.Now;
+				TimeSpan threatTimeDifference = currentTime - LastThreatRefresh;
 
-                if(threatTimeDifference.TotalMilliseconds < Settings.General.ThreatRefreshTimerMinimum * 1000) {
+				if(threatTimeDifference.TotalMilliseconds < Settings.General.ThreatRefreshTimerMinimum * 1000) {
 
-                    return;
+					return;
 
-                }
+				}
 
-                LastThreatRefresh = currentTime;
+				LastThreatRefresh = currentTime;
 
-            }
+			}
 
 			GridThreatLevels.Clear();
 			GridPCULevels.Clear();
@@ -719,35 +733,68 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 
-        public static IMyPlayer GetPlayerById(long identityId) {
+		public static IMyPlayer GetPlayerById(long identityId) {
 
-            var playerList = new List<IMyPlayer>();
-            MyAPIGateway.Players.GetPlayers(playerList);
+			var playerList = new List<IMyPlayer>();
+			MyAPIGateway.Players.GetPlayers(playerList);
 
-            foreach(var player in playerList) {
+			foreach(var player in playerList) {
 
-                if(player.IdentityId == identityId) {
+				if(player.IdentityId == identityId) {
 
-                    return player;
+					return player;
 
-                }
+				}
 
-            }
+			}
 
-            return null;
+			return null;
 
-        }
+		}
 
-        public static MyPlanet GetNearestPlanet(Vector3D position){
+		public static MyPlanet GetNearestPlanet(Vector3D position, bool extendedCheck = false){
 			
 			MyPlanet planet = MyGamePruningStructure.GetClosestPlanet(position);
 			
-			return planet;
+			if(planet != null)
+				return planet;
+
+			if (!extendedCheck)
+				return planet;
+
+			if (EntityList.Count == 0)
+				RefreshEntityLists();
+
+			Vector3D closestPlanet = Vector3D.Zero;
+			double closestDist = 0;
+
+			foreach (var entity in EntityList.Where(p => p as MyPlanet != null)) {
+
+				var tempPlanet = entity as MyPlanet;
+				var planetPos = tempPlanet.PositionComp.WorldAABB.Center;
+				var dist = Vector3D.Distance(planetPos, position);
+
+				if (planet == null || dist < closestDist) {
+
+					planet = tempPlanet;
+					closestPlanet = planetPos;
+					closestDist = dist;
+				
+				}
+
+			}
+
+			return null;
 			
 		}
 
-        
-		
+		public static double GetAngleBetweenDirections(Vector3D dirA, Vector3D dirB) {
+
+			var radians = MyUtils.GetAngleBetweenVectors(dirA, dirB);
+			return (180 / Math.PI) * radians;
+
+		}
+
 		public static Vector3D GetRandomCompassDirection(Vector3D position, MyPlanet planet){
 			
 			if(planet == null){
@@ -868,18 +915,65 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 
-        public static bool IsIdentityNPC(long id) {
+		public static bool IsIdentityNPC(long id) {
 
-            if(MyAPIGateway.Players.TryGetSteamId(id) > 0) {
+			if(MyAPIGateway.Players.TryGetSteamId(id) > 0) {
 
-                return false;
+				return false;
 
-            }
+			}
 
-            return true;
+			return true;
 
-        }
-		
+		}
+
+		public static bool IsNight(Vector3D coords) {
+
+			//Get Planet
+			MyPlanet myPlanet = MyGamePruningStructure.GetClosestPlanet(coords);
+			if (myPlanet == null)
+				return false;
+
+			//Sun Rotation Axis
+			var BaseSunDirectionNormalized = new Vector3(0.339467347f, 0.709795356f, -0.617213368f);
+
+			var checkpoint = MyAPIGateway.Session.GetCheckpoint("null");
+
+			foreach (var component in checkpoint.SessionComponents) {
+
+				var weather = component as MyObjectBuilder_SectorWeatherComponent;
+
+				if (weather != null) {
+
+					BaseSunDirectionNormalized.X = weather.BaseSunDirection.X;
+					BaseSunDirectionNormalized.Y = weather.BaseSunDirection.Y;
+					BaseSunDirectionNormalized.Z = weather.BaseSunDirection.Z;
+					break;
+
+				}
+			
+			}
+
+			
+			Vector3 axis = (!(Math.Abs(Vector3.Dot(BaseSunDirectionNormalized, Vector3.Up)) > 0.95f)) ? Vector3.Cross(Vector3.Cross(BaseSunDirectionNormalized, Vector3.Up), BaseSunDirectionNormalized) : Vector3.Cross(Vector3.Cross(BaseSunDirectionNormalized, Vector3.Left), BaseSunDirectionNormalized);
+			axis.Normalize();
+
+			//Sun Direction
+			var speed = 60f * MyAPIGateway.Session.SessionSettings.SunRotationIntervalMinutes;
+			var gameTime = MyAPIGateway.Session.GameDateTime - new DateTime(2081, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+			float angle = 6.283186f * (float)(gameTime.TotalSeconds / (double)speed);
+			Vector3 sunDirection = Vector3.Transform(BaseSunDirectionNormalized, Matrix.CreateFromAxisAngle(axis, angle));
+			sunDirection.Normalize();
+
+			Vector3D result = coords - myPlanet.PositionComp.GetPosition();
+			if ((float)result.Length() > myPlanet.MaximumRadius * 1.1f)
+				return false;
+
+			Vector3 vector = Vector3.Normalize(result);
+			return Vector3.Dot(sunDirection, vector) < -0.1f;
+
+		}
+
 		public static bool IsPositionNearEntities(Vector3D coords, double distance){
 			
 			foreach(var entity in EntityList){
@@ -1176,222 +1270,223 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 
-        public static List<string> ValidNpcFactions(ImprovedSpawnGroup spawnGroup, Vector3D coords) {
+		public static List<string> ValidNpcFactions(ImprovedSpawnGroup spawnGroup, Vector3D coords, string factionOverride = "") {
 
-            var resultList = new List<string>();
-            var factionList = new List<IMyFaction>();
+			var resultList = new List<string>();
+			var factionList = new List<IMyFaction>();
+			var initialFactionTag = !string.IsNullOrWhiteSpace(factionOverride) ? factionOverride : spawnGroup.FactionOwner;
 
-            if(spawnGroup.UseRandomBuilderFaction == false && spawnGroup.UseRandomMinerFaction == false && spawnGroup.UseRandomTraderFaction == false) {
+			if (!string.IsNullOrWhiteSpace(factionOverride) || (spawnGroup.UseRandomBuilderFaction == false && spawnGroup.UseRandomMinerFaction == false && spawnGroup.UseRandomTraderFaction == false)) {
 
-                var initialFaction = MyAPIGateway.Session.Factions.TryGetFactionByTag(spawnGroup.FactionOwner);
+				var initialFaction = MyAPIGateway.Session.Factions.TryGetFactionByTag(initialFactionTag);
 
-                if(initialFaction != null) {
+				if(initialFaction != null) {
 
-                    factionList.Add(initialFaction);
+					factionList.Add(initialFaction);
 
-                } else {
+				} else {
 
-                    if(spawnGroup.FactionOwner == "Nobody") {
+					if(initialFactionTag == "Nobody") {
 
-                        resultList.Add("Nobody");
+						resultList.Add("Nobody");
 
-                    }
+					}
 
-                    return resultList;
+					return resultList;
 
-                }
+				}
 
-            }
+			}
 
-            if(spawnGroup.UseRandomBuilderFaction == true) {
+			if(spawnGroup.UseRandomBuilderFaction == true) {
 
-                var tempList = factionList.Concat(NpcBuilderFactions);
-                factionList = new List<IMyFaction>(tempList.ToList());
+				var tempList = factionList.Concat(NpcBuilderFactions);
+				factionList = new List<IMyFaction>(tempList.ToList());
 
-            }
+			}
 
-            if(spawnGroup.UseRandomMinerFaction == true) {
+			if(spawnGroup.UseRandomMinerFaction == true) {
 
-                var tempList = factionList.Concat(NpcMinerFactions);
-                factionList = new List<IMyFaction>(tempList.ToList());
+				var tempList = factionList.Concat(NpcMinerFactions);
+				factionList = new List<IMyFaction>(tempList.ToList());
 
-            }
+			}
 
-            if(spawnGroup.UseRandomTraderFaction == true) {
+			if(spawnGroup.UseRandomTraderFaction == true) {
 
-                var tempList = factionList.Concat(NpcTraderFactions);
-                factionList = new List<IMyFaction>(tempList.ToList());
+				var tempList = factionList.Concat(NpcTraderFactions);
+				factionList = new List<IMyFaction>(tempList.ToList());
 
-            }
+			}
 
-            if(factionList.Count == 0) {
+			if(factionList.Count == 0) {
 
-                var defaultFaction = MyAPIGateway.Session.Factions.TryGetFactionByTag(spawnGroup.FactionOwner);
+				var defaultFaction = MyAPIGateway.Session.Factions.TryGetFactionByTag(spawnGroup.FactionOwner);
 
-                if(defaultFaction != null) {
+				if(defaultFaction != null) {
 
-                    factionList.Add(defaultFaction);
+					factionList.Add(defaultFaction);
 
-                }
+				}
 
-            }
+			}
 
-            if(spawnGroup.UsePlayerFactionReputation == true) {
+			if(spawnGroup.UsePlayerFactionReputation == true) {
 
-                foreach(var faction in factionList.ToList()) {
+				foreach(var faction in factionList.ToList()) {
 
-                    bool validFaction = false;
-                    bool specificFactionCheck = false;
+					bool validFaction = false;
+					bool specificFactionCheck = false;
 
-                    IMyFaction checkFaction = faction;
+					IMyFaction checkFaction = faction;
 
-                    if(string.IsNullOrWhiteSpace(spawnGroup.CheckReputationAgainstOtherNPCFaction) == false) {
+					if(string.IsNullOrWhiteSpace(spawnGroup.CheckReputationAgainstOtherNPCFaction) == false) {
 
-                        var factionOvr = MyAPIGateway.Session.Factions.TryGetFactionByTag(spawnGroup.CheckReputationAgainstOtherNPCFaction);
+						var factionOvr = MyAPIGateway.Session.Factions.TryGetFactionByTag(spawnGroup.CheckReputationAgainstOtherNPCFaction);
 
-                        if(factionOvr != null) {
+						if(factionOvr != null) {
 
-                            if(NPCWatcher.NPCFactionTags.Contains(factionOvr.Tag) == false) {
+							if(NPCWatcher.NPCFactionTags.Contains(factionOvr.Tag) == false) {
 
-                                continue;
+								continue;
 
-                            }
+							}
 
-                            checkFaction = factionOvr;
-                            specificFactionCheck = true;
+							checkFaction = factionOvr;
+							specificFactionCheck = true;
 
-                        }
+						}
 
-                    }
+					}
 
-                    foreach(var player in MES_SessionCore.PlayerList) {
+					foreach(var player in MES_SessionCore.PlayerList) {
 
-                        if(player.IsBot == true || player.Character == null) {
+						if(player.IsBot == true || player.Character == null) {
 
-                            continue;
+							continue;
 
-                        }
+						}
 
-                        if(Vector3D.Distance(player.GetPosition(), coords) > spawnGroup.PlayerReputationCheckRadius) {
+						if(Vector3D.Distance(player.GetPosition(), coords) > spawnGroup.PlayerReputationCheckRadius) {
 
-                            continue;
+							continue;
 
-                        }
+						}
 
-                        var playerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(player.IdentityId);
+						var playerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(player.IdentityId);
 
-                        int rep = 0;
-                        rep = MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(player.IdentityId, checkFaction.FactionId);
+						int rep = 0;
+						rep = MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(player.IdentityId, checkFaction.FactionId);
 
-                        /*
-                        if(playerFaction != null) {
+						/*
+						if(playerFaction != null) {
 
-                            rep = MyAPIGateway.Session.Factions.GetReputationBetweenFactions(playerFaction.FactionId, checkFaction.FactionId);
+							rep = MyAPIGateway.Session.Factions.GetReputationBetweenFactions(playerFaction.FactionId, checkFaction.FactionId);
 
-                        } else {
+						} else {
 
-                            rep = MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(player.IdentityId, checkFaction.FactionId);
+							rep = MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(player.IdentityId, checkFaction.FactionId);
 
-                        }
-                        */
+						}
+						*/
 
-                        if(rep < spawnGroup.MinimumReputation && spawnGroup.MinimumReputation > -1501) {
+						if(rep < spawnGroup.MinimumReputation && spawnGroup.MinimumReputation > -1501) {
 
-                            continue;
+							continue;
 
-                        }
+						}
 
-                        if(rep > spawnGroup.MaximumReputation && spawnGroup.MaximumReputation < 1501) {
+						if(rep > spawnGroup.MaximumReputation && spawnGroup.MaximumReputation < 1501) {
 
-                            continue;
+							continue;
 
-                        }
+						}
 
-                        validFaction = true;
-                        break;
+						validFaction = true;
+						break;
 
-                    }
+					}
 
-                    if(validFaction == false) {
+					if(validFaction == false) {
 
-                        factionList.Remove(faction);
+						factionList.Remove(faction);
 
-                        if(specificFactionCheck == true) {
+						if(specificFactionCheck == true) {
 
-                            factionList.Clear();
-                            break;
+							factionList.Clear();
+							break;
 
-                        }
+						}
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                }
+				}
 
-            }
+			}
 
-            foreach(var faction in factionList) {
+			foreach(var faction in factionList) {
 
-                if(resultList.Contains(faction.Tag) == false) {
+				if(resultList.Contains(faction.Tag) == false) {
 
-                    resultList.Add(faction.Tag);
+					resultList.Add(faction.Tag);
 
-                }
+				}
 
-            }
+			}
 
-            return resultList;
+			return resultList;
 
-        }
+		}
 
-        public static void PopulateNpcFactionLists() {
+		public static void PopulateNpcFactionLists() {
 
-            foreach(var id in MyAPIGateway.Session.Factions.Factions.Keys) {
+			foreach(var id in MyAPIGateway.Session.Factions.Factions.Keys) {
 
-                var faction = MyAPIGateway.Session.Factions.Factions[id];
+				var faction = MyAPIGateway.Session.Factions.Factions[id];
 
-                if(faction.IsEveryoneNpc() == false) {
+				if(faction.IsEveryoneNpc() == false) {
 
-                    continue;
+					continue;
 
-                }
+				}
 
-                NpcFactions.Add(faction);
+				NpcFactions.Add(faction);
 
-                foreach(var factionOB in MyAPIGateway.Session.Factions.GetObjectBuilder().Factions) {
+				foreach(var factionOB in MyAPIGateway.Session.Factions.GetObjectBuilder().Factions) {
 
-                    if(faction.Tag != factionOB.Tag) {
+					if(faction.Tag != factionOB.Tag) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    if(factionOB.FactionType == MyFactionTypes.Miner) {
+					if(factionOB.FactionType == MyFactionTypes.Miner) {
 
-                        NpcMinerFactions.Add(faction);
+						NpcMinerFactions.Add(faction);
 
-                    }
+					}
 
-                    if(factionOB.FactionType == MyFactionTypes.Trader) {
+					if(factionOB.FactionType == MyFactionTypes.Trader) {
 
-                        NpcTraderFactions.Add(faction);
+						NpcTraderFactions.Add(faction);
 
-                    }
+					}
 
-                    if(factionOB.FactionType == MyFactionTypes.Builder) {
+					if(factionOB.FactionType == MyFactionTypes.Builder) {
 
-                        NpcBuilderFactions.Add(faction);
+						NpcBuilderFactions.Add(faction);
 
-                    }
+					}
 
-                }
+				}
 
-            }
+			}
 
-        }
+		}
 
-        public static List<ImprovedSpawnGroup> SelectSpawnGroupSublist(Dictionary<string, List<ImprovedSpawnGroup>> sublists, Dictionary<string, int> modIdEligibleGroups){
+		public static List<ImprovedSpawnGroup> SelectSpawnGroupSublist(Dictionary<string, List<ImprovedSpawnGroup>> sublists, Dictionary<string, int> modIdEligibleGroups){
 			
 			var sublistKeys = sublists.Keys;
 			

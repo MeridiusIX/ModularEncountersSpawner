@@ -377,15 +377,25 @@ namespace ModularEncountersSpawner{
 
 				}
 
+				//Debug.CheckNight
+				if (receivedData.ChatMessage.StartsWith("/MES.Debug.CheckNight") == true) {
+
+					MyVisualScriptLogicProvider.ShowNotification("Is Night: " + SpawnResources.IsNight(MyAPIGateway.Session.LocalHumanPlayer.GetPosition()).ToString(), 5000, "White", receivedData.PlayerId);
+					MyVisualScriptLogicProvider.ShowNotification("Time: " + MyAPIGateway.Session.GameDateTime.ToString(), 5000, "White", receivedData.PlayerId);
+					var gameTime = MyAPIGateway.Session.GameDateTime - new DateTime(2081, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+					MyVisualScriptLogicProvider.ShowNotification("Seconds: " + gameTime.TotalSeconds.ToString(), 5000, "White", receivedData.PlayerId);
+
+				}
+
 				//Debug.CheckRemovalStatus
-				if(receivedData.ChatMessage.StartsWith("/MES.Debug.CheckRemovalStatus") == true) {
+				if (receivedData.ChatMessage.StartsWith("/MES.Debug.CheckRemovalStatus") == true) {
 
 					MyVisualScriptLogicProvider.ShowNotification("Number Of Pending Deletions: " + NPCWatcher.DeleteGridList.Count.ToString(), 5000, "White", receivedData.PlayerId);
 					MyVisualScriptLogicProvider.ShowNotification("Deletion Process Status: " + NPCWatcher.DeleteGrids.ToString(), 5000, "White", receivedData.PlayerId);
 
 				}
 
-				//Debug.CheckRemovalStatus
+				//Debug.Debug.CreateKPL
 				if(receivedData.ChatMessage.StartsWith("/MES.Debug.CreateKPL") == true) {
 
 					KnownPlayerLocationManager.AddKnownPlayerLocation(MyAPIGateway.Session.LocalHumanPlayer.GetPosition(), "SPRT", 200, 1, -1);

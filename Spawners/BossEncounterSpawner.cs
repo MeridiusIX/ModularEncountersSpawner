@@ -150,18 +150,18 @@ namespace ModularEncountersSpawner.Spawners{
 		}
 		
 		public static List<ImprovedSpawnGroup> GetBossEncounters(Vector3D playerCoords, Vector3D spawnCoords){
-			
-			MyPlanet planet = SpawnResources.GetNearestPlanet(playerCoords);
+
 			bool spaceSpawn = false;
 			bool planetSpawn = false;
 			string specificGroup = "";
 			var planetRestrictions = new List<string>(Settings.General.PlanetSpawnsDisableList.ToList());
 			SpawnGroupSublists.Clear();
 			EligibleSpawnsByModId.Clear();
+			var environment = new EnvironmentEvaluation(playerCoords);
 			
-			if(planet != null){
+			if(environment.NearestPlanet != null){
 				
-				if(planetRestrictions.Contains(planet.Generator.Id.SubtypeName) == true){
+				if(planetRestrictions.Contains(environment.NearestPlanetName) && environment.IsOnPlanet){
 					
 					return new List<ImprovedSpawnGroup>();
 					
@@ -179,9 +179,9 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 			
-			if(SpawnResources.IsPositionInGravity(spawnCoords, planet) == true){
+			if(environment.IsOnPlanet) {
 				
-				if(planet.GetAirDensity(spawnCoords) > Settings.BossEncounters.MinAirDensity){
+				if(environment.AtmosphereAtPosition > Settings.BossEncounters.MinAirDensity){
 					
 					planetSpawn = true;
 					
@@ -236,7 +236,7 @@ namespace ModularEncountersSpawner.Spawners{
 					
 				}
 				
-				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, planet, specificSpawnRequest) == false){
+				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
 					
 					continue;
 					

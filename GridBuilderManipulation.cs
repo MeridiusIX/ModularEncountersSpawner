@@ -35,9 +35,10 @@ namespace ModularEncountersSpawner{
 		
 		public struct WeaponProfile{
 			
-			public MyWeaponBlockDefinition BlockDefinition;
-			public MyWeaponDefinition WeaponDefinition;
-			public List<MyAmmoMagazineDefinition> AmmoList;
+			public MyCubeBlockDefinition BlockDefinition;
+			public bool IsWeaponCore;
+			public bool IsWeaponStatic;
+			public bool IsWeaponTurret;
 			
 		}
 		
@@ -47,7 +48,11 @@ namespace ModularEncountersSpawner{
 		public static Dictionary<string, float> BatteryMaxCapacity = new Dictionary<string, float>();
 		public static List<string> ForwardGunIDs = new List<string>();
 		public static List<string> TurretIDs = new List<string>();
-		
+
+		public static List<MyDefinitionId> AllWeaponCoreIDs = new List<MyDefinitionId>();
+		public static List<MyDefinitionId> AllWeaponCoreStaticIDs = new List<MyDefinitionId>();
+		public static List<MyDefinitionId> AllWeaponCoreTurretIDs = new List<MyDefinitionId>();
+
 		public static List<string> BlacklistedWeaponSubtypes = new List<string>();
 		public static List<string> WhitelistedWeaponSubtypes = new List<string>();
 		public static List<string> BlacklistedWeaponTargetSubtypes = new List<string>();
@@ -387,7 +392,9 @@ namespace ModularEncountersSpawner{
 				Logger.AddMsg("Unwanted Blocks May Be Used When Replacing Weapons.");
 				
 			}
-						
+
+			
+
 			var allDefs = MyDefinitionManager.Static.GetAllDefinitions();
 			
 			//Check For Energy Shield Mod
@@ -455,69 +462,77 @@ namespace ModularEncountersSpawner{
 					}
 					
 					errorDebugging.Append("Check if Weapon Block, Continue if Not").AppendLine();
-					
-					var weaponBlock = definition as MyWeaponBlockDefinition;
-					
-					if(weaponBlock == null || definition.Public == false){
-						
-						continue;
-						
-					}
-					
-					errorDebugging.Append("Get Weapon Definition").AppendLine();
-					
-					MyWeaponDefinition weaponDefinition = null;
-					
-					if(MyDefinitionManager.Static.TryGetWeaponDefinition(weaponBlock.WeaponDefinitionId, out weaponDefinition) == false){
-						
-						Logger.AddMsg("Weapon Block Definition Missing Actual Weapon Defintion - " + definition.Id.ToString(), true);
-						continue;
-						
-					}
-					
-					errorDebugging.Append("Get Ammo Magazines").AppendLine();
-					
-					var ammoDefList = new List<MyAmmoMagazineDefinition>();
-					
-					foreach(var defId in weaponDefinition.AmmoMagazinesId){
-						
-						var ammoMagDef = MyDefinitionManager.Static.GetAmmoMagazineDefinition(defId);
-						
-						if(ammoMagDef != null){
-							
-							ammoDefList.Add(ammoMagDef);
-							
+
+					MyCubeBlockDefinition weaponBlock = null;
+					bool isWeaponCore = false;
+					bool isTurret = false;
+					bool isStatic = false;
+
+					if (AllWeaponCoreIDs.Contains(definition.Id)) {
+
+						weaponBlock = definition as MyCubeBlockDefinition;
+						isWeaponCore = true;
+						isStatic = AllWeaponCoreStaticIDs.Contains(definition.Id);
+						isTurret = AllWeaponCoreTurretIDs.Contains(definition.Id);
+
+					} else {
+
+						if (definition as MyWeaponBlockDefinition != null) {
+
+							weaponBlock = definition as MyCubeBlockDefinition;
+
+							if (weaponBlock as MyLargeTurretBaseDefinition != null) {
+
+								isTurret = true;
+
+							} else {
+
+								isStatic = true;
+
+							}
+
 						}
-						
-					}
 					
-					Logger.AddMsg("Total Ammos: " + ammoDefList.Count.ToString(), true);
+					}
+
+					if (weaponBlock == null || definition.Public == false) {
+
+						continue;
+
+					}
 					
 					errorDebugging.Append("Set Defintions To WeaponProfile class object").AppendLine();
 					
 					WeaponProfile weaponProfile;
 					weaponProfile.BlockDefinition = weaponBlock;
-					weaponProfile.WeaponDefinition = weaponDefinition;
-					weaponProfile.AmmoList = ammoDefList;
-					
+					weaponProfile.IsWeaponCore = isWeaponCore;
+					weaponProfile.IsWeaponStatic = isStatic;
+					weaponProfile.IsWeaponTurret = isTurret;
+
+					Logger.AddMsg("Potential Weapon Profile: " + weaponBlock.Id.ToString() + " / WC: " + weaponProfile.IsWeaponCore.ToString() + " / TW: " + weaponProfile.IsWeaponTurret.ToString() + " / SW: " + weaponProfile.IsWeaponStatic.ToString(), true);
+
 					bool goodSize = false;
 					
 					errorDebugging.Append("Check if weapon grid X,Y,Z size is valid").AppendLine();
 					
-					if(weaponBlock as MyLargeTurretBaseDefinition != null){
+					if(weaponProfile.IsWeaponTurret) {
 						
 						if(weaponBlock.Size.X == weaponBlock.Size.Z && weaponBlock.Size.X % 2 != 0){
 							
 							goodSize = true;
+							//Logger.AddMsg("Turret Profile: " + weaponBlock.Id.ToString(), true);
 							TurretIDs.Add(weaponBlock.Id.ToString());
 							
 						}
 			
-					}else{
+					} 
+
+					if(weaponProfile.IsWeaponStatic){
 						
 						if(weaponBlock.Size.X == weaponBlock.Size.Y && weaponBlock.Size.X % 2 != 0){
 							
 							goodSize = true;
+							//Logger.AddMsg("Static Profile: " + weaponBlock.Id.ToString(), true);
 							ForwardGunIDs.Add(weaponBlock.Id.ToString());
 							
 						}
@@ -535,6 +550,7 @@ namespace ModularEncountersSpawner{
 					if(WeaponProfiles.ContainsKey(weaponBlock.Id.ToString()) == false){
 						
 						WeaponProfiles.Add(weaponBlock.Id.ToString(), weaponProfile);
+
 						
 					}else{
 						
@@ -706,6 +722,27 @@ namespace ModularEncountersSpawner{
 				foreach(var grid in prefabDef.CubeGrids) {
 
 					RivalAiInitialize(grid, spawnGroup, behavior);
+
+				}
+
+			}
+
+			//Provide Shields
+			if (!spawnGroup.IgnoreShieldProviderMod) {
+
+				bool allowedShields = true;
+
+				if (spawnGroup.PlanetaryInstallation || (spawnGroup.SpaceRandomEncounter && spawnGroup.SpawnGroup.Voxels.Count > 0))
+					allowedShields = false;
+
+				if (allowedShields) {
+
+					foreach (var grid in prefabDef.CubeGrids) {
+
+						if (NPCShieldManager.AddDefenseShieldsToGrid(grid, spawnGroup.AddDefenseShieldBlocks))
+							break;
+
+					}
 
 				}
 
@@ -1583,11 +1620,13 @@ namespace ModularEncountersSpawner{
 
 					var blockColor = new Vector3(block.ColorMaskHSV.X, block.ColorMaskHSV.Y, block.ColorMaskHSV.Z);
 
+					/*
 					if(block.SubtypeName.Contains("Round")) {
 
 						Logger.AddMsg(blockColor.ToString(), true);
 
 					}
+					*/
 
 					//Replace Colors
 					if(replaceColorList.Contains(blockColor) == true) {
@@ -2422,16 +2461,16 @@ namespace ModularEncountersSpawner{
 					var weaponIds = WeaponProfiles.Keys.ToList();
 					bool isTurret = false;
 					bool targetNeutralSetting = false;
-					
-					if(weaponBlock as MyObjectBuilder_TurretBase != null){
-						
+
+					if (weaponBlock as MyObjectBuilder_TurretBase != null) {
+
 						var tempTurretOb = weaponBlock as MyObjectBuilder_TurretBase;
 						targetNeutralSetting = tempTurretOb.TargetNeutrals;
 						isTurret = true;
 						weaponIds = new List<string>(TurretIDs);
-						
+
 					}
-					
+
 					//Get Additional Details From Old Block.
 					var oldBlocksCells = GetBlockCells(weaponBlock.Min, blockDefinition.Size, weaponBlock.BlockOrientation);
 					var likelyMountingCell = GetLikelyBlockMountingPoint((MyWeaponBlockDefinition)blockDefinition, cubeGrid, blockMap, weaponBlock);
@@ -2474,15 +2513,22 @@ namespace ModularEncountersSpawner{
 						}
 						
 						var weaponProfile = WeaponProfiles[randId];
-						
-						if(IsRandomWeaponAllowed(weaponProfile.BlockDefinition, spawnGroup) == false || IsWeaponStaticOrTurret(isTurret, weaponProfile.BlockDefinition) == false){
-							
+
+						if (IsWeaponStaticOrTurret(isTurret, weaponProfile) == false) {
+
+							errorDebugging.Append(" - Did not match Turret vs Static").AppendLine();
+							continue;
+
+						}
+
+						if (IsRandomWeaponAllowed(weaponProfile.BlockDefinition, spawnGroup) == false) {
+
 							errorDebugging.Append(" - Did not pass Blacklist/Whitelist").AppendLine();
 							continue;
-							
+
 						}
-						
-						if(weaponProfile.BlockDefinition.CubeSize != cubeGrid.GridSizeEnum){
+
+						if (weaponProfile.BlockDefinition.CubeSize != cubeGrid.GridSizeEnum){
 							
 							errorDebugging.Append(" - Block not same grid size").AppendLine();
 							continue;
@@ -2538,7 +2584,7 @@ namespace ModularEncountersSpawner{
 						var newBlockBuilder = MyObjectBuilderSerializer.CreateNewObject((SerializableDefinitionId)weaponProfile.BlockDefinition.Id);
 						
 						//Determine If Weapon Is Turret or Gun. Build Object For That Type
-						if(isTurret == true){
+						if(isTurret == true && !weaponProfile.IsWeaponCore) {
 							
 							var turretBuilder = newBlockBuilder as MyObjectBuilder_TurretBase;
 							turretBuilder.EntityId = 0;
@@ -2590,7 +2636,7 @@ namespace ModularEncountersSpawner{
 							
 						}else{
 							
-							var gunBuilder = newBlockBuilder as MyObjectBuilder_UserControllableGun;
+							var gunBuilder = newBlockBuilder as MyObjectBuilder_CubeBlock;
 							gunBuilder.EntityId = 0;
 							gunBuilder.SubtypeName = weaponProfile.BlockDefinition.Id.SubtypeName;
 							gunBuilder.Min = estimatedMin;
@@ -2628,43 +2674,34 @@ namespace ModularEncountersSpawner{
 			
 			if(Logger.LoggerDebugMode == true){
 				
-				//Logger.AddMsg(errorDebugging.ToString(), true);
+				Logger.AddMsg(errorDebugging.ToString(), true);
 				
 			}
 		
 		}
-		
-		public static bool IsWeaponStaticOrTurret(bool sourceIsTurret, MyWeaponBlockDefinition weaponDefinition){
+
+		public static bool IsWeaponStaticOrTurret(bool turret, WeaponProfile weapon) {
+
+			if (weapon.IsWeaponTurret) {
+
+				if (!turret)
+					return false;
 			
-			if((weaponDefinition as MyLargeTurretBaseDefinition) != null){
-				
-				if(sourceIsTurret == true){
-					
-					return true;
-					
-				}else{
-					
+			} 
+			
+			if(weapon.IsWeaponStatic){
+
+				if (turret)
 					return false;
-					
-				}
-				
-			}else{
-				
-				if(sourceIsTurret == true){
-					
-					return false;
-					
-				}else{
-					
-					return true;
-					
-				}
-				
+
 			}
-			
-		}
+
+			return true;
 		
-		public static bool IsRandomWeaponAllowed(MyWeaponBlockDefinition weaponDefinition, ImprovedSpawnGroup spawnGroup){
+		}
+
+
+		public static bool IsRandomWeaponAllowed(MyCubeBlockDefinition weaponDefinition, ImprovedSpawnGroup spawnGroup){
 			
 			//Check SpawnGroup First
 			if(spawnGroup.WeaponRandomizerBlacklist.Count > 0){

@@ -89,7 +89,10 @@ namespace ModularEncountersSpawner.Templates{
 		public List<string> WeaponRandomizerTargetWhitelist; 
 		public List<string> WeaponRandomizerBlacklist;
 		public List<string> WeaponRandomizerWhitelist; 
-		
+
+		public bool AddDefenseShieldBlocks = false;
+		public bool IgnoreShieldProviderMod = false;
+
 		public bool UseBlockReplacer;
 		public Dictionary<MyDefinitionId, MyDefinitionId> ReplaceBlockReference;
 		
@@ -113,8 +116,8 @@ namespace ModularEncountersSpawner.Templates{
 
 		public List<string> AssignContainerTypesToAllCargo; 
 
-		public bool UseContainerTypeAssignment; //Test / Doc
-		public Dictionary<string, string> ContainerTypeAssignmentReference; //Test / Doc
+		public bool UseContainerTypeAssignment;
+		public Dictionary<string, string> ContainerTypeAssignmentReference;
 
 		public bool OverrideBlockDamageModifier;
 		public double BlockDamageModifier;
@@ -173,9 +176,22 @@ namespace ModularEncountersSpawner.Templates{
 		
 		public double MinSpawnFromWorldCenter;
 		public double MaxSpawnFromWorldCenter;
+		public Vector3D CustomWorldCenter;
 		public Vector3D DirectionFromWorldCenter;
 		public double MinAngleFromDirection;
 		public double MaxAngleFromDirection;
+
+		public double MinSpawnFromPlanetSurface;
+		public double MaxSpawnFromPlanetSurface;
+
+		public bool UseDayOrNightOnly;
+		public bool SpawnOnlyAtNight;
+
+		public bool UseWeatherSpawning;
+		public List<string> AllowedWeatherSystems;
+
+		public bool UseTerrainTypeValidation;
+		public List<string> AllowedTerrainTypes;
 
 		public List<string> PlanetBlacklist;
 		public List<string> PlanetWhitelist;
@@ -311,6 +327,9 @@ namespace ModularEncountersSpawner.Templates{
 			WeaponRandomizerTargetWhitelist = new List<string>();
 			WeaponRandomizerBlacklist = new List<string>();
 			WeaponRandomizerWhitelist = new List<string>();
+
+			AddDefenseShieldBlocks = false;
+			IgnoreShieldProviderMod = false;
 			
 			UseBlockReplacer = false;
 			ReplaceBlockReference = new Dictionary<MyDefinitionId, MyDefinitionId>();
@@ -396,6 +415,18 @@ namespace ModularEncountersSpawner.Templates{
 			DirectionFromWorldCenter = Vector3D.Zero;
 			MinAngleFromDirection = -1;
 			MaxAngleFromDirection = -1;
+
+			MinSpawnFromPlanetSurface = -1;
+			MaxSpawnFromPlanetSurface = -1;
+
+			UseDayOrNightOnly = false;
+			SpawnOnlyAtNight = false;
+
+			UseWeatherSpawning = false;
+			AllowedWeatherSystems = new List<string>();
+
+			UseTerrainTypeValidation = false;
+			AllowedTerrainTypes = new List<string>();
 
 			PlanetBlacklist = new List<string>();
 			PlanetWhitelist = new List<string>();

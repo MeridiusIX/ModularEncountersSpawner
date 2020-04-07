@@ -27,6 +27,7 @@ using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
 using ModularEncountersSpawner.Api;
+using DefenseShields;
 
 namespace ModularEncountersSpawner{
 	
@@ -34,7 +35,7 @@ namespace ModularEncountersSpawner{
 	
 	public class MES_SessionCore : MySessionComponentBase{
 		
-		public static float ModVersion = 1.074f;
+		public static float ModVersion = 1.080f;
 		public static string SaveName = "";
 		public static int PlayerWatcherTimer = 0;
 		public static Dictionary<IMyPlayer, PlayerWatcher> playerWatchList = new Dictionary<IMyPlayer, PlayerWatcher>();
@@ -55,14 +56,25 @@ namespace ModularEncountersSpawner{
 		//Mod Message Receivers
 		public static long blockReplacerModId = 1521905890001;
 		public static long manualSpawnRequestModId = 1521905890002;
-		public static long rivalAISpawnRequestModId = 1521905890003;
 
 		public static IMyGps BossEncounterGps;
 		
 		public static bool NPCWeaponUpgradesModDetected = false;
 		public static bool SpaceWaveSpawnerModDetected = false;
 		public static bool spawningInProgress = false;
-		
+
+		//WeaponCore and DefenseSheld API Requirements
+		internal static MES_SessionCore Instance { get; private set; }
+		public ulong ShieldModId = 1365616918;
+		public bool ShieldMod { get; set; }
+		public bool ShieldApiLoaded { get; set; }
+		public ShieldApi DefenseShields = new ShieldApi();
+
+		public ulong WeaponCoreModId = 1918681825;
+		public bool WeaponCoreMod { get; set; }
+		public bool WeaponCoreLoaded { get; set; }
+		public WcApi WeaponCore = new WcApi();
+
 		bool scriptInit = false;
 		bool scriptFail = false;
 		int tickCounter = 0;
@@ -80,14 +92,112 @@ namespace ModularEncountersSpawner{
 		}
 
 		public override void LoadData() {
-			
 
+			if (MyAPIGateway.Multiplayer.IsServer == false)
+				return;
+
+			Instance = this;
+
+			foreach (var mod in MyAPIGateway.Session.Mods) {
+
+				if (mod.PublishedFileId == ShieldModId) {
+
+					Logger.AddMsg("Defense Shield Mod Detected");
+					ShieldMod = true;
+					continue;
+
+				}
+
+				if (mod.PublishedFileId == WeaponCoreModId || mod.Name.Contains("WeaponCore-Local")) {
+
+					Logger.AddMsg("WeaponCore Mod Detected");
+					WeaponCoreMod = true;
+
+				}
+
+			}
 
 		}
 
 		public override void BeforeStart() {
 
+			if (!MyAPIGateway.Multiplayer.IsServer)
+				return;
+
 			SpawnerLocalApi.SendApiToMods();
+
+			try {
+
+				if (WeaponCoreMod && !Instance.WeaponCore.IsReady) {
+
+					Logger.AddMsg("WeaponCore API Loading");
+					WeaponCore.Load(WcApiCallback, true);
+
+				} else {
+
+					Logger.AddMsg("WeaponCore API Failed To Load For Unknown Reason");
+
+				}
+
+			} catch (Exception exc) {
+
+				Logger.AddMsg("WeaponCore API Failed To Load");
+				Logger.AddMsg(exc.ToString());
+
+			}
+
+			try {
+
+				Logger.AddMsg("Defense Shields API Loading");
+
+				if (ShieldMod && !ShieldApiLoaded) {
+
+					Instance.DefenseShields.Load();
+
+				}
+
+			} catch (Exception exc) {
+
+				Logger.AddMsg("Defense Shields API Failed To Load With Exception: ");
+				Logger.AddMsg(exc.ToString());
+
+			}
+
+		}
+
+		public void WcApiCallback() {
+
+			if (MES_SessionCore.Instance.WeaponCore.IsReady) {
+
+				Logger.AddMsg("WeaponCore Successfully Loaded");
+				MES_SessionCore.Instance.WeaponCoreLoaded = true;
+				MES_SessionCore.Instance.WeaponCore.GetAllCoreWeapons(GridBuilderManipulation.AllWeaponCoreIDs);
+				MES_SessionCore.Instance.WeaponCore.GetAllCoreStaticLaunchers(GridBuilderManipulation.AllWeaponCoreStaticIDs);
+				MES_SessionCore.Instance.WeaponCore.GetAllCoreTurrets(GridBuilderManipulation.AllWeaponCoreTurretIDs);
+
+				if (Logger.LoggerDebugMode) {
+
+					Logger.AddMsg("Static Weapons", true);
+					foreach (var statics in GridBuilderManipulation.AllWeaponCoreStaticIDs) {
+
+						Logger.AddMsg(" - " + statics.ToString(), true);
+
+					}
+
+					Logger.AddMsg("Turret Weapons", true);
+					foreach (var turret in GridBuilderManipulation.AllWeaponCoreTurretIDs) {
+
+						Logger.AddMsg(" - " + turret.ToString(), true);
+
+					}
+
+				}
+	
+			} else {
+
+				Logger.AddMsg("WeaponCore API Failed To Load");
+
+			}
 
 		}
 
@@ -556,7 +666,11 @@ namespace ModularEncountersSpawner{
 				suppressEncounter = true;
 				
 			}
-			
+
+			NPCShieldManager.DefenseShieldModLoaded = ActiveMods.Contains(1365616918);
+			NPCShieldManager.NPCShieldProviderModLoaded = ActiveMods.Contains(2043339470);
+			NPCShieldManager.InitializeArmorBlockList();
+
 			SuppressGroups.ApplySuppression(suppressCargo, suppressEncounter);
 			
 			//Init Timers
@@ -865,6 +979,13 @@ namespace ModularEncountersSpawner{
 			MyAPIGateway.Utilities.UnregisterMessageHandler(1521905890002, ModMessages.ModMessageReceiverBlockReplace);
 			MyAPIGateway.Utilities.UnregisterMessageHandler(1521905890001, ModMessages.ModMessageReceiverBlockReplace);
 			MyAPIGateway.Utilities.UnregisterMessageHandler(1521905890, ModMessages.ModMessageHandler);
+			
+			if (WeaponCoreLoaded)
+				WeaponCore.Unload();
+
+			if (ShieldApiLoaded)
+				DefenseShields.Unload();
+
 			MyAPIGateway.Entities.OnEntityAdd -= NPCWatcher.NewEntityDetected;
 			
 		}
