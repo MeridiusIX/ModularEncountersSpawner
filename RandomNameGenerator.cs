@@ -455,6 +455,68 @@ namespace ModularEncountersSpawner {
 			"Lancaster"
 			
 		};
+		
+		public static string[] NatoLetter = {
+
+			"Alpha",
+			"Bravo",
+			"Charlie",
+			"Delta",
+			"Echo",
+			"Foxtrot",
+			"Golf",
+			"Hotel",
+			"India",
+			"Juliett",
+			"Kilo",
+			"Lima",
+			"Mike",
+			"November",
+			"Oscar",
+			"Papa",
+			"Quebec",
+			"Romeo",
+			"Sierra",
+			"Tango",
+			"Uniform",
+			"Victor",
+			"Whiskey",
+			"X-Ray",
+			"Yankee",
+			"Zulu"
+
+		};
+		
+		public static string[] GreekLetter = {
+
+			"Alpha",
+			"Beta",
+			"Gamma",
+			"Delta",
+			"Epsilon",
+			"Zeta",
+			"Eta",
+			"Theta",
+			"Iota",
+			"Kappa",
+			"Lambda",
+			"Mu",
+			"Nu",
+			"Xi",
+			"Omicron",
+			"Pi",
+			"Rho",
+			"Sigma"
+			"Tau",
+			"Upsilon",
+			"Phi",
+			"Chi",
+			"Psi",
+			"Omega"
+
+		};
+		
+		
 
 		public static string CreateRandomNameFromPattern(string pattern) {
 
@@ -704,6 +766,20 @@ namespace ModularEncountersSpawner {
 				string randString = CharStringAll[Rnd.Next(0, CharStringAll.Length)].ToString();
 
 				newPattern = ReplaceFirstOccurence("RandomChar", randString, newPattern);
+
+			}
+			
+			if(newPattern.Contains("NatoLetter") == true) {
+
+				var randString = NatoLetter[Rnd.Next(0, NatoLetter.Length)];
+				newPattern = newPattern.Replace("NatoLetter", randString);
+
+			}
+			
+			if(newPattern.Contains("GreekLetter") == true) {
+
+				var randString = GreekLetter[Rnd.Next(0, GreekLetter.Length)];
+				newPattern = newPattern.Replace("GreekLetter", randString);
 
 			}
 
