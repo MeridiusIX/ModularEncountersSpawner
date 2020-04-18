@@ -197,7 +197,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 				try{
 					
-					MyAPIGateway.PrefabManager.SpawnPrefab(gridList, prefab.SubtypeId, spawnPosition, spawnMatrix.Forward, spawnMatrix.Up, speedL, speedA, prefab.BeaconText, options, gridOwner);
+					MyAPIGateway.PrefabManager.SpawnPrefab(gridList, prefab.SubtypeId, spawnPosition, spawnMatrix.Forward, spawnMatrix.Up, speedL, speedA, !string.IsNullOrWhiteSpace(prefab.BeaconText) ? prefab.BeaconText : null, options, gridOwner);
 					
 				}catch(Exception exc){
 					

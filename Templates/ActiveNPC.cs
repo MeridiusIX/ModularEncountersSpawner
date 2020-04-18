@@ -29,7 +29,7 @@ namespace ModularEncountersSpawner.Templates{
 	
 	[ProtoContract]
 	public class ActiveNPC{
-		
+
 		[ProtoMember(1)]
 		public string SpawnGroupName;
 		

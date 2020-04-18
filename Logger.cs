@@ -31,13 +31,14 @@ using ModularEncountersSpawner.Templates;
 namespace ModularEncountersSpawner{
 	
 	public static class Logger{
-		
-		public static bool LoggerDebugMode = false;
+
+		public static bool LoggerDebugMode { get { return Settings.General.DebugMode; } set { Settings.General.DebugMode = value; } }
 		public static bool SkipNextMessage = false;
 		public static string LogDefaultIdentifier = "Modular Encounters Spawner: ";
 		public static Stopwatch PerformanceTimer = new Stopwatch();
 
 		public static string DebugSpawnGroup = "(NPC-SDE) SuperDuperEasyCargoShipNo";
+		public static StringBuilder VoxelCutDebugLog = new StringBuilder();
 
 		public static void AddMsg(string message, bool debugOnly = false, string identifier = ""){
 			
@@ -90,6 +91,18 @@ namespace ModularEncountersSpawner{
 
 			Logger.AddMsg(spawnGroup + ": " + msg, true);
 		
+		}
+
+		public static void VoxelCutLogging(string msg, bool reset = false) {
+
+			if (!LoggerDebugMode)
+				return;
+
+			if (reset)
+				VoxelCutDebugLog.Clear();
+
+			VoxelCutDebugLog.Append(msg).AppendLine();
+
 		}
 
 		public static void StartTimer(){

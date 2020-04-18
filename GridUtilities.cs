@@ -30,6 +30,7 @@ using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
+using VRage.Collections;
 
 namespace ModularEncountersSpawner{
 	
@@ -56,6 +57,9 @@ namespace ModularEncountersSpawner{
 						continue;
 
 					}
+
+					if (GridBuilderManipulation.AllWeaponCoreIDs.Contains(block.SlimBlock.BlockDefinition.Id))
+						continue;
 
 					var firstItem = block.GetInventory().GetItems()[0];
 					var ammoMagId = new MyDefinitionId(firstItem.Content.TypeId, firstItem.Content.SubtypeName);
@@ -301,14 +305,18 @@ namespace ModularEncountersSpawner{
 						var definitionId = new MyDefinitionId(typeof(MyObjectBuilder_Component), "Canvas");
 						var content = (MyObjectBuilder_PhysicalObject)MyObjectBuilderSerializer.CreateNewObject(definitionId);
 						MyObjectBuilder_InventoryItem inventoryItem = new MyObjectBuilder_InventoryItem { Amount = totalAdd, Content = content };
-						
-						if(block.GetInventory().CanItemsBeAdded(totalAdd, definitionId) == true){
-							
-							errorLogBuilder.Append("   - Adding Canvas'.").AppendLine();
-							block.GetInventory().AddItems(totalAdd, inventoryItem.Content);
-							
+
+						for (int i = 0; i < (int)totalAdd; i++) {
+
+							if (block.GetInventory().CanItemsBeAdded(1, definitionId) == true) {
+
+								errorLogBuilder.Append("   - Adding Canvas'.").AppendLine();
+								block.GetInventory().AddItems(1, inventoryItem.Content);
+
+							} else { break; }
+
 						}
-						
+
 						errorLogBuilder.Append("   - Completed Parachute Filling.").AppendLine();
 						
 					}
@@ -362,31 +370,8 @@ namespace ModularEncountersSpawner{
 
 		public static void WeaponCoreReplenishment(IMyTerminalBlock block) {
 
-			var weaponDefs = new Dictionary<string, int>();
-			MES_SessionCore.Instance.WeaponCore.GetBlockWeaponMap(block, weaponDefs);
 			MES_SessionCore.Instance.WeaponCore.DisableRequiredPower(block);
-			var ammoList = new Dictionary<MyDefinitionId, int>();
-
-			foreach (var weaponName in weaponDefs.Keys) {
-
-				var currentAmmo = MES_SessionCore.Instance.WeaponCore.GetActiveAmmo(block, weaponDefs[weaponName]);
-
-				if (!string.IsNullOrWhiteSpace(currentAmmo)) {
-
-					if (currentAmmo == "Energy")
-						continue;
-
-					var ammoMagId = new MyDefinitionId(typeof(MyObjectBuilder_AmmoMagazine), currentAmmo);
-
-					if (!ammoList.ContainsKey(ammoMagId)) {
-
-						ammoList.Add(ammoMagId, weaponDefs[weaponName]);
-
-					}
-
-				}
-
-			}
+			var ammoList = GetCompatibleAmmoTypes(block);
 
 			//Fill Ammos - 
 			int totalMagazines = 0;
@@ -394,7 +379,7 @@ namespace ModularEncountersSpawner{
 			int maxMagazines = 100; //Until Moved To Config;
 			int maxLoopRuns = 100;
 
-			if (ammoList.Keys.Count == 0)
+			if (ammoList.Count == 0)
 				return;
 
 			while (totalMagazines < maxMagazines && totalLoopRuns < maxLoopRuns) {
@@ -402,8 +387,12 @@ namespace ModularEncountersSpawner{
 				totalLoopRuns++;
 				bool breakNow = false;
 				bool noLoop = true;
+				bool addedItem = false;
 
-				foreach (var ammoId in ammoList.Keys) {
+				foreach (var ammoId in ammoList) {
+
+					if (ammoId.SubtypeName == "Energy")
+						continue;
 
 					noLoop = false;
 					var content = (MyObjectBuilder_PhysicalObject)MyObjectBuilderSerializer.CreateNewObject(ammoId);
@@ -413,20 +402,43 @@ namespace ModularEncountersSpawner{
 
 						block.GetInventory().AddItems(1, inventoryItem.Content);
 						totalMagazines++;
-
-					} else {
-
-						breakNow = true;
+						addedItem = true;
 
 					}
 
 				}
 
-				if (breakNow || noLoop)
+				if (breakNow || noLoop || !addedItem)
 					break;
 			
 			}
 
+		}
+
+		public static HashSetReader<MyDefinitionId> GetCompatibleAmmoTypes(IMyTerminalBlock block) {
+
+			var entity = block as MyEntity;
+
+			if (block == null || !block.HasInventory) {
+
+				Logger.AddMsg("Block null or has no inventory", true);
+				return new HashSetReader<MyDefinitionId>();
+
+			}
+				
+
+			MyInventory inventory = entity.GetInventory();
+
+			if (inventory == null) {
+
+				Logger.AddMsg("Block MyInventory is null", true);
+				return new HashSetReader<MyDefinitionId>();
+
+			}
+	
+			Logger.AddMsg(block.CustomName + " Has Total Compatible Ammos: " + inventory.Constraint.ConstrainedIds.Count(), true);
+			return inventory.Constraint.ConstrainedIds;
+		
 		}
 		
 		public static bool FixUnfinishedBlock(IMyInventory inv, IMySlimBlock slimBlock, long owner){

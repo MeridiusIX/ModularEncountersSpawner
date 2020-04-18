@@ -63,7 +63,7 @@ namespace ModularEncountersSpawner.Configuration{
 	public class ConfigGeneral{
 		
 		public float ModVersion {get; set;}
-		
+		public bool DebugMode { get; set; }
 		public bool EnableSpaceCargoShips {get; set;}
 		public bool EnablePlanetaryCargoShips {get; set;}
 		public bool EnableRandomEncounters {get; set;}
@@ -126,6 +126,7 @@ namespace ModularEncountersSpawner.Configuration{
 		public ConfigGeneral(){
 			
 			ModVersion = MES_SessionCore.ModVersion;
+			DebugMode = false;
 			EnableSpaceCargoShips = true;
 			EnablePlanetaryCargoShips = true;
 			EnableRandomEncounters = true;

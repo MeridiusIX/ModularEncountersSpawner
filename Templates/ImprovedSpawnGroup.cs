@@ -51,6 +51,7 @@ namespace ModularEncountersSpawner.Templates{
 		public bool BossEncounterAtmo;
 		public bool BossEncounterAny;
 
+		public bool RivalAiSpawn;
 		public bool RivalAiSpaceSpawn;
 		public bool RivalAiAtmosphericSpawn;
 		public bool RivalAiAnySpawn;
@@ -193,6 +194,11 @@ namespace ModularEncountersSpawner.Templates{
 		public bool UseTerrainTypeValidation;
 		public List<string> AllowedTerrainTypes;
 
+		public double MinAirDensity;
+		public double MaxAirDensity;
+		public double MinGravity;
+		public double MaxGravity;
+
 		public List<string> PlanetBlacklist;
 		public List<string> PlanetWhitelist;
 		public bool PlanetRequiresVacuum;
@@ -289,6 +295,7 @@ namespace ModularEncountersSpawner.Templates{
 			BossEncounterAtmo = false;
 			BossEncounterAny = false;
 
+			RivalAiSpawn = false;
 			RivalAiSpaceSpawn = false;
 			RivalAiAtmosphericSpawn = false;
 			RivalAiAnySpawn = false;
@@ -427,6 +434,11 @@ namespace ModularEncountersSpawner.Templates{
 
 			UseTerrainTypeValidation = false;
 			AllowedTerrainTypes = new List<string>();
+
+			MinAirDensity = -1;
+			MaxAirDensity = -1;
+			MinGravity = -1;
+			MaxGravity = -1;
 
 			PlanetBlacklist = new List<string>();
 			PlanetWhitelist = new List<string>();

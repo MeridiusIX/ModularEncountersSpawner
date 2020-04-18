@@ -43,6 +43,7 @@ namespace ModularEncountersSpawner.Api {
 			var dict = new Dictionary<string, Delegate>();
 			dict.Add("AddKnownPlayerLocation", new Action<Vector3D, string, double, int, int>(KnownPlayerLocationManager.AddKnownPlayerLocation));
 			dict.Add("CustomSpawnRequest", new Func<List<string>, MatrixD, Vector3, bool, string, string, bool>(CustomSpawner.CustomSpawnRequest));
+			dict.Add("GetDespawnCoords", new Func<IMyCubeGrid, Vector3D>(GetDespawnCoords));
 			dict.Add("GetSpawnGroupBlackList", new Func<List<string>>(GetSpawnGroupBlackList));
 			dict.Add("GetNpcNameBlackList", new Func<List<string>>(GetNpcNameBlackList));
 			dict.Add("IsPositionInKnownPlayerLocation", new Func<Vector3D, bool, string, bool>(KnownPlayerLocationManager.IsPositionInKnownPlayerLocation));
@@ -52,6 +53,20 @@ namespace ModularEncountersSpawner.Api {
 			dict.Add("SetSpawnerIgnoreForDespawn", new Func<IMyCubeGrid, bool, bool>(SetSpawnerIgnoreForDespawn));
 			return dict;
 
+		}
+
+		public static Vector3D GetDespawnCoords(IMyCubeGrid cubeGrid) {
+
+			ActiveNPC npcData = null;
+
+			if (!NPCWatcher.ActiveNPCs.TryGetValue(cubeGrid, out npcData))
+				return Vector3D.Zero;
+
+			if (npcData != null)
+				return npcData.EndCoords;
+
+			return Vector3D.Zero;
+		
 		}
 
 		public static List<string> GetSpawnGroupBlackList() {

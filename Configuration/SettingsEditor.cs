@@ -61,9 +61,27 @@ namespace ModularEncountersSpawner.Configuration{
 			////////////////////////////////////////////////////////
 			
 			if(receivedCommand.StartsWith("/MES.Settings.General.") == true){
-					
+
+				//DebugMode
+				if (receivedCommand.StartsWith("/MES.Settings.General.DebugMode.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.General.DebugMode.", "");
+					bool result = false;
+
+					if (bool.TryParse(receivedValue, out result) == false) {
+
+						return "Failed To Parse Value: " + receivedValue;
+
+					}
+
+					Settings.General.DebugMode = result;
+					var saveSetting = Settings.General.SaveSettings(Settings.General);
+					return saveSetting;
+
+				}
+
 				//EnableSpaceCargoShips
-				if(receivedCommand.StartsWith("/MES.Settings.General.EnableSpaceCargoShips.") == true){
+				if (receivedCommand.StartsWith("/MES.Settings.General.EnableSpaceCargoShips.") == true){
 					
 					var receivedValue = receivedCommand.Replace("/MES.Settings.General.EnableSpaceCargoShips.", "");
 					bool result = false;

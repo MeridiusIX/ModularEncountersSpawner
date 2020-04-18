@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Sandbox.ModAPI;
 using VRage.Game.ModAPI;
+using VRage.Utils;
 using VRageMath;
 
 //Change namespace to your mod's namespace
@@ -13,6 +14,7 @@ namespace ModularEncountersSpawner.Api {
 		private static long _mesModId = 1521905890;
 		private static Action<Vector3D, string, double, int, int> _addKnownPlayerLocation;
 		private static Func<List<string>, MatrixD, Vector3, bool, string, string, bool> _customSpawnRequest;
+		private static Func<IMyCubeGrid, Vector3D> _getDespawnCoords;
 		private static Func<List<string>> _getSpawnGroupBlackList;
 		private static Func<List<string>> _getNpcNameBlackList;
 		private static Func<Vector3D, bool, string, bool> _isPositionInKnownPlayerLocation;
@@ -50,6 +52,14 @@ namespace ModularEncountersSpawner.Api {
 		/// <param name="factionOverride">Faction tag you want spawngroup to use, regardless of its settings</param>
 		/// <param name="spawnProfileId">Identifier for your mod so MES can properly log where the spawn request originated from</param>
 		public static bool CustomSpawnRequest(List<string> spawnGroups, MatrixD spawningMatrix, Vector3 velocity, bool ignoreSafetyCheck, string factionOverride, string spawnProfileId) => _customSpawnRequest?.Invoke(spawnGroups, spawningMatrix, velocity, ignoreSafetyCheck, factionOverride, spawnProfileId) ?? false;
+
+		/// <summary>
+		/// Gets the Despawn Coords that are generated from a ship spawned as either Space or Planet CargoShip.
+		/// Returns Vector3D.Zero if no Coords can be found.
+		/// </summary>
+		/// <param name="cubeGrid">The cubegrid of the NPC you want to check Despawn Coords For</param>
+		/// <returns></returns>
+		public static Vector3D GetDespawnCoords(IMyCubeGrid cubeGrid) => _getDespawnCoords?.Invoke(cubeGrid) ?? Vector3D.Zero;
 
 		/// <summary>
 		/// Get a String List of all Current SpawnGroup SubtypeNames Currently in the MES Blacklist
@@ -111,25 +121,36 @@ namespace ModularEncountersSpawner.Api {
 
 		public static void APIListener(object data) {
 
-			var dict = data as Dictionary<string, Delegate>;
+			try {
 
-			if(dict == null) {
+				var dict = data as Dictionary<string, Delegate>;
 
-				return;
+				if (dict == null) {
+
+					return;
+
+				}
+
+				MESApiReady = true;
+				_addKnownPlayerLocation = (Action<Vector3D, string, double, int, int>)dict["AddKnownPlayerLocation"];
+				_customSpawnRequest = (Func<List<string>, MatrixD, Vector3, bool, string, string, bool>)dict["CustomSpawnRequest"];
+				_getDespawnCoords = (Func<IMyCubeGrid, Vector3D>)dict["GetDespawnCoords"];
+				_getSpawnGroupBlackList = (Func<List<string>>)dict["GetSpawnGroupBlackList"];
+				_getNpcNameBlackList = (Func<List<string>>)dict["GetNpcNameBlackList"];
+				_isPositionInKnownPlayerLocation = (Func<Vector3D, bool, string, bool>)dict["IsPositionInKnownPlayerLocation"];
+				_convertRandomNamePatterns = (Func<string, string>)dict["ConvertRandomNamePatterns"];
+				_getNpcStartCoordinates = (Func<IMyCubeGrid, Vector3D>)dict["GetNpcStartCoordinates"];
+				_getNpcEndCoordinates = (Func<IMyCubeGrid, Vector3D>)dict["GetNpcEndCoordinates"];
+				_setSpawnerIgnoreForDespawn = (Func<IMyCubeGrid, bool, bool>)dict["SetSpawnerIgnoreForDespawn"];
+
+
+			} catch (Exception e) {
+
+				MyLog.Default.WriteLineAndConsole("MES API Failed To Load For Client: " + MyAPIGateway.Utilities.GamePaths.ModScopeName);
 
 			}
 
-			MESApiReady = true;
-			_addKnownPlayerLocation = (Action<Vector3D, string, double, int, int>)dict["AddKnownPlayerLocation"];
-			_customSpawnRequest = (Func<List<string>, MatrixD, Vector3, bool, string, string, bool>)dict["CustomSpawnRequest"];
-			_getSpawnGroupBlackList = (Func<List<string>>)dict["GetSpawnGroupBlackList"];
-			_getNpcNameBlackList = (Func<List<string>>)dict["GetNpcNameBlackList"];
-			_isPositionInKnownPlayerLocation = (Func<Vector3D, bool, string, bool>)dict["IsPositionInKnownPlayerLocation"];
-			_convertRandomNamePatterns = (Func<string, string>)dict["ConvertRandomNamePatterns"];
-			_getNpcStartCoordinates = (Func<IMyCubeGrid, Vector3D>)dict["GetNpcStartCoordinates"];
-			_getNpcEndCoordinates = (Func<IMyCubeGrid, Vector3D>)dict["GetNpcEndCoordinates"];
-			_setSpawnerIgnoreForDespawn = (Func<IMyCubeGrid, bool, bool>)dict["SetSpawnerIgnoreForDespawn"];
-
+			
 		}
 
 	}

@@ -56,10 +56,15 @@ namespace ModularEncountersSpawner {
 
             }
 
-            if(foundExistingLocation == false) {
+            if (foundExistingLocation == false) {
 
+                Logger.AddMsg("Creating KnownPlayerLocation at " + coords.ToString() + " / Radius: " + radius.ToString(), true);
                 Locations.Add(new KnownPlayerLocation(faction, coords, radius, duration, maxEncounters));
                 AlertPlayersOfNewKPL(coords, radius, faction);
+
+            } else {
+
+                Logger.AddMsg("Attempt To Create KnownPlayerLocation Failed - Area Already Exists", true);
 
             }
 

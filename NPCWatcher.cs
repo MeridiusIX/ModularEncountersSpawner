@@ -342,6 +342,7 @@ namespace ModularEncountersSpawner{
 							}catch(Exception exc){
 								
 								Logger.AddMsg("Error While Cutting Installation Voxels");
+								Logger.AddMsg(exc.ToString(), true);
 								
 							}
 							
@@ -1796,13 +1797,15 @@ namespace ModularEncountersSpawner{
 		}
 		
 		public static void CutVoxelsAtAirtightPositions(IMyCubeGrid cubeGrid){
-			
+
+			Logger.VoxelCutLogging("Beginning Voxel Cut Process At CubeGrid:", true);
 			var min = cubeGrid.Min;
 			var max = cubeGrid.Max;
 			var sphere = new BoundingSphereD(cubeGrid.GetPosition(), 1000);
 			var airtightCells = new List<Vector3I>();
-			
-			for(int x = min.X; x <= max.X; x++){
+
+			Logger.VoxelCutLogging(" - Collecting List Of AirTight Cells");
+			for (int x = min.X; x <= max.X; x++){
 				
 				for(int y = min.Y; y <= max.Y; y++){
 					
@@ -1821,8 +1824,10 @@ namespace ModularEncountersSpawner{
 				}
 				
 			}
-			
-			foreach(var cell in airtightCells){
+
+			Logger.VoxelCutLogging(" - Total Airtight Cells: " + airtightCells.ToString());
+			Logger.VoxelCutLogging(" - Queueing Airtight Cells That Require Removal");
+			foreach (var cell in airtightCells){
 
 				var cellWorldSpace = cubeGrid.GridIntegerToWorld(cell);
 				var voxelTool = MyAPIGateway.Session.VoxelMaps.GetBoxVoxelHand();
@@ -1830,7 +1835,8 @@ namespace ModularEncountersSpawner{
 				MES_SessionCore.RemoveVoxels.Add(MatrixD.CreateWorld(cellWorldSpace, cubeGrid.WorldMatrix.Forward, cubeGrid.WorldMatrix.Up));
 				
 			}
-			
+
+			Logger.VoxelCutLogging(" - Cells Queued, Removal Activated.");
 			MES_SessionCore.VoxelsToRemove = true;
 		
 		}
@@ -1894,7 +1900,7 @@ namespace ModularEncountersSpawner{
 		}
 		
 		public static void StartupScan(){
-			
+
 			SpawnResources.RefreshEntityLists();
 			
 			foreach(var entity in SpawnResources.EntityList){

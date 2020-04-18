@@ -296,6 +296,18 @@ namespace ModularEncountersSpawner{
 
 		public static bool EnvironmentChecks(ImprovedSpawnGroup spawnGroup, EnvironmentEvaluation environment) {
 
+			if (spawnGroup.MinAirDensity != -1 && environment.AtmosphereAtPosition < spawnGroup.MinAirDensity)
+				return false;
+
+			if (spawnGroup.MaxAirDensity != -1 && environment.AtmosphereAtPosition > spawnGroup.MinAirDensity)
+				return false;
+
+			if (spawnGroup.MinGravity != -1 && environment.GravityAtPosition < spawnGroup.MinGravity)
+				return false;
+
+			if (spawnGroup.MaxGravity != -1 && environment.GravityAtPosition > spawnGroup.MaxGravity)
+				return false;
+
 			if (spawnGroup.UseDayOrNightOnly) {
 
 				if (spawnGroup.SpawnOnlyAtNight != environment.IsNight) {
@@ -447,8 +459,15 @@ namespace ModularEncountersSpawner{
 						
 				}
 
+				//RivalAiSpawn
+				if (tag.Contains("[RivalAiSpawn") == true) {
+
+					improveSpawnGroup.RivalAiAnySpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
 				//RivalAiSpaceSpawn
-				if(tag.Contains("[RivalAiSpaceSpawn") == true) {
+				if (tag.Contains("[RivalAiSpaceSpawn") == true) {
 
 					improveSpawnGroup.RivalAiSpaceSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 
@@ -1156,6 +1175,76 @@ namespace ModularEncountersSpawner{
 				if (tag.Contains("[MaxSpawnFromPlanetSurface") == true) {
 
 					improveSpawnGroup.MaxSpawnFromPlanetSurface = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxSpawnFromPlanetSurface, out badParse);
+
+				}
+
+				//UseDayOrNightOnly
+				if (tag.Contains("[UseDayOrNightOnly") == true) {
+
+					improveSpawnGroup.UseDayOrNightOnly = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
+				//SpawnOnlyAtNight
+				if (tag.Contains("[SpawnOnlyAtNight") == true) {
+
+					improveSpawnGroup.SpawnOnlyAtNight = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
+				//UseWeatherSpawning
+				if (tag.Contains("[UseWeatherSpawning") == true) {
+
+					improveSpawnGroup.UseWeatherSpawning = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
+				//AllowedWeatherSystems
+				if (tag.Contains("[AllowedWeatherSystems") == true) {
+
+					improveSpawnGroup.AllowedWeatherSystems = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
+				//UseTerrainTypeValidation
+				if (tag.Contains("[UseTerrainTypeValidation") == true) {
+
+					improveSpawnGroup.UseTerrainTypeValidation = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
+				//AllowedTerrainTypes
+				if (tag.Contains("[AllowedTerrainTypes") == true) {
+
+					improveSpawnGroup.AllowedTerrainTypes = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
+				//MinAirDensity
+				if (tag.Contains("[MinAirDensity") == true) {
+
+					improveSpawnGroup.MinAirDensity = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinAirDensity, out badParse);
+
+				}
+
+				//MaxAirDensity
+				if (tag.Contains("[MaxAirDensity") == true) {
+
+					improveSpawnGroup.MaxAirDensity = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxAirDensity, out badParse);
+
+				}
+
+				//MinGravity
+				if (tag.Contains("[MinGravity") == true) {
+
+					improveSpawnGroup.MinGravity = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinGravity, out badParse);
+
+				}
+
+				//MaxGravity
+				if (tag.Contains("[MaxGravity") == true) {
+
+					improveSpawnGroup.MaxGravity = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxGravity, out badParse);
 
 				}
 

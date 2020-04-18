@@ -35,7 +35,7 @@ namespace ModularEncountersSpawner{
 	
 	public class MES_SessionCore : MySessionComponentBase{
 		
-		public static float ModVersion = 1.080f;
+		public static float ModVersion = 1.081f;
 		public static string SaveName = "";
 		public static int PlayerWatcherTimer = 0;
 		public static Dictionary<IMyPlayer, PlayerWatcher> playerWatchList = new Dictionary<IMyPlayer, PlayerWatcher>();
@@ -149,6 +149,26 @@ namespace ModularEncountersSpawner{
 			try {
 
 				Logger.AddMsg("Defense Shields API Loading");
+
+				if (!ShieldMod) {
+
+					//Check for compatible alts
+					var definitions = MyDefinitionManager.Static.GetAllDefinitions();
+					var npcEmitter = new MyDefinitionId(typeof(MyObjectBuilder_UpgradeModule), "NPCEmitterLB");
+
+					foreach (var def in definitions) {
+
+						if (def.Id == npcEmitter) {
+
+							Logger.AddMsg("Alternate Defense Shield Mod Detected");
+							ShieldMod = true;
+							break;
+
+						}
+					
+					}
+				
+				}
 
 				if (ShieldMod && !ShieldApiLoaded) {
 
@@ -348,22 +368,15 @@ namespace ModularEncountersSpawner{
 			//Save File Validation
 			SaveName = MyAPIGateway.Session.Name;
 
-			//Some Faction BS - Temporary
-			if(1 == 0) {
+			//Setup Watchers and Handlers
+			MyAPIGateway.Multiplayer.RegisterMessageHandler(8877, ChatCommand.MESMessageHandler);
+			MyAPIGateway.Utilities.MessageEntered += ChatCommand.MESChatCommand;	
+			var thisPlayer = MyAPIGateway.Session.LocalHumanPlayer;
 
-				var factions = MyDefinitionManager.Static.GetDefaultFactions();
-				var sb = new StringBuilder();
-				sb.Append("Faction Data: ").AppendLine().AppendLine();
+			if (MyAPIGateway.Multiplayer.IsServer == false) {
 
-				foreach(var faction in factions) {
-
-					sb.Append(faction.Tag).AppendLine();
-					sb.Append(faction.DefaultRelation).AppendLine();
-					sb.Append(faction.DefaultRelationToPlayers).AppendLine().AppendLine();
-
-				}
-
-				Logger.AddMsg(sb.ToString());
+				//Client Setup Ends Here
+				return;
 
 			}
 
@@ -371,11 +384,6 @@ namespace ModularEncountersSpawner{
 			Logger.AddMsg("Initializing RivalAI Helper");
 			RivalAIHelper.SetupRivalAIHelper();
 
-			//Setup Watchers and Handlers
-			MyAPIGateway.Multiplayer.RegisterMessageHandler(8877, ChatCommand.MESMessageHandler);
-			MyAPIGateway.Utilities.MessageEntered += ChatCommand.MESChatCommand;	
-			var thisPlayer = MyAPIGateway.Session.LocalHumanPlayer;
-			
 			//Disable Vanilla Spawners
 			Logger.AddMsg("Checking World Settings.");
 			if(MyAPIGateway.Session.SessionSettings.CargoShipsEnabled == true){
@@ -667,7 +675,7 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-			NPCShieldManager.DefenseShieldModLoaded = ActiveMods.Contains(1365616918);
+			NPCShieldManager.DefenseShieldModLoaded = ActiveMods.Contains(1365616918) || ShieldMod;
 			NPCShieldManager.NPCShieldProviderModLoaded = ActiveMods.Contains(2043339470);
 			NPCShieldManager.InitializeArmorBlockList();
 
@@ -925,7 +933,6 @@ namespace ModularEncountersSpawner{
 		public static void CutVoxelsAtAirtightPositions(MatrixD cutMatrix){
 
 			var sphere = new BoundingSphereD(cutMatrix.Translation, 1000);
-
 			var mapList = new List<IMyVoxelBase>();
 			MyAPIGateway.Session.VoxelMaps.GetInstances(mapList);
 			
