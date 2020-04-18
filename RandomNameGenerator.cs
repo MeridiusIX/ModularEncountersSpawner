@@ -506,7 +506,7 @@ namespace ModularEncountersSpawner {
 			"Omicron",
 			"Pi",
 			"Rho",
-			"Sigma"
+			"Sigma",
 			"Tau",
 			"Upsilon",
 			"Phi",
