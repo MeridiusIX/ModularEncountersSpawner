@@ -262,6 +262,7 @@ namespace ModularEncountersSpawner.Templates{
 		public string BossCustomAnnounceAuthor;
 		public string BossCustomAnnounceMessage;
 		public string BossCustomGPSLabel;
+		public string BossMusicId;
 		
 		public bool RotateFirstCockpitToForward;
 		public bool PositionAtFirstCockpit;
@@ -503,7 +504,8 @@ namespace ModularEncountersSpawner.Templates{
 			BossCustomAnnounceAuthor = "";
 			BossCustomAnnounceMessage = "";
 			BossCustomGPSLabel = "Dangerous Encounter";
-			
+			BossMusicId = "";
+
 			RotateFirstCockpitToForward = true;
 			PositionAtFirstCockpit = false;
 			SpawnRandomCargo = true;

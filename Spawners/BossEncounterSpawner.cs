@@ -33,7 +33,7 @@ namespace ModularEncountersSpawner.Spawners{
 		public static Dictionary<string, List<ImprovedSpawnGroup>> SpawnGroupSublists = new Dictionary<string, List<ImprovedSpawnGroup>>();
 		public static Dictionary<string, int> EligibleSpawnsByModId = new Dictionary<string, int>();
 		
-		public static string AttemptSpawn(Vector3D startCoords){
+		public static string AttemptSpawn(Vector3D startCoords, List<string> eligibleNames = null) {
 		
 			if(Settings.General.UseMaxNpcGrids == true){
 				
@@ -61,7 +61,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 			
-			var spawnGroupList = GetBossEncounters(startCoords, spawnCoords);
+			var spawnGroupList = GetBossEncounters(startCoords, spawnCoords, eligibleNames);
 			
 			if(Settings.General.UseModIdSelectionForSpawning == true){
 				
@@ -149,7 +149,7 @@ namespace ModularEncountersSpawner.Spawners{
 		
 		}
 		
-		public static List<ImprovedSpawnGroup> GetBossEncounters(Vector3D playerCoords, Vector3D spawnCoords){
+		public static List<ImprovedSpawnGroup> GetBossEncounters(Vector3D playerCoords, Vector3D spawnCoords, List<string> eligibleNames){
 
 			bool spaceSpawn = false;
 			bool planetSpawn = false;
@@ -197,19 +197,31 @@ namespace ModularEncountersSpawner.Spawners{
 			
 			//Filter Eligible Groups To List
 			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
-				
-				if(specificGroup != "" && spawnGroup.SpawnGroup.Id.SubtypeName != specificGroup){
-					
-					continue;
-					
+
+				if (eligibleNames != null) {
+
+					if (!eligibleNames.Contains(spawnGroup.SpawnGroupName)) {
+
+						continue;
+
+					}
+
+				} else {
+
+					if (specificGroup != "" && spawnGroup.SpawnGroup.Id.SubtypeName != specificGroup) {
+
+						continue;
+
+					}
+
+					if (specificGroup == "" && spawnGroup.AdminSpawnOnly == true) {
+
+						continue;
+
+					}
+
 				}
-				
-				if(specificGroup == "" && spawnGroup.AdminSpawnOnly == true){
-					
-					continue;
-					
-				}
-				
+
 				bool eligibleGroup = false;
 				
 				if(spawnGroup.BossEncounterSpace == true && spaceSpawn == true){
@@ -417,13 +429,6 @@ namespace ModularEncountersSpawner.Spawners{
 				
 				foreach(var prefab in encounter.SpawnGroup.SpawnGroup.Prefabs){
 
-					if (encounter.SpawnGroup.UseKnownPlayerLocations) {
-
-						KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(encounter.Position);
-
-
-					}
-
 					var options = SpawnGroupManager.CreateSpawningOptions(encounter.SpawnGroup, prefab);
 					var spawnPosition = Vector3D.Transform((Vector3D)prefab.Position, tempMatrix);
 					var speedL = prefab.Speed * (Vector3)tempMatrix.Forward;
@@ -453,7 +458,15 @@ namespace ModularEncountersSpawner.Spawners{
 						Logger.AddMsg("Could Not Find Faction Founder For: " + encounter.SpawnGroup.FactionOwner);
 						
 					}
-					
+
+
+					if (encounter.SpawnGroup.UseKnownPlayerLocations) {
+
+						KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(encounter.Position, gridOwner != 0 ? encounter.SpawnGroup.FactionOwner : null);
+
+					}
+
+
 					//Grid Manipulation
 					GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, encounter.SpawnGroup, "BossEncounter", prefab.Behaviour);
 					
@@ -507,6 +520,12 @@ namespace ModularEncountersSpawner.Spawners{
 					
 					NPCWatcher.PendingNPCs.Add(pendingNPC);
 					
+				}
+
+				if (!string.IsNullOrWhiteSpace(encounter.SpawnGroup.BossMusicId)) {
+
+					MyVisualScriptLogicProvider.MusicPlayMusicCue(encounter.SpawnGroup.BossMusicId);
+				
 				}
 				
 				return true;

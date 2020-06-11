@@ -40,7 +40,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 				if(totalNPCs >= Settings.General.MaxGlobalNpcGrids){
 
-					//return "Spawning Aborted. Max Global NPCs Limit Reached.";
+					Logger.AddMsg("Custom Spawn Request Aborted: Too Many NPC Grids In World");
 					return false;
 					
 				}
@@ -53,6 +53,7 @@ namespace ModularEncountersSpawner.Spawners{
 			
 			if(spawnGroupList.Count == 0){
 
+				Logger.AddMsg("Custom Spawn Request Aborted: No Eligible Spawngroups");
 				return false;
 				//return "No Eligible Spawn Groups Could Be Found To Spawn Near Player.";
 				
@@ -72,7 +73,6 @@ namespace ModularEncountersSpawner.Spawners{
 
 			var startPathCoords = Vector3D.Zero;
 			var endPathCoords = Vector3D.Zero;
-			bool successfulPath = false;
 			
 			//Get Directions
 			var spawnForwardDir = spawningMatrix.Forward;
@@ -101,7 +101,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 				if (spawnGroup.UseKnownPlayerLocations) {
 
-					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(spawnMatrix.Translation);
+					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(spawnMatrix.Translation, randFactionTag);
 
 
 				}
@@ -201,9 +201,9 @@ namespace ModularEncountersSpawner.Spawners{
 
 				}
 
-				if(spawnGroup.RivalAiAnySpawn == false) {
+				if(spawnGroup.RivalAiAnySpawn == false && spawnGroup.RivalAiSpawn == false) {
 
-					if(environment.NearestPlanet == null && spawnGroup.RivalAiSpaceSpawn == false) {
+					if(environment.GravityAtPosition > 0 && spawnGroup.RivalAiSpaceSpawn) {
 
 						continue;
 

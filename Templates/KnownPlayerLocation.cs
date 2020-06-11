@@ -52,6 +52,12 @@ namespace ModularEncountersSpawner.Templates {
         [ProtoMember(7)]
         public int SpawnedEncounters;
 
+        [ProtoMember(8)]
+        public BoundingSphereD Sphere;
+
+        [ProtoMember(9)]
+        public int MinThreatForAvoidingAbandonment;
+
         public KnownPlayerLocation() {
 
             this.NpcFaction = "";
@@ -61,16 +67,19 @@ namespace ModularEncountersSpawner.Templates {
             this.MaxSpawnedEncounters = -1;
             this.LastSighting = MyAPIGateway.Session.GameDateTime;
             this.SpawnedEncounters = 0;
+            this.Sphere = new BoundingSphereD();
 
         }
 
-        public KnownPlayerLocation(string faction, Vector3D coords, double radius, int expiration, int maxSpawns) : base() {
+        public KnownPlayerLocation(string faction, Vector3D coords, double radius, int expiration, int maxSpawns, int minThreat) : base() {
 
             this.NpcFaction = faction;
             this.Coords = coords;
             this.Radius = radius;
             this.ExpirationTimeMinutes = expiration;
             this.MaxSpawnedEncounters = maxSpawns;
+            this.Sphere = new BoundingSphereD(coords, radius);
+            this.MinThreatForAvoidingAbandonment = minThreat;
 
         }
 

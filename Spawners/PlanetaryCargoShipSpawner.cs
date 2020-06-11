@@ -33,7 +33,7 @@ namespace ModularEncountersSpawner.Spawners{
 		public static Dictionary<string, List<ImprovedSpawnGroup>> SpawnGroupSublists = new Dictionary<string, List<ImprovedSpawnGroup>>();
 		public static Dictionary<string, int> EligibleSpawnsByModId = new Dictionary<string, int>();
 		
-		public static string AttemptSpawn(Vector3D startCoords){
+		public static string AttemptSpawn(Vector3D startCoords, List<string> eligibleNames = null) {
 				
 			if(Settings.General.UseMaxNpcGrids == true){
 				
@@ -63,7 +63,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 			KnownPlayerLocationManager.CleanExpiredLocations();
 			var validFactions = new Dictionary<string, List<string>>();
-			var spawnGroupList = GetPlanetaryCargoShips(startCoords, out validFactions);
+			var spawnGroupList = GetPlanetaryCargoShips(startCoords, eligibleNames, out validFactions);
 			
 			if(Settings.General.UseModIdSelectionForSpawning == true){
 				
@@ -118,7 +118,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 				if (spawnGroup.UseKnownPlayerLocations) {
 
-					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(startCoords);
+					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(startCoords, randFactionTag);
 
 				}
 
@@ -376,7 +376,7 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 				
-		public static List<ImprovedSpawnGroup> GetPlanetaryCargoShips(Vector3D playerCoords, out Dictionary<string, List<string>> validFactions) {
+		public static List<ImprovedSpawnGroup> GetPlanetaryCargoShips(Vector3D playerCoords, List<string> eligibleNames, out Dictionary<string, List<string>> validFactions) {
 
 			string specificGroup = "";
 			var planetRestrictions = new List<string>(Settings.General.PlanetSpawnsDisableList.ToList());
@@ -385,7 +385,7 @@ namespace ModularEncountersSpawner.Spawners{
 			EligibleSpawnsByModId.Clear();
 			var environment = new EnvironmentEvaluation(playerCoords);
 
-			if (environment.NearestPlanet != null) {
+			if (environment.NearestPlanet != null && environment.IsOnPlanet) {
 
 				if (planetRestrictions.Contains(environment.NearestPlanetName) == true) {
 
@@ -421,18 +421,32 @@ namespace ModularEncountersSpawner.Spawners{
 			
 			//Filter Eligible Groups To List
 			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
-				
-				if(specificGroup != "" && spawnGroup.SpawnGroup.Id.SubtypeName != specificGroup){
-					
-					continue;
-					
+
+				if (eligibleNames != null) {
+
+					if (!eligibleNames.Contains(spawnGroup.SpawnGroupName)) {
+
+						continue;
+
+					}
+
+				} else {
+
+					if (specificGroup != "" && spawnGroup.SpawnGroup.Id.SubtypeName != specificGroup) {
+
+						continue;
+
+					}
+
+					if (specificGroup == "" && spawnGroup.AdminSpawnOnly == true) {
+
+						continue;
+
+					}
+
 				}
+
 				
-				if(specificGroup == "" && spawnGroup.AdminSpawnOnly == true){
-					
-					continue;
-					
-				}
 				
 				if(spawnGroup.AtmosphericCargoShip == false){
 					

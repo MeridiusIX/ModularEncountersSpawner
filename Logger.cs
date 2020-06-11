@@ -531,11 +531,40 @@ namespace ModularEncountersSpawner{
 			var sb = new StringBuilder();
 			var validFactions = new Dictionary<string, List<string>>();
 
+			//Spawn Data Near Player
+			var selectedSpawnGroup = new ImprovedSpawnGroup();
+			SpawnResources.RefreshEntityLists();
+			SpawnResources.LastThreatRefresh = SpawnResources.GameStartTime;
+			var threatLevel = SpawnResources.GetThreatLevel(selectedSpawnGroup, coords);
+			var pcuLevel = SpawnResources.GetPCULevel(selectedSpawnGroup, coords);
 
-			
+			sb.Append("::: Spawn Data Near Player :::").AppendLine();
+			sb.Append(" - Threat Score: ").Append(threatLevel.ToString()).AppendLine();
+			sb.Append(" - PCU Score:    ").Append(pcuLevel.ToString()).AppendLine();
+
+			sb.AppendLine();
+
+			//Environment Data Near Player
+			var environment = new EnvironmentEvaluation(coords);
+			sb.Append("::: Environment Data Near Player :::").AppendLine();
+			sb.Append(" - Distance From World Center:  ").Append(environment.DistanceFromWorldCenter.ToString()).AppendLine();
+			sb.Append(" - Direction From World Center: ").Append(environment.DirectionFromWorldCenter.ToString()).AppendLine();
+			sb.Append(" - Is On Planet:                ").Append(environment.IsOnPlanet.ToString()).AppendLine();
+			sb.Append(" - Planet Name:                 ").Append(environment.IsOnPlanet ? environment.NearestPlanetName : "N/A").AppendLine();
+			sb.Append(" - Planet Diameter:             ").Append(environment.IsOnPlanet ? environment.PlanetDiameter.ToString() : "N/A").AppendLine();
+			sb.Append(" - Oxygen At Position:          ").Append(environment.IsOnPlanet ? environment.OxygenAtPosition.ToString() : "N/A").AppendLine();
+			sb.Append(" - Atmosphere At Position:      ").Append(environment.IsOnPlanet ? environment.AtmosphereAtPosition.ToString() : "N/A").AppendLine();
+			sb.Append(" - Gravity At Position:         ").Append(environment.IsOnPlanet ? environment.GravityAtPosition.ToString() : "N/A").AppendLine();
+			sb.Append(" - Altitude At Position:        ").Append(environment.IsOnPlanet ? environment.AltitudeAtPosition.ToString() : "N/A").AppendLine();
+			sb.Append(" - Is Night At Position:        ").Append(environment.IsOnPlanet ? environment.IsNight.ToString() : "N/A").AppendLine();
+			sb.Append(" - Weather At Position:         ").Append(environment.IsOnPlanet && !string.IsNullOrWhiteSpace(environment.WeatherAtPosition) ? environment.WeatherAtPosition.ToString() : "N/A").AppendLine();
+			sb.Append(" - Common Terrain At Position:  ").Append(environment.IsOnPlanet ? environment.CommonTerrainAtPosition.ToString() : "N/A").AppendLine();
+
+			sb.AppendLine();
+
 			//Space Cargo Ship
 			sb.Append("::: Space / Lunar Cargo Ship Eligible Spawns :::").AppendLine();
-			var spaceCargoList = SpaceCargoShipSpawner.GetSpaceCargoShips(coords, out validFactions);
+			var spaceCargoList = SpaceCargoShipSpawner.GetSpaceCargoShips(coords, null, out validFactions);
 			
 			foreach(var sgroup in spaceCargoList.Distinct().ToList()){
 				
@@ -547,7 +576,7 @@ namespace ModularEncountersSpawner{
 			
 			//Random Encounter
 			sb.Append("::: Random Encounter Eligible Spawns :::").AppendLine().AppendLine();
-			var randEncounterList = RandomEncounterSpawner.GetRandomEncounters(coords, out validFactions);
+			var randEncounterList = RandomEncounterSpawner.GetRandomEncounters(coords, null, out validFactions);
 			
 			foreach(var sgroup in randEncounterList.Distinct().ToList()){
 				
@@ -559,7 +588,7 @@ namespace ModularEncountersSpawner{
 			
 			//Planetary Cargo Ship
 			sb.Append("::: Planetary Cargo Ship Eligible Spawns :::").AppendLine().AppendLine();
-			var planetCargoList = PlanetaryCargoShipSpawner.GetPlanetaryCargoShips(coords, out validFactions);
+			var planetCargoList = PlanetaryCargoShipSpawner.GetPlanetaryCargoShips(coords, null, out validFactions);
 			
 			foreach(var sgroup in planetCargoList.Distinct().ToList()){
 				
@@ -574,7 +603,7 @@ namespace ModularEncountersSpawner{
 			var smallList = new List<ImprovedSpawnGroup>();
 			var mediumList = new List<ImprovedSpawnGroup>();
 			var largeList = new List<ImprovedSpawnGroup>();
-			var planetStationList = PlanetaryInstallationSpawner.GetPlanetaryInstallations(coords, out smallList, out mediumList, out largeList, out validFactions);
+			var planetStationList = PlanetaryInstallationSpawner.GetPlanetaryInstallations(coords, null, out smallList, out mediumList, out largeList, out validFactions);
 			
 			foreach(var sgroup in planetStationList.Distinct().ToList()){
 				
@@ -591,7 +620,7 @@ namespace ModularEncountersSpawner{
 			
 			if(BossEncounterSpawner.GetInitialSpawnCoords(coords, out spawnCoords) == true){
 				
-				var bossList = BossEncounterSpawner.GetBossEncounters(coords, spawnCoords);
+				var bossList = BossEncounterSpawner.GetBossEncounters(coords, spawnCoords, null);
 			
 				foreach(var sgroup in bossList.Distinct().ToList()){
 					

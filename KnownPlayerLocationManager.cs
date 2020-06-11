@@ -33,11 +33,13 @@ namespace ModularEncountersSpawner {
 
         public static List<KnownPlayerLocation> Locations = new List<KnownPlayerLocation>();
 
-        public static void AddKnownPlayerLocation(Vector3D coords, string faction, double radius, int duration = -1, int maxEncounters = -1) {
+        public static void AddKnownPlayerLocation(Vector3D coords, string faction, double radius, int duration = -1, int maxEncounters = -1, int minThreatToAvoidAbandonment = -1) {
 
             bool foundExistingLocation = false;
+            var sphere = new BoundingSphereD(coords, radius);
+            List<KnownPlayerLocation> intersectingLocations = new List<KnownPlayerLocation>();
 
-            foreach(var location in Locations) {
+            foreach (var location in Locations) {
 
                 if(location.NpcFaction != faction) {
 
@@ -45,26 +47,42 @@ namespace ModularEncountersSpawner {
 
                 }
 
-                if(Vector3D.Distance(coords, location.Coords) > location.Radius) {
+                if(!sphere.Intersects(location.Sphere) && location.Sphere.Contains(coords) == ContainmentType.Disjoint) {
 
                     continue;
 
                 }
 
+                intersectingLocations.Add(location);
                 foundExistingLocation = true;
-                break;
 
             }
 
             if (foundExistingLocation == false) {
 
                 Logger.AddMsg("Creating KnownPlayerLocation at " + coords.ToString() + " / Radius: " + radius.ToString(), true);
-                Locations.Add(new KnownPlayerLocation(faction, coords, radius, duration, maxEncounters));
+                Locations.Add(new KnownPlayerLocation(faction, coords, radius, duration, maxEncounters, minThreatToAvoidAbandonment));
                 AlertPlayersOfNewKPL(coords, radius, faction);
 
             } else {
 
-                Logger.AddMsg("Attempt To Create KnownPlayerLocation Failed - Area Already Exists", true);
+                var currentLocation = new KnownPlayerLocation(faction, coords, radius, duration, maxEncounters, minThreatToAvoidAbandonment);
+
+                foreach (var location in intersectingLocations) {
+
+                    var dirFromCurrentToIntersection = Vector3D.Normalize(location.Coords - currentLocation.Coords);
+                    var coordsBetweenCenters = dirFromCurrentToIntersection * (Vector3D.Distance(location.Coords, currentLocation.Coords) / 2) + currentLocation.Coords;
+                    var radiusToUse = location.Radius == currentLocation.Radius ? currentLocation.Radius : currentLocation.Radius > location.Radius ? currentLocation.Radius : location.Radius;
+                    var outerRimCoords = -dirFromCurrentToIntersection * radiusToUse + currentLocation.Coords;
+                    var finalRadius = Vector3D.Distance(outerRimCoords, coordsBetweenCenters);
+                    currentLocation = new KnownPlayerLocation(faction, coordsBetweenCenters, finalRadius, duration, maxEncounters, minThreatToAvoidAbandonment);
+                    Locations.Remove(location);
+
+                }
+
+                Locations.Add(currentLocation);
+                AlertPlayersOfNewKPL(coords, radius, faction);
+                Logger.AddMsg("Known Player Location(s) Already Exist, Merging Locations.", true);
 
             }
 
@@ -171,9 +189,12 @@ namespace ModularEncountersSpawner {
 
         }
 
-        public static void IncreaseSpawnCountOfLocations(Vector3D coords) {
+        public static void IncreaseSpawnCountOfLocations(Vector3D coords, string faction) {
 
             foreach (var location in Locations) {
+
+                if (!string.IsNullOrWhiteSpace(location.NpcFaction) && faction != location.NpcFaction)
+                    continue;
 
                 if (IsPositionInKnownPlayerLocation(location, coords, false)) {
 
@@ -182,6 +203,8 @@ namespace ModularEncountersSpawner {
                 }
 
             }
+
+            SaveLocations();
 
         }
 
@@ -206,6 +229,30 @@ namespace ModularEncountersSpawner {
 
             }
 
+        }
+
+        public static void RemoveLocation(Vector3D coords, string faction = "", bool removeAllZones = false) {
+
+            bool removedLocation = false;
+
+            for (int i = Locations.Count - 1; i >= 0; i--) {
+
+                if (Locations[i].Sphere.Contains(coords) != ContainmentType.Disjoint) {
+
+                    if (removeAllZones || faction == Locations[i].NpcFaction || string.IsNullOrWhiteSpace(faction) == string.IsNullOrWhiteSpace(Locations[i].NpcFaction)) {
+
+                        Locations.RemoveAt(i);
+                        removedLocation = true;
+
+                    }
+
+                }
+            
+            }
+
+            if (removedLocation)
+                SaveLocations();
+        
         }
 
         public static void SaveLocations() {

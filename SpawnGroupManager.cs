@@ -284,10 +284,10 @@ namespace ModularEncountersSpawner{
 			if (environment.NearestPlanet == null && spawnGroup.MaxSpawnFromPlanetSurface > 0)
 				return false;
 
-			if (spawnGroup.MinSpawnFromPlanetSurface > 0 && spawnGroup.MinSpawnFromPlanetSurface < environment.AltitudeAtPosition)
+			if (spawnGroup.MinSpawnFromPlanetSurface > 0 && spawnGroup.MinSpawnFromPlanetSurface > environment.AltitudeAtPosition)
 				return false;
 
-			if (spawnGroup.MaxSpawnFromPlanetSurface > 0 && spawnGroup.MaxSpawnFromPlanetSurface > environment.AltitudeAtPosition)
+			if (spawnGroup.MaxSpawnFromPlanetSurface > 0 && spawnGroup.MaxSpawnFromPlanetSurface < environment.AltitudeAtPosition)
 				return false;
 
 			return true;
@@ -1653,7 +1653,14 @@ namespace ModularEncountersSpawner{
 					improveSpawnGroup.BossCustomGPSLabel = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
 						
 				}
-								
+
+				//BossMusicId
+				if (tag.Contains("[BossMusicId") == true) {
+
+					improveSpawnGroup.BossMusicId = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+
+				}
+
 			}
 			
 			if(improveSpawnGroup.SpaceCargoShip == true && setDampeners == false){
@@ -1842,7 +1849,7 @@ namespace ModularEncountersSpawner{
 			return null;
 			
 		}
-		
+
 		public static bool ModRestrictionCheck(ImprovedSpawnGroup spawnGroup){
 			
 			//Require All

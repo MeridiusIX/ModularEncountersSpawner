@@ -39,13 +39,13 @@ namespace ModularEncountersSpawner.BlockLogic{
 	public class DisposableBeaconLogic : MyGameLogicComponent{
 		
 		IMyBeacon Beacon;
-        bool IsWorking = false;
+		bool IsWorking = false;
 
-        float TicksSincePlayerNearby = 0;
-        float TicksSinceWorking = 0;
+		float TicksSincePlayerNearby = 0;
+		float TicksSinceWorking = 0;
 
-        bool SetupDone = false;
-        bool IsServer = false;
+		bool SetupDone = false;
+		bool IsServer = false;
 		
 		public override void Init(MyObjectBuilder_EntityBase objectBuilder){
 			
@@ -66,22 +66,22 @@ namespace ModularEncountersSpawner.BlockLogic{
 		
 		public override void UpdateBeforeSimulation100(){
 
-            if(SetupDone == false) {
+			if(SetupDone == false) {
 
-                SetupDone = true;
-                IsServer = MyAPIGateway.Multiplayer.IsServer;
+				SetupDone = true;
+				IsServer = MyAPIGateway.Multiplayer.IsServer;
 
-                if(IsServer == false) {
+				if(IsServer == false) {
 
-                    NeedsUpdate = MyEntityUpdateEnum.NONE;
-                    return;
+					NeedsUpdate = MyEntityUpdateEnum.NONE;
+					return;
 
-                }
+				}
 
-                Beacon = Entity as IMyBeacon;
-                Beacon.IsWorkingChanged += OnWorkingChange;
+				Beacon = Entity as IMyBeacon;
+				Beacon.IsWorkingChanged += OnWorkingChange;
 
-            }
+			}
 
 			if(Beacon == null){
 				
@@ -90,92 +90,92 @@ namespace ModularEncountersSpawner.BlockLogic{
 				
 			}
 
-            if(Settings.CustomBlocks.UseDisposableBeaconInactivity == true) {
+			if(Settings.CustomBlocks.UseDisposableBeaconInactivity == true) {
 
-                if(IsWorking == false) {
+				if(IsWorking == false) {
 
-                    TicksSinceWorking += 100;
+					TicksSinceWorking += 100;
 
-                } else {
+				} else {
 
-                    TicksSinceWorking = 0;
+					TicksSinceWorking = 0;
 
-                }
+				}
 
-                if((TicksSinceWorking / 60) / 60 >= Settings.CustomBlocks.DisposableBeaconRemovalTimerMinutes) {
+				if((TicksSinceWorking / 60) / 60 >= Settings.CustomBlocks.DisposableBeaconRemovalTimerMinutes) {
 
-                    Beacon.CubeGrid.RazeBlock(Beacon.SlimBlock.Min);
-                    NeedsUpdate = MyEntityUpdateEnum.NONE;
-                    return;
+					Beacon.CubeGrid.RazeBlock(Beacon.SlimBlock.Min);
+					NeedsUpdate = MyEntityUpdateEnum.NONE;
+					return;
 
-                }
+				}
 
-            }
+			}
 
-            if(Settings.CustomBlocks.UseDisposableBeaconPlayerDistance == true) {
+			if(Settings.CustomBlocks.UseDisposableBeaconPlayerDistance == true) {
 
-                double closestDistance = -1;
+				double closestDistance = -1;
 
-                foreach(var player in MES_SessionCore.PlayerList) {
+				foreach(var player in MES_SessionCore.PlayerList) {
 
-                    if(player.IsBot == true || player.Character == null) {
+					if(player.IsBot == true || player.Character == null) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    if(player.Character.IsDead == true || player.Character.IsPlayer == false) {
+					if(player.Character.IsDead == true || player.Character.IsPlayer == false) {
 
-                        continue;
+						continue;
 
-                    }
+					}
 
-                    var thisDist = Vector3D.Distance(player.GetPosition(), Beacon.GetPosition());
+					var thisDist = Vector3D.Distance(player.GetPosition(), Beacon.GetPosition());
 
-                    if(thisDist < closestDistance || closestDistance == -1) {
+					if(thisDist < closestDistance || closestDistance == -1) {
 
-                        closestDistance = thisDist;
+						closestDistance = thisDist;
 
-                    }
+					}
 
-                }
+				}
 
-                if(closestDistance >= Settings.CustomBlocks.DisposableBeaconPlayerDistanceTrigger) {
+				if(closestDistance >= Settings.CustomBlocks.DisposableBeaconPlayerDistanceTrigger) {
 
-                    TicksSincePlayerNearby += 100;
+					TicksSincePlayerNearby += 100;
 
-                    if((TicksSincePlayerNearby / 60) / 60 >= Settings.CustomBlocks.DisposableBeaconRemovalTimerMinutes) {
+					if((TicksSincePlayerNearby / 60) / 60 >= Settings.CustomBlocks.DisposableBeaconRemovalTimerMinutes) {
 
-                        Beacon.CubeGrid.RazeBlock(Beacon.SlimBlock.Min);
-                        NeedsUpdate = MyEntityUpdateEnum.NONE;
-                        return;
+						Beacon.CubeGrid.RazeBlock(Beacon.SlimBlock.Min);
+						NeedsUpdate = MyEntityUpdateEnum.NONE;
+						return;
 
-                    }
+					}
 
-                } else {
+				} else {
 
-                    TicksSincePlayerNearby = 0;
+					TicksSincePlayerNearby = 0;
 
-                }
+				}
 
-            }
+			}
 
 		}
 
-        void OnWorkingChange(IMyCubeBlock block) {
+		void OnWorkingChange(IMyCubeBlock block) {
 
-            if(block.IsWorking == false || block.IsFunctional == false) {
+			if(block.IsWorking == false || block.IsFunctional == false) {
 
-                IsWorking = false;
-                return;
+				IsWorking = false;
+				return;
 
-            }
+			}
 
-            IsWorking = true;
-            
-        }
+			IsWorking = true;
+			
+		}
 
-        public override void OnRemovedFromScene(){
+		public override void OnRemovedFromScene(){
 			
 			base.OnRemovedFromScene();
 			
@@ -187,9 +187,9 @@ namespace ModularEncountersSpawner.BlockLogic{
 				
 			}
 
-            Block.IsWorkingChanged += OnWorkingChange;
+			Block.IsWorkingChanged += OnWorkingChange;
 
-        }
+		}
 		
 		public override void OnBeforeRemovedFromContainer(){
 			

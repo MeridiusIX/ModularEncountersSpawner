@@ -12,16 +12,22 @@ namespace ModularEncountersSpawner.Api {
 		public static bool MESApiReady = false;
 
 		private static long _mesModId = 1521905890;
-		private static Action<Vector3D, string, double, int, int> _addKnownPlayerLocation;
+		private static Action<Vector3D, string, double, int, int, int> _addKnownPlayerLocation;
+		private static Func<string, string> _convertRandomNamePatterns;
 		private static Func<List<string>, MatrixD, Vector3, bool, string, string, bool> _customSpawnRequest;
 		private static Func<IMyCubeGrid, Vector3D> _getDespawnCoords;
 		private static Func<List<string>> _getSpawnGroupBlackList;
 		private static Func<List<string>> _getNpcNameBlackList;
 		private static Func<Vector3D, bool, string, bool> _isPositionInKnownPlayerLocation;
-		private static Func<string, string> _convertRandomNamePatterns;
 		private static Func<IMyCubeGrid, Vector3D> _getNpcStartCoordinates;
 		private static Func<IMyCubeGrid, Vector3D> _getNpcEndCoordinates;
+		private static Action<Vector3D, string, bool> _removeKnownPlayerLocation;
 		private static Func<IMyCubeGrid, bool, bool> _setSpawnerIgnoreForDespawn;
+		private static Func<Vector3D, List<string>, bool> _spawnBossEncounter;
+		private static Func<Vector3D, List<string>, bool> _spawnPlanetaryCargoShip;
+		private static Func<Vector3D, List<string>, bool> _spawnPlanetaryInstallation;
+		private static Func<Vector3D, List<string>, bool> _spawnRandomEncounter;
+		private static Func<Vector3D, List<string>, bool> _spawnSpaceCargoShip;
 
 		//Run This Method in your SessionComponent LoadData() Method
 		public static void RegisterAPIListener() {
@@ -39,7 +45,8 @@ namespace ModularEncountersSpawner.Api {
 		/// <param name="radius"></param>
 		/// <param name="expirationMinutes"></param>
 		/// <param name="maxSpawns"></param>
-		public static void AddKnownPlayerLocation(Vector3D coords, string faction, double radius, int expirationMinutes, int maxSpawns) => _addKnownPlayerLocation?.Invoke(coords, faction, radius, expirationMinutes, maxSpawns);
+		/// <param name="minThreatForAvoidingAbandonment"></param>
+		public static void AddKnownPlayerLocation(Vector3D coords, string faction, double radius, int expirationMinutes, int maxSpawns, int minThreatForAvoidingAbandonment) => _addKnownPlayerLocation?.Invoke(coords, faction, radius, expirationMinutes, maxSpawns, minThreatForAvoidingAbandonment);
 
 		/// <summary>
 		/// Used To Spawn A Random SpawnGroup From A Provided List At A Provided Location. The Spawn Will Not Be Categorized As A CargoShip/RandomEncounter/Etc
@@ -105,12 +112,60 @@ namespace ModularEncountersSpawner.Api {
 		public static Vector3D GetNpcEndCoordinates(IMyCubeGrid cubeGrid) => _getNpcEndCoordinates?.Invoke(cubeGrid) ?? Vector3D.Zero;
 
 		/// <summary>
+		/// Allows you to remove a Known Player Location at a set of coordinates
+		/// </summary>
+		/// <param name="coords">The coordinates to check for KPLs</param>
+		/// <param name="faction">Remove only a specific faction via their Tag</param>
+		/// <param name="removeAll">If true, removes all KPLs at the coords</param>
+		public static void RemoveKnownPlayerLocation(Vector3D coords, string faction = "", bool removeAll = false) => _removeKnownPlayerLocation?.Invoke(coords, faction, removeAll);
+
+		/// <summary>
 		/// Allows you to set a grid to be ignored or considered by the MES Cleanup Processes
 		/// </summary>
 		/// <param name="cubeGrid">The cubegrid of the NPC you want to set</param>
 		/// <param name="ignoreSetting">Whether or not the grid should be ignored by cleanup</param>
 		/// <returns>Returns a bool indicating if the change was successful or not</returns>
 		public static bool SetSpawnerIgnoreForDespawn(IMyCubeGrid cubeGrid, bool ignoreSetting) => _setSpawnerIgnoreForDespawn?.Invoke(cubeGrid, ignoreSetting) ?? false;
+
+		/// <summary>
+		/// Allows you to request a Boss Encounter Spawn at a position and with a selection of spawnGroups
+		/// </summary>
+		/// <param name="coords">The coordinates where a player would normally be (used as the origin to calculate the spawn from)</param>
+		/// <param name="spawnGroups">The spawnGroups you want to potentially spawn</param>
+		/// <returns>true or false depending on if the spawn was successful</returns>
+		public static bool SpawnBossEncounter(Vector3D coords, List<string> spawnGroups) => _spawnBossEncounter?.Invoke(coords, spawnGroups) ?? false;
+
+		/// <summary>
+		/// Allows you to request a Boss Encounter Spawn at a position and with a selection of spawnGroups
+		/// </summary>
+		/// <param name="coords">The coordinates where a player would normally be (used as the origin to calculate the spawn from)</param>
+		/// <param name="spawnGroups">The spawnGroups you want to potentially spawn</param>
+		/// <returns>true or false depending on if the spawn was successful</returns>
+		public static bool SpawnPlanetaryCargoShip(Vector3D coords, List<string> spawnGroups) => _spawnPlanetaryCargoShip?.Invoke(coords, spawnGroups) ?? false;
+
+		/// <summary>
+		/// Allows you to request a Boss Encounter Spawn at a position and with a selection of spawnGroups
+		/// </summary>
+		/// <param name="coords">The coordinates where a player would normally be (used as the origin to calculate the spawn from)</param>
+		/// <param name="spawnGroups">The spawnGroups you want to potentially spawn</param>
+		/// <returns>true or false depending on if the spawn was successful</returns>
+		public static bool SpawnPlanetaryInstallation(Vector3D coords, List<string> spawnGroups) => _spawnPlanetaryInstallation?.Invoke(coords, spawnGroups) ?? false;
+
+		/// <summary>
+		/// Allows you to request a Boss Encounter Spawn at a position and with a selection of spawnGroups
+		/// </summary>
+		/// <param name="coords">The coordinates where a player would normally be (used as the origin to calculate the spawn from)</param>
+		/// <param name="spawnGroups">The spawnGroups you want to potentially spawn</param>
+		/// <returns>true or false depending on if the spawn was successful</returns>
+		public static bool SpawnRandomEncounter(Vector3D coords, List<string> spawnGroups) => _spawnRandomEncounter?.Invoke(coords, spawnGroups) ?? false;
+
+		/// <summary>
+		/// Allows you to request a Boss Encounter Spawn at a position and with a selection of spawnGroups
+		/// </summary>
+		/// <param name="coords">The coordinates where a player would normally be (used as the origin to calculate the spawn from)</param>
+		/// <param name="spawnGroups">The spawnGroups you want to potentially spawn</param>
+		/// <returns>true or false depending on if the spawn was successful</returns>
+		public static bool SpawnSpaceCargoShip(Vector3D coords, List<string> spawnGroups) => _spawnSpaceCargoShip?.Invoke(coords, spawnGroups) ?? false;
 
 		//Run This Method in your SessionComponent UnloadData() Method
 		public static void UnregisterListener() {
@@ -132,7 +187,7 @@ namespace ModularEncountersSpawner.Api {
 				}
 
 				MESApiReady = true;
-				_addKnownPlayerLocation = (Action<Vector3D, string, double, int, int>)dict["AddKnownPlayerLocation"];
+				_addKnownPlayerLocation = (Action<Vector3D, string, double, int, int, int>)dict["AddKnownPlayerLocation"];
 				_customSpawnRequest = (Func<List<string>, MatrixD, Vector3, bool, string, string, bool>)dict["CustomSpawnRequest"];
 				_getDespawnCoords = (Func<IMyCubeGrid, Vector3D>)dict["GetDespawnCoords"];
 				_getSpawnGroupBlackList = (Func<List<string>>)dict["GetSpawnGroupBlackList"];
@@ -141,8 +196,13 @@ namespace ModularEncountersSpawner.Api {
 				_convertRandomNamePatterns = (Func<string, string>)dict["ConvertRandomNamePatterns"];
 				_getNpcStartCoordinates = (Func<IMyCubeGrid, Vector3D>)dict["GetNpcStartCoordinates"];
 				_getNpcEndCoordinates = (Func<IMyCubeGrid, Vector3D>)dict["GetNpcEndCoordinates"];
+				_removeKnownPlayerLocation = (Action<Vector3D, string, bool>)dict["RemoveKnownPlayerLocation"];
 				_setSpawnerIgnoreForDespawn = (Func<IMyCubeGrid, bool, bool>)dict["SetSpawnerIgnoreForDespawn"];
-
+				_spawnBossEncounter = (Func<Vector3D, List<string>, bool>)dict["SpawnBossEncounter"];
+				_spawnPlanetaryCargoShip = (Func<Vector3D, List<string>, bool>)dict["SpawnPlanetaryCargoShip"];
+				_spawnPlanetaryInstallation = (Func<Vector3D, List<string>, bool>)dict["SpawnPlanetaryInstallation"];
+				_spawnRandomEncounter = (Func<Vector3D, List<string>, bool>)dict["SpawnRandomEncounter"];
+				_spawnSpaceCargoShip = (Func<Vector3D, List<string>, bool>)dict["SpawnSpaceCargoShip"];
 
 			} catch (Exception e) {
 

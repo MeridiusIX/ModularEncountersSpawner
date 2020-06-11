@@ -41,7 +41,7 @@ namespace ModularEncountersSpawner.Api {
 		public static Dictionary<string, Delegate> GetApiDictionary() {
 
 			var dict = new Dictionary<string, Delegate>();
-			dict.Add("AddKnownPlayerLocation", new Action<Vector3D, string, double, int, int>(KnownPlayerLocationManager.AddKnownPlayerLocation));
+			dict.Add("AddKnownPlayerLocation", new Action<Vector3D, string, double, int, int, int>(KnownPlayerLocationManager.AddKnownPlayerLocation));
 			dict.Add("CustomSpawnRequest", new Func<List<string>, MatrixD, Vector3, bool, string, string, bool>(CustomSpawner.CustomSpawnRequest));
 			dict.Add("GetDespawnCoords", new Func<IMyCubeGrid, Vector3D>(GetDespawnCoords));
 			dict.Add("GetSpawnGroupBlackList", new Func<List<string>>(GetSpawnGroupBlackList));
@@ -50,7 +50,14 @@ namespace ModularEncountersSpawner.Api {
 			dict.Add("ConvertRandomNamePatterns", new Func<string, string>(RandomNameGenerator.CreateRandomNameFromPattern));
 			dict.Add("GetNpcStartCoordinates", new Func<IMyCubeGrid, Vector3D>(GetNpcStartCoordinates));
 			dict.Add("GetNpcEndCoordinates", new Func<IMyCubeGrid, Vector3D>(GetNpcEndCoordinates));
+			dict.Add("RemoveKnownPlayerLocation", new Action<Vector3D, string, bool>(KnownPlayerLocationManager.RemoveLocation));
 			dict.Add("SetSpawnerIgnoreForDespawn", new Func<IMyCubeGrid, bool, bool>(SetSpawnerIgnoreForDespawn));
+			dict.Add("SpawnBossEncounter", new Func<Vector3D, List<string>, bool>(SpawnBossEncounter));
+			dict.Add("SpawnPlanetaryCargoShip", new Func<Vector3D, List<string>, bool>(SpawnPlanetaryCargoShip));
+			dict.Add("SpawnPlanetaryInstallation", new Func<Vector3D, List<string>, bool>(SpawnPlanetaryInstallation));
+			dict.Add("SpawnRandomEncounter", new Func<Vector3D, List<string>, bool>(SpawnRandomEncounter));
+			dict.Add("SpawnSpaceCargoShip", new Func<Vector3D, List<string>, bool>(SpawnSpaceCargoShip));
+
 			return dict;
 
 		}
@@ -124,6 +131,46 @@ namespace ModularEncountersSpawner.Api {
 			}
 
 			return false;
+
+		}
+
+		//SpawnBossEncounter
+		public static bool SpawnBossEncounter(Vector3D coords, List<string> spawnGroups) {
+
+			var result = BossEncounterSpawner.AttemptSpawn(coords, spawnGroups);
+			return result.StartsWith("Boss Encounter GPS Created with Spawngroup");
+		
+		}
+
+		//SpawnPlanetaryCargoShip
+		public static bool SpawnPlanetaryCargoShip(Vector3D coords, List<string> spawnGroups) {
+
+			var result = PlanetaryCargoShipSpawner.AttemptSpawn(coords, spawnGroups);
+			return result.StartsWith("Spawning Group - ");
+
+		}
+
+		//SpawnPlanetaryInstallation
+		public static bool SpawnPlanetaryInstallation(Vector3D coords, List<string> spawnGroups) {
+
+			var result = PlanetaryInstallationSpawner.AttemptSpawn(coords, null, spawnGroups);
+			return result.StartsWith("Spawning Group - ");
+
+		}
+
+		//SpawnRandomEncounter
+		public static bool SpawnRandomEncounter(Vector3D coords, List<string> spawnGroups) {
+
+			var result = RandomEncounterSpawner.AttemptSpawn(coords, spawnGroups);
+			return result.StartsWith("Spawning Group - ");
+
+		}
+
+		//SpawnSpaceCargoShip
+		public static bool SpawnSpaceCargoShip(Vector3D coords, List<string> spawnGroups) {
+
+			var result = SpaceCargoShipSpawner.AttemptSpawn(coords, spawnGroups);
+			return result.StartsWith("Spawning Group - ");
 
 		}
 

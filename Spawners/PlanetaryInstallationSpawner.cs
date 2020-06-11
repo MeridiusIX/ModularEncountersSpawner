@@ -40,7 +40,7 @@ namespace ModularEncountersSpawner.Spawners{
 		public static Dictionary<string, int> EligibleMediumSpawnsByModId = new Dictionary<string, int>();
 		public static Dictionary<string, int> EligibleLargeSpawnsByModId = new Dictionary<string, int>();
 		
-		public static string AttemptSpawn(Vector3D startCoords, IMyPlayer player){
+		public static string AttemptSpawn(Vector3D startCoords, IMyPlayer player, List<string> eligibleNames = null) {
 			
 			if(Settings.General.UseMaxNpcGrids == true){
 				
@@ -77,31 +77,35 @@ namespace ModularEncountersSpawner.Spawners{
 			}
 			
 			var planetEntity = planet as IMyEntity;
-			
-			if(MES_SessionCore.playerWatchList.ContainsKey(player) == true){
-				
-				var playerSurface = SpawnResources.GetNearestSurfacePoint(player.GetPosition(), planet);
-				
-				if(MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck == Vector3D.Zero){
-					
+
+			if (player != null) {
+
+				if (MES_SessionCore.playerWatchList.ContainsKey(player) == true) {
+
+					var playerSurface = SpawnResources.GetNearestSurfacePoint(player.GetPosition(), planet);
+
+					if (MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck == Vector3D.Zero) {
+
+						MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck = playerSurface;
+						return "New Player Detected. Storing Position On Planet.";
+
+					}
+
+					if (Vector3D.Distance(MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck, playerSurface) < Settings.PlanetaryInstallations.PlayerDistanceSpawnTrigger) {
+
+						Logger.AddMsg("Player Travelled: " + Vector3D.Distance(MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck, playerSurface) + " Distance From Last Saved Position.");
+						return "Player Hasn't Traveled Far Enough Yet.";
+
+					}
+
 					MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck = playerSurface;
-					return "New Player Detected. Storing Position On Planet.";
-					
+
+				} else {
+
+					return "Player Not In Watcher List... Although They Probably Should Be If The Script Got Here.";
+
 				}
-				
-				if(Vector3D.Distance(MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck, playerSurface) < Settings.PlanetaryInstallations.PlayerDistanceSpawnTrigger){
-					
-					Logger.AddMsg("Player Travelled: " + Vector3D.Distance(MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck, playerSurface) + " Distance From Last Saved Position.");
-					return "Player Hasn't Traveled Far Enough Yet.";
-					
-				}
-				
-				MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck = playerSurface;
-				
-			}else{
-				
-				return "Player Not In Watcher List... Although They Probably Should Be If The Script Got Here.";
-				
+
 			}
 
 			KnownPlayerLocationManager.CleanExpiredLocations();
@@ -109,7 +113,7 @@ namespace ModularEncountersSpawner.Spawners{
 			var mediumStations = new List<ImprovedSpawnGroup>();
 			var largeStations = new List<ImprovedSpawnGroup>();
 			var validFactions = new Dictionary<string, List<string>>();
-			var spawnGroupList = GetPlanetaryInstallations(startCoords, out smallStations, out mediumStations, out largeStations, out validFactions);
+			var spawnGroupList = GetPlanetaryInstallations(startCoords, eligibleNames, out smallStations, out mediumStations, out largeStations, out validFactions);
 			
 			if(Settings.General.UseModIdSelectionForSpawning == true){
 				
@@ -288,7 +292,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 				if (spawnGroup.UseKnownPlayerLocations) {
 
-					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(startCoords);
+					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(startCoords, randFactionTag);
 
 				}
 
@@ -493,7 +497,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 		}
 
-		public static List<ImprovedSpawnGroup> GetPlanetaryInstallations(Vector3D playerCoords, out List<ImprovedSpawnGroup> smallStations, out List<ImprovedSpawnGroup> mediumStations, out List<ImprovedSpawnGroup> largeStations, out Dictionary<string, List<string>> validFactions) {
+		public static List<ImprovedSpawnGroup> GetPlanetaryInstallations(Vector3D playerCoords, List<string> eligibleNames, out List<ImprovedSpawnGroup> smallStations, out List<ImprovedSpawnGroup> mediumStations, out List<ImprovedSpawnGroup> largeStations, out Dictionary<string, List<string>> validFactions) {
 			
 			smallStations = new List<ImprovedSpawnGroup>();
 			mediumStations = new List<ImprovedSpawnGroup>();
@@ -513,7 +517,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 			var environment = new EnvironmentEvaluation(playerCoords);
 
-			if (environment.NearestPlanet != null) {
+			if (environment.NearestPlanet != null && environment.IsOnPlanet) {
 
 				if (planetRestrictions.Contains(environment.NearestPlanetName) == true) {
 
@@ -544,20 +548,32 @@ namespace ModularEncountersSpawner.Spawners{
 			
 			//Filter Eligible Groups To List
 			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
-				
-				if(specificGroup != "" && spawnGroup.SpawnGroup.Id.SubtypeName != specificGroup){
-					
-					continue;
-					
+
+				if (eligibleNames != null) {
+
+					if (!eligibleNames.Contains(spawnGroup.SpawnGroupName)) {
+
+						continue;
+
+					}
+
+				} else {
+
+					if (specificGroup != "" && spawnGroup.SpawnGroup.Id.SubtypeName != specificGroup) {
+
+						continue;
+
+					}
+
+					if (specificGroup == "" && spawnGroup.AdminSpawnOnly == true) {
+
+						continue;
+
+					}
+
 				}
-				
-				if(specificGroup == "" && spawnGroup.AdminSpawnOnly == true){
-					
-					continue;
-					
-				}
-				
-				if(spawnGroup.PlanetaryInstallation == false){
+
+				if (spawnGroup.PlanetaryInstallation == false){
 					
 					continue;
 					

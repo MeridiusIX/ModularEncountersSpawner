@@ -719,16 +719,19 @@ namespace ModularEncountersSpawner{
 			//Replace RemoteControl
 			if(spawnGroup.UseRivalAi == true) {
 
+				bool primaryBehaviorSet = false;
+
 				foreach(var grid in prefabDef.CubeGrids) {
 
-					RivalAiInitialize(grid, spawnGroup, behavior);
+					if (RivalAiInitialize(grid, spawnGroup, behavior, primaryBehaviorSet))
+						primaryBehaviorSet = true;
 
 				}
 
 			}
 
 			//Provide Shields
-			if (!spawnGroup.IgnoreShieldProviderMod) {
+			if (!spawnGroup.IgnoreShieldProviderMod && spawnGroup.FactionOwner != "Nobody") {
 
 				bool allowedShields = true;
 
@@ -1770,57 +1773,61 @@ namespace ModularEncountersSpawner{
 					}
 					
 				}
-				
-				//Enable Blocks By Name
-				foreach(var blockName in spawnGroup.EnableBlocksWithName){
-					
-					if(string.IsNullOrEmpty(blockName) == true){
-						
-						continue;
-						
-					}
-					
-					if(spawnGroup.AllowPartialNames == true){
-						
-						if(termBlock.CustomName.Contains(blockName) == true){
-							
+
+				if (!string.IsNullOrWhiteSpace(termBlock.CustomName)) {
+
+					//Enable Blocks By Name
+					foreach (var blockName in spawnGroup.EnableBlocksWithName) {
+
+						if (string.IsNullOrWhiteSpace(blockName) == true) {
+
+							continue;
+
+						}
+
+						if (spawnGroup.AllowPartialNames == true) {
+
+							if (termBlock.CustomName.Contains(blockName) == true) {
+
+								funcBlock.Enabled = true;
+
+							}
+
+						} else if (termBlock.CustomName == blockName) {
+
 							funcBlock.Enabled = true;
-							
+
 						}
-						
-					}else if(termBlock.CustomName == blockName){
-						
-						funcBlock.Enabled = true;
-						
+
 					}
-					
-				}
-				
-				//Disable Blocks By Name
-				foreach(var blockName in spawnGroup.DisableBlocksWithName){
-					
-					if(string.IsNullOrEmpty(blockName) == true){
-						
-						continue;
-						
-					}
-					
-					if(spawnGroup.AllowPartialNames == true){
-						
-						if(termBlock.CustomName.Contains(blockName) == true){
-							
+
+					//Disable Blocks By Name
+					foreach (var blockName in spawnGroup.DisableBlocksWithName) {
+
+						if (string.IsNullOrWhiteSpace(blockName)) {
+
+							continue;
+
+						}
+
+						if (spawnGroup.AllowPartialNames == true) {
+
+							if (termBlock.CustomName.Contains(blockName) == true) {
+
+								funcBlock.Enabled = false;
+
+							}
+
+						} else if (termBlock.CustomName == blockName) {
+
 							funcBlock.Enabled = false;
-							
+
 						}
-						
-					}else if(termBlock.CustomName == blockName){
-						
-						funcBlock.Enabled = false;
-						
+
 					}
-					
+
 				}
-				
+
 				//Turret Settings
 				if(spawnGroup.ChangeTurretSettings == true){
 					
@@ -1974,7 +1981,7 @@ namespace ModularEncountersSpawner{
 					continue;
 					
 				}
-				
+
 				if(newBlockDef == null){
 					
 					if(spawnGroup.AlwaysRemoveBlock == true){
@@ -2221,7 +2228,7 @@ namespace ModularEncountersSpawner{
 
 		}
 		
-		public static bool RivalAiInitialize(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup, string behaviorName = null){
+		public static bool RivalAiInitialize(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup, string behaviorName = null, bool primaryBehaviorAlreadySet = false){
 			
 			MyObjectBuilder_RemoteControl primaryRemote = null;
 			MyObjectBuilder_RemoteControl rivalAiRemote = null;
@@ -2273,6 +2280,12 @@ namespace ModularEncountersSpawner{
 
 				rivalAiRemote = primaryRemote;
 				
+			}
+
+			if (primaryBehaviorAlreadySet) {
+
+				return false;
+			
 			}
 
 			if(rivalAiRemote != null && string.IsNullOrWhiteSpace(behaviorName) == false) {

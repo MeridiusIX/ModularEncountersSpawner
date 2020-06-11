@@ -33,7 +33,7 @@ namespace ModularEncountersSpawner.Spawners{
 		public static Dictionary<string, List<ImprovedSpawnGroup>> SpawnGroupSublists = new Dictionary<string, List<ImprovedSpawnGroup>>();
 		public static Dictionary<string, int> EligibleSpawnsByModId = new Dictionary<string, int>();
 		
-		public static string AttemptSpawn(Vector3D startCoords){
+		public static string AttemptSpawn(Vector3D startCoords, List<string> eligibleNames = null){
 			
 			if(Settings.General.UseMaxNpcGrids == true){
 				
@@ -55,7 +55,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 			KnownPlayerLocationManager.CleanExpiredLocations();
 			var validFactions = new Dictionary<string, List<string>>();
-			var spawnGroupList = GetSpaceCargoShips(startCoords, out validFactions);
+			var spawnGroupList = GetSpaceCargoShips(startCoords, eligibleNames, out validFactions);
 			
 			if(Settings.General.UseModIdSelectionForSpawning == true){
 				
@@ -118,7 +118,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 				if (spawnGroup.UseKnownPlayerLocations) {
 
-					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(startCoords);
+					KnownPlayerLocationManager.IncreaseSpawnCountOfLocations(startCoords, randFactionTag);
 
 				}
 
@@ -420,7 +420,7 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 		
-		public static List<ImprovedSpawnGroup> GetSpaceCargoShips(Vector3D playerCoords, out Dictionary<string, List<string>> validFactions){
+		public static List<ImprovedSpawnGroup> GetSpaceCargoShips(Vector3D playerCoords, List<string> eligibleNames, out Dictionary<string, List<string>> validFactions){
 
 			bool allowLunar = false;
 			string specificGroup = "";
@@ -471,20 +471,33 @@ namespace ModularEncountersSpawner.Spawners{
 			//Filter Eligible Groups To List
 			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
 				
-				if(specificGroup != "" && spawnGroup.SpawnGroup.Id.SubtypeName != specificGroup){
+				if (eligibleNames != null) {
 
-					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Doesn't Match Admin Spawn");
-					continue;
-					
-				}
-				
-				if(specificGroup == "" && spawnGroup.AdminSpawnOnly == true){
+					if (!eligibleNames.Contains(spawnGroup.SpawnGroupName)) {
 
-					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Only Admin Spawn Allowed");
-					continue;
-					
-				}
+						Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Was not included in Groups From API Request");
+						continue;
+
+					}
 				
+				} else {
+
+					if (specificGroup != "" && spawnGroup.SpawnGroup.Id.SubtypeName != specificGroup) {
+
+						Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Doesn't Match Admin Spawn");
+						continue;
+
+					}
+
+					if (specificGroup == "" && spawnGroup.AdminSpawnOnly == true) {
+
+						Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Only Admin Spawn Allowed");
+						continue;
+
+					}
+
+				}
+
 				if(spawnGroup.SpaceCargoShip == false){
 					
 					if(allowLunar == true){

@@ -34,7 +34,15 @@ namespace ModularEncountersSpawner.Templates {
 		public string WeatherAtPosition;
 		public string CommonTerrainAtPosition;
 
-		public EnvironmentEvaluation(Vector3D coords) {
+		public EnvironmentEvaluation() {
+
+			WeatherAtPosition = "";
+			CommonTerrainAtPosition = "";
+			NearestPlanetName = "";
+
+		}
+
+		public EnvironmentEvaluation(Vector3D coords) : base() {
 
 			//Non Planet Checks
 			DistanceFromWorldCenter = Vector3D.Distance(Vector3D.Zero, coords);
@@ -74,7 +82,7 @@ namespace ModularEncountersSpawner.Templates {
 			AtmosphereAtPosition = NearestPlanet.GetAirDensity(coords);
 			OxygenAtPosition = NearestPlanet.GetOxygenForPosition(coords);
 			IsNight = MyVisualScriptLogicProvider.IsOnDarkSide(NearestPlanet, coords);
-			WeatherAtPosition = MyVisualScriptLogicProvider.GetWeather(coords);
+			WeatherAtPosition = MyVisualScriptLogicProvider.GetWeather(coords) ?? "";
 
 			//Terrain Material Checks
 			var upDir = Vector3D.Normalize(coords - NearestPlanet.PositionComp.WorldAABB.Center);
