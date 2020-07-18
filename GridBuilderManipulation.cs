@@ -2607,44 +2607,29 @@ namespace ModularEncountersSpawner{
 							turretBuilder.ColorMaskHSV = oldColor;
 							
 							var turretDef = (MyLargeTurretBaseDefinition)weaponProfile.BlockDefinition;
-							
-							if(turretDef.MaxRangeMeters <= 800){
-								
-								turretBuilder.Range = turretDef.MaxRangeMeters;
-								
-								
-							}else if(gridBlockCount <= 800){
-								
-								if(turretDef.MaxRangeMeters <= 800){
-									
-									turretBuilder.Range = turretDef.MaxRangeMeters;
-									
-								}else{
-									
-									turretBuilder.Range = 800;
-									
-								}
-								
-							}else{
-								
-								var randRange = (float)Rnd.Next(800, (int)gridBlockCount);
-								
-								if(randRange > turretDef.MaxRangeMeters){
-									
-									randRange = turretDef.MaxRangeMeters;
-									
-								}
-								
-								turretBuilder.Range = randRange;
-								turretBuilder.TargetMissiles = true;
-								turretBuilder.TargetCharacters = true;
-								turretBuilder.TargetSmallGrids = true;
-								turretBuilder.TargetLargeGrids = true;
-								turretBuilder.TargetStations = true;
-								turretBuilder.TargetNeutrals = targetNeutralSetting;
-								
+
+
+							if (Settings.General.WeaponReplacerUseMaxRangeOverride)
+                            {
+
+								turretBuilder.Range = Math.Min(turretDef.MaxRangeMeters, Settings.General.WeaponReplacerMaxRangeOverride);
+
+							} else
+							{
+
+								const float DefaultTurretRange = 800;
+								var randRange = (float)Rnd.Next((int)DefaultTurretRange, Math.Max((int)DefaultTurretRange,(int)gridBlockCount));
+								turretBuilder.Range = Math.Min(turretDef.MaxRangeMeters, randRange);
+
 							}
-							
+
+							turretBuilder.TargetMissiles = true;
+							turretBuilder.TargetCharacters = true;
+							turretBuilder.TargetSmallGrids = true;
+							turretBuilder.TargetLargeGrids = true;
+							turretBuilder.TargetStations = true;
+							turretBuilder.TargetNeutrals = targetNeutralSetting;
+
 							cubeGrid.CubeBlocks.Add(turretBuilder as MyObjectBuilder_CubeBlock);
 							
 						}else{
