@@ -111,8 +111,10 @@ namespace ModularEncountersSpawner.Configuration{
 		public string[] WeaponReplacerWhitelist {get; set;}
 		public string[] WeaponReplacerTargetBlacklist {get; set;}
 		public string[] WeaponReplacerTargetWhitelist {get; set;}
-		
-		public bool UseGlobalBlockReplacer {get; set;}
+
+        public bool WeaponReplacerUseMaxRangeOverride {get; set;}
+        public float WeaponReplacerMaxRangeOverride {get; set;}
+        public bool UseGlobalBlockReplacer {get; set;}
 		public string[] GlobalBlockReplacerReference {get; set;}
 		public string[] GlobalBlockReplacerProfiles {get; set;}
 		
@@ -164,6 +166,8 @@ namespace ModularEncountersSpawner.Configuration{
 			WeaponReplacerWhitelist = new string[]{};
 			WeaponReplacerTargetBlacklist = new string[]{};
 			WeaponReplacerTargetWhitelist = new string[]{};
+			WeaponReplacerUseMaxRangeOverride = false;
+			WeaponReplacerMaxRangeOverride = 800;
 			UseGlobalBlockReplacer = false;
 			GlobalBlockReplacerReference = new string[]{};
 			GlobalBlockReplacerProfiles = new string[]{};

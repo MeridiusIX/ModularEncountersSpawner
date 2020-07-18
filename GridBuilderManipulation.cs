@@ -2607,12 +2607,17 @@ namespace ModularEncountersSpawner{
 							turretBuilder.ColorMaskHSV = oldColor;
 							
 							var turretDef = (MyLargeTurretBaseDefinition)weaponProfile.BlockDefinition;
-							
-							if(turretDef.MaxRangeMeters <= 800){
-								
+
+							if (turretDef.MaxRangeMeters <= 800)
+							{
+
 								turretBuilder.Range = turretDef.MaxRangeMeters;
-								
-								
+
+							}else if (Settings.General.WeaponReplacerUseMaxRangeOverride)
+                            {
+
+								turretBuilder.Range = Math.Min(turretDef.MaxRangeMeters, Settings.General.WeaponReplacerMaxRangeOverride);
+
 							}else if(gridBlockCount <= 800){
 								
 								if(turretDef.MaxRangeMeters <= 800){
