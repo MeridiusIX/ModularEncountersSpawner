@@ -2636,15 +2636,15 @@ namespace ModularEncountersSpawner{
 								}
 								
 								turretBuilder.Range = randRange;
-								turretBuilder.TargetMissiles = true;
-								turretBuilder.TargetCharacters = true;
-								turretBuilder.TargetSmallGrids = true;
-								turretBuilder.TargetLargeGrids = true;
-								turretBuilder.TargetStations = true;
-								turretBuilder.TargetNeutrals = targetNeutralSetting;
-								
 							}
-							
+
+							turretBuilder.TargetMissiles = true;
+							turretBuilder.TargetCharacters = true;
+							turretBuilder.TargetSmallGrids = true;
+							turretBuilder.TargetLargeGrids = true;
+							turretBuilder.TargetStations = true;
+							turretBuilder.TargetNeutrals = targetNeutralSetting;
+
 							cubeGrid.CubeBlocks.Add(turretBuilder as MyObjectBuilder_CubeBlock);
 							
 						}else{
