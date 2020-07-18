@@ -2608,39 +2608,19 @@ namespace ModularEncountersSpawner{
 							
 							var turretDef = (MyLargeTurretBaseDefinition)weaponProfile.BlockDefinition;
 
-							if (turretDef.MaxRangeMeters <= 800)
-							{
 
-								turretBuilder.Range = turretDef.MaxRangeMeters;
-
-							}else if (Settings.General.WeaponReplacerUseMaxRangeOverride)
+							if (Settings.General.WeaponReplacerUseMaxRangeOverride)
                             {
 
 								turretBuilder.Range = Math.Min(turretDef.MaxRangeMeters, Settings.General.WeaponReplacerMaxRangeOverride);
 
-							}else if(gridBlockCount <= 800){
-								
-								if(turretDef.MaxRangeMeters <= 800){
-									
-									turretBuilder.Range = turretDef.MaxRangeMeters;
-									
-								}else{
-									
-									turretBuilder.Range = 800;
-									
-								}
-								
-							}else{
-								
-								var randRange = (float)Rnd.Next(800, (int)gridBlockCount);
-								
-								if(randRange > turretDef.MaxRangeMeters){
-									
-									randRange = turretDef.MaxRangeMeters;
-									
-								}
-								
-								turretBuilder.Range = randRange;
+							} else
+							{
+
+								const float DefaultTurretRange = 800;
+								var randRange = (float)Rnd.Next((int)DefaultTurretRange, Math.Max((int)DefaultTurretRange,(int)gridBlockCount));
+								turretBuilder.Range = Math.Min(turretDef.MaxRangeMeters, randRange);
+
 							}
 
 							turretBuilder.TargetMissiles = true;
