@@ -1,0 +1,70 @@
+﻿<Definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<EntityComponents>
+	
+		<EntityComponent xsi:type="MyObjectBuilder_ModStorageComponentDefinition">
+			<Id>
+				<TypeId>ModStorageComponent</TypeId>
+				<SubtypeId>ModularEncountersSpawner</SubtypeId>
+			</Id>
+			<RegisteredStorageGuids>
+				<guid>CC27ADFD-A121-477A-94B1-FB1B4E2E3046</guid>
+				<guid>513F6C90-E0D9-4A8F-972E-09757FE32C19</guid>
+				<guid>C9D22735-C76B-4DB4-AFB5-51D1E1516A05</guid>
+				<guid>8E5E70C9-9C7B-429A-9D5D-036465948175</guid>
+				<guid>7ADDED32-4069-4C52-891C-25F52478B2EB</guid>
+			</RegisteredStorageGuids>
+		</EntityComponent>
+		
+		<EntityComponent xsi:type="MyObjectBuilder_ModStorageComponentDefinition">
+			<Id>
+				<TypeId>ModStorageComponent</TypeId>
+				<SubtypeId>ModularEncountersSpawnerB</SubtypeId>
+			</Id>
+			<RegisteredStorageGuids>
+				<guid>C0CD2D13-AA56-466E-BA44-D840658A772B</guid>
+			</RegisteredStorageGuids>
+		</EntityComponent>
+		
+		<EntityComponent xsi:type="MyObjectBuilder_ModStorageComponentDefinition">
+			<Id>
+				<TypeId>ModStorageComponent</TypeId>
+				<SubtypeId>ModularEncountersSpawnerNPETag</SubtypeId>
+			</Id>
+			<RegisteredStorageGuids>
+				<guid>1295CAA8-D50A-4D03-AC36-A7F49BCA54C2</guid>
+			</RegisteredStorageGuids>
+		</EntityComponent>
+		
+		<EntityComponent xsi:type="MyObjectBuilder_ModStorageComponentDefinition">
+			<Id>
+				<TypeId>ModStorageComponent</TypeId>
+				<SubtypeId>MES-ActiveNpcData</SubtypeId>
+			</Id>
+			<RegisteredStorageGuids>
+				<guid>AD4DBD09-359D-48F5-9F48-54D352B59171</guid>
+			</RegisteredStorageGuids>
+		</EntityComponent>
+		
+		<EntityComponent xsi:type="MyObjectBuilder_ModStorageComponentDefinition">
+			<Id>
+				<TypeId>ModStorageComponent</TypeId>
+				<SubtypeId>MES-CustomData</SubtypeId>
+			</Id>
+			<RegisteredStorageGuids>
+				<guid>89E9B43E-084E-411D-94CC-28AA2A9A765E</guid>
+			</RegisteredStorageGuids>
+		</EntityComponent>
+
+		<EntityComponent xsi:type="MyObjectBuilder_ModStorageComponentDefinition">
+			<Id>
+				<TypeId>ModStorageComponent</TypeId>
+				<SubtypeId>MES-ThrustDataStorage</SubtypeId>
+			</Id>
+			<RegisteredStorageGuids>
+				<guid>DA22D750-3262-4C1E-A898-7FB7A7F58182</guid>
+			</RegisteredStorageGuids>
+		</EntityComponent>
+		
+	</EntityComponents>
+</Definitions>
+

@@ -1,0 +1,339 @@
+<?xml version="1.0"?>
+<Definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<DroneBehaviors>
+
+		<DroneBehavior xsi:type="MyObjectBuilder_DroneBehaviorDefinition">
+			<Id>
+				<TypeId>DroneBehaviorDefinition</TypeId>
+				<SubtypeId>MES-GeneralAttack</SubtypeId>
+			</Id>
+			<StrafeWidth>20</StrafeWidth>
+			<StrafeHeight>20</StrafeHeight>
+			<StrafeDepth>10</StrafeDepth>
+			<MinStrafeDistance>5</MinStrafeDistance>
+
+			<AvoidCollisions>true</AvoidCollisions>
+			<RotateToPlayer>true</RotateToPlayer>
+			<UseStaticWeaponry>true</UseStaticWeaponry>
+			<UseTools>true</UseTools>
+			<UseRammingBehavior>true</UseRammingBehavior>
+			<AlternativeBehavior/>
+
+			<SpeedLimit>75</SpeedLimit>
+			<PlayerYAxisOffset>0.9</PlayerYAxisOffset>
+			<TargetDistance>75</TargetDistance>
+			<MaxManeuverDistance>200</MaxManeuverDistance>
+			<StaticWeaponryUsage>800</StaticWeaponryUsage>
+			<ToolsUsage>8</ToolsUsage>
+			<RammingBehaviorDistance>75</RammingBehaviorDistance>
+
+			<UsePlanetHover>true</UsePlanetHover>
+			<PlanetHoverMin>50</PlanetHoverMin>
+			<PlanetHoverMax>75</PlanetHoverMax>
+
+			<WaypointDelayMsMin>1000</WaypointDelayMsMin>
+			<WaypointDelayMsMax>3000</WaypointDelayMsMax>
+			<WaypointMaxTime>15000</WaypointMaxTime>
+			<WaypointThresholdDistance>0.5</WaypointThresholdDistance>
+			<LostTimeMs>20000</LostTimeMs>
+
+			<UsesWeaponBehaviors>true</UsesWeaponBehaviors>
+			<WeaponBehaviorNotFoundDelay>3</WeaponBehaviorNotFoundDelay>
+			<WeaponBehaviors>
+				
+				<WeaponBehavior>
+					<Name>All Weapons</Name>
+					<Priority>2</Priority>
+					<IgnoresVoxels>true</IgnoresVoxels>
+					<IgnoresGrids>true</IgnoresGrids>
+					<TimeMin>1</TimeMin>
+					<TimeMax>2</TimeMax>
+					<Requirements />
+					<RequirementsIsWhitelist>false</RequirementsIsWhitelist>
+					<WeaponRules>
+						<WeaponRule>
+							<Weapon>SmallMissileLauncherReload</Weapon>
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>false</FiringAfterLosingSight>
+							<CanGoThroughVoxels>true</CanGoThroughVoxels>
+						</WeaponRule>
+						<WeaponRule>
+							<Weapon>SmallMissileLauncher</Weapon>
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>false</FiringAfterLosingSight>
+							<CanGoThroughVoxels>true</CanGoThroughVoxels>
+						</WeaponRule>
+						<WeaponRule>
+							<Weapon>SmallGatlingGun</Weapon>
+							<!-- Gatlings -->
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>true</FiringAfterLosingSight>
+							<CanGoThroughVoxels>false</CanGoThroughVoxels>
+						</WeaponRule>
+						<WeaponRule>
+							<Weapon />
+							<!-- modded weapons -->
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>false</FiringAfterLosingSight>
+							<CanGoThroughVoxels>false</CanGoThroughVoxels>
+						</WeaponRule>
+					</WeaponRules>
+				</WeaponBehavior>
+			</WeaponBehaviors>
+		</DroneBehavior>
+		
+		<DroneBehavior xsi:type="MyObjectBuilder_DroneBehaviorDefinition">
+			<Id>
+				<TypeId>DroneBehaviorDefinition</TypeId>
+				<SubtypeId>MES-LongRangeAttack</SubtypeId>
+			</Id>
+			<StrafeWidth>20</StrafeWidth>
+			<StrafeHeight>20</StrafeHeight>
+			<StrafeDepth>10</StrafeDepth>
+			<MinStrafeDistance>5</MinStrafeDistance>
+
+			<AvoidCollisions>true</AvoidCollisions>
+			<RotateToPlayer>true</RotateToPlayer>
+			<UseStaticWeaponry>true</UseStaticWeaponry>
+			<UseTools>true</UseTools>
+			<UseRammingBehavior>true</UseRammingBehavior>
+			<AlternativeBehavior/>
+
+			<SpeedLimit>75</SpeedLimit>
+			<PlayerYAxisOffset>0.9</PlayerYAxisOffset>
+			<TargetDistance>400</TargetDistance>
+			<MaxManeuverDistance>200</MaxManeuverDistance>
+			<StaticWeaponryUsage>800</StaticWeaponryUsage>
+			<ToolsUsage>8</ToolsUsage>
+			<RammingBehaviorDistance>75</RammingBehaviorDistance>
+
+			<UsePlanetHover>true</UsePlanetHover>
+			<PlanetHoverMin>150</PlanetHoverMin>
+			<PlanetHoverMax>300</PlanetHoverMax>
+
+			<WaypointDelayMsMin>1000</WaypointDelayMsMin>
+			<WaypointDelayMsMax>3000</WaypointDelayMsMax>
+			<WaypointMaxTime>15000</WaypointMaxTime>
+			<WaypointThresholdDistance>0.5</WaypointThresholdDistance>
+			<LostTimeMs>20000</LostTimeMs>
+
+			<UsesWeaponBehaviors>true</UsesWeaponBehaviors>
+			<WeaponBehaviorNotFoundDelay>3</WeaponBehaviorNotFoundDelay>
+			<WeaponBehaviors>
+				
+				<WeaponBehavior>
+					<Name>All Weapons</Name>
+					<Priority>2</Priority>
+					<IgnoresVoxels>true</IgnoresVoxels>
+					<IgnoresGrids>true</IgnoresGrids>
+					<TimeMin>1</TimeMin>
+					<TimeMax>2</TimeMax>
+					<Requirements />
+					<RequirementsIsWhitelist>false</RequirementsIsWhitelist>
+					<WeaponRules>
+						<WeaponRule>
+							<Weapon>SmallMissileLauncherReload</Weapon>
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>false</FiringAfterLosingSight>
+							<CanGoThroughVoxels>true</CanGoThroughVoxels>
+						</WeaponRule>
+						<WeaponRule>
+							<Weapon>SmallMissileLauncher</Weapon>
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>false</FiringAfterLosingSight>
+							<CanGoThroughVoxels>true</CanGoThroughVoxels>
+						</WeaponRule>
+						<WeaponRule>
+							<Weapon>SmallGatlingGun</Weapon>
+							<!-- Gatlings -->
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>true</FiringAfterLosingSight>
+							<CanGoThroughVoxels>false</CanGoThroughVoxels>
+						</WeaponRule>
+						<WeaponRule>
+							<Weapon />
+							<!-- modded weapons -->
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>false</FiringAfterLosingSight>
+							<CanGoThroughVoxels>false</CanGoThroughVoxels>
+						</WeaponRule>
+					</WeaponRules>
+				</WeaponBehavior>
+			</WeaponBehaviors>
+		</DroneBehavior>
+		
+		<DroneBehavior xsi:type="MyObjectBuilder_DroneBehaviorDefinition">
+			<Id>
+				<TypeId>DroneBehaviorDefinition</TypeId>
+				<SubtypeId>MES-Ramming</SubtypeId>
+			</Id>
+			<StrafeWidth>20</StrafeWidth>
+			<StrafeHeight>20</StrafeHeight>
+			<StrafeDepth>10</StrafeDepth>
+			<MinStrafeDistance>5</MinStrafeDistance>
+
+			<AvoidCollisions>true</AvoidCollisions>
+			<RotateToPlayer>true</RotateToPlayer>
+			<UseStaticWeaponry>false</UseStaticWeaponry>
+			<UseTools>false</UseTools>
+			<UseRammingBehavior>true</UseRammingBehavior>
+			<AlternativeBehavior/>
+
+			<SpeedLimit>100</SpeedLimit>
+			<PlayerYAxisOffset>0.9</PlayerYAxisOffset>
+			<TargetDistance>400</TargetDistance>
+			<MaxManeuverDistance>200</MaxManeuverDistance>
+			<StaticWeaponryUsage>800</StaticWeaponryUsage>
+			<ToolsUsage>8</ToolsUsage>
+			<RammingBehaviorDistance>1500</RammingBehaviorDistance>
+
+			<UsePlanetHover>false</UsePlanetHover>
+			<PlanetHoverMin>150</PlanetHoverMin>
+			<PlanetHoverMax>300</PlanetHoverMax>
+
+			<WaypointDelayMsMin>1000</WaypointDelayMsMin>
+			<WaypointDelayMsMax>3000</WaypointDelayMsMax>
+			<WaypointMaxTime>15000</WaypointMaxTime>
+			<WaypointThresholdDistance>0.5</WaypointThresholdDistance>
+			<LostTimeMs>20000</LostTimeMs>
+
+			<UsesWeaponBehaviors>false</UsesWeaponBehaviors>
+			
+		</DroneBehavior>
+		
+		<DroneBehavior xsi:type="MyObjectBuilder_DroneBehaviorDefinition">
+			<Id>
+				<TypeId>DroneBehaviorDefinition</TypeId>
+				<SubtypeId>MES-CapitalShip</SubtypeId>
+			</Id>
+			<StrafeWidth>20</StrafeWidth>
+			<StrafeHeight>20</StrafeHeight>
+			<StrafeDepth>10</StrafeDepth>
+			<MinStrafeDistance>5</MinStrafeDistance>
+
+			<AvoidCollisions>false</AvoidCollisions>
+			<RotateToPlayer>true</RotateToPlayer>
+			<UseStaticWeaponry>true</UseStaticWeaponry>
+			<UseTools>true</UseTools>
+			<UseRammingBehavior>true</UseRammingBehavior>
+			<AlternativeBehavior/>
+
+			<SpeedLimit>50</SpeedLimit>
+			<PlayerYAxisOffset>0.9</PlayerYAxisOffset>
+			<TargetDistance>400</TargetDistance>
+			<MaxManeuverDistance>200</MaxManeuverDistance>
+			<StaticWeaponryUsage>800</StaticWeaponryUsage>
+			<ToolsUsage>8</ToolsUsage>
+			<RammingBehaviorDistance>50</RammingBehaviorDistance>
+
+			<UsePlanetHover>true</UsePlanetHover>
+			<PlanetHoverMin>300</PlanetHoverMin>
+			<PlanetHoverMax>1500</PlanetHoverMax>
+
+			<WaypointDelayMsMin>1000</WaypointDelayMsMin>
+			<WaypointDelayMsMax>3000</WaypointDelayMsMax>
+			<WaypointMaxTime>15000</WaypointMaxTime>
+			<WaypointThresholdDistance>0.5</WaypointThresholdDistance>
+			<LostTimeMs>20000</LostTimeMs>
+
+			<UsesWeaponBehaviors>true</UsesWeaponBehaviors>
+			<WeaponBehaviorNotFoundDelay>3</WeaponBehaviorNotFoundDelay>
+			<WeaponBehaviors>
+				
+				<WeaponBehavior>
+					<Name>All Weapons</Name>
+					<Priority>2</Priority>
+					<IgnoresVoxels>true</IgnoresVoxels>
+					<IgnoresGrids>true</IgnoresGrids>
+					<TimeMin>1</TimeMin>
+					<TimeMax>2</TimeMax>
+					<Requirements />
+					<RequirementsIsWhitelist>false</RequirementsIsWhitelist>
+					<WeaponRules>
+						<WeaponRule>
+							<Weapon>SmallMissileLauncherReload</Weapon>
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>false</FiringAfterLosingSight>
+							<CanGoThroughVoxels>true</CanGoThroughVoxels>
+						</WeaponRule>
+						<WeaponRule>
+							<Weapon>SmallMissileLauncher</Weapon>
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>false</FiringAfterLosingSight>
+							<CanGoThroughVoxels>true</CanGoThroughVoxels>
+						</WeaponRule>
+						<WeaponRule>
+							<Weapon>SmallGatlingGun</Weapon>
+							<!-- Gatlings -->
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>true</FiringAfterLosingSight>
+							<CanGoThroughVoxels>false</CanGoThroughVoxels>
+						</WeaponRule>
+						<WeaponRule>
+							<Weapon />
+							<!-- modded weapons -->
+							<TimeMin>8</TimeMin>
+							<TimeMax>10</TimeMax>
+							<FiringAfterLosingSight>false</FiringAfterLosingSight>
+							<CanGoThroughVoxels>false</CanGoThroughVoxels>
+						</WeaponRule>
+					</WeaponRules>
+				</WeaponBehavior>
+			</WeaponBehaviors>
+		</DroneBehavior>
+
+		<DroneBehavior xsi:type="MyObjectBuilder_DroneBehaviorDefinition">
+			<Id>
+				<TypeId>DroneBehaviorDefinition</TypeId>
+				<SubtypeId>MES-CapitalShipNoStaticGuns</SubtypeId>
+			</Id>
+			<StrafeWidth>20</StrafeWidth>
+			<StrafeHeight>20</StrafeHeight>
+			<StrafeDepth>10</StrafeDepth>
+			<MinStrafeDistance>5</MinStrafeDistance>
+
+			<AvoidCollisions>true</AvoidCollisions>
+			<RotateToPlayer>false</RotateToPlayer>
+			<UseStaticWeaponry>false</UseStaticWeaponry>
+			<UseTools>false</UseTools>
+			<UseRammingBehavior>true</UseRammingBehavior>
+			<AlternativeBehavior/>
+
+			<SpeedLimit>40</SpeedLimit>
+			<PlayerYAxisOffset>0.9</PlayerYAxisOffset>
+			<TargetDistance>400</TargetDistance>
+			<MaxManeuverDistance>150</MaxManeuverDistance>
+			<StaticWeaponryUsage>800</StaticWeaponryUsage>
+			<ToolsUsage>8</ToolsUsage>
+			<RammingBehaviorDistance>50</RammingBehaviorDistance>
+
+			<UsePlanetHover>true</UsePlanetHover>
+			<PlanetHoverMin>300</PlanetHoverMin>
+			<PlanetHoverMax>1500</PlanetHoverMax>
+
+			<WaypointDelayMsMin>1000</WaypointDelayMsMin>
+			<WaypointDelayMsMax>3000</WaypointDelayMsMax>
+			<WaypointMaxTime>15000</WaypointMaxTime>
+			<WaypointThresholdDistance>0.5</WaypointThresholdDistance>
+			<LostTimeMs>20000</LostTimeMs>
+
+			<UsesWeaponBehaviors>false</UsesWeaponBehaviors>
+			<WeaponBehaviorNotFoundDelay>3</WeaponBehaviorNotFoundDelay>
+		
+		</DroneBehavior>
+		
+	</DroneBehaviors>
+	
+</Definitions>

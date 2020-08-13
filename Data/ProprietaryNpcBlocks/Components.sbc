@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<Definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Components>
+    <Component>
+      <Id>
+        <TypeId>Component</TypeId>
+        <SubtypeId>ProprietaryTech</SubtypeId>
+      </Id>
+      <DisplayName>Proprietary Circuits</DisplayName>
+      <Icon>Textures\GUI\Icons\component\computer_component.dds</Icon>
+      <Size>
+        <X>0.1</X>
+        <Y>0.1</Y>
+        <Z>0.2</Z>
+      </Size>
+      <Mass>0.250</Mass>
+      <Volume>1</Volume>
+      <Model>Models\Components\computer_component.mwm</Model>
+      <PhysicalMaterial>Metal</PhysicalMaterial>
+      <CanSpawnFromScreen>false</CanSpawnFromScreen>
+      <MinimalPricePerUnit>-1</MinimalPricePerUnit>
+      <MinimumOfferAmount>-1</MinimumOfferAmount>
+      <MaximumOfferAmount>-1</MaximumOfferAmount>
+      <CanPlayerOrder>false</CanPlayerOrder>
+
+      <MaxIntegrity>1</MaxIntegrity>
+      <DropProbability>0</DropProbability>
+    </Component>
+  </Components>
+</Definitions>
