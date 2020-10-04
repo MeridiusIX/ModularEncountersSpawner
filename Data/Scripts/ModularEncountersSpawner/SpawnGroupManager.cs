@@ -199,7 +199,7 @@ namespace ModularEncountersSpawner{
 				
 			}
 
-			if(spawnGroup.PlanetRequiresAtmo == true && environment.AtmosphereAtPosition == 0){
+			if(!spawnGroup.GravityCargoShip && spawnGroup.PlanetRequiresAtmo == true && environment.AtmosphereAtPosition == 0){
 
 				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Planet Requires Atmo");
 				return false;
@@ -232,10 +232,12 @@ namespace ModularEncountersSpawner{
 		}
 		
 		public static bool DistanceFromCenterCheck(ImprovedSpawnGroup spawnGroup, EnvironmentEvaluation environment){
-			
-			if(spawnGroup.MinSpawnFromWorldCenter > 0){
+
+			var distFromCenter = spawnGroup.CustomWorldCenter == Vector3D.Zero ? environment.DistanceFromWorldCenter : Vector3D.Distance(spawnGroup.CustomWorldCenter, environment.Position);
+
+			if (spawnGroup.MinSpawnFromWorldCenter > 0){
 				
-				if(environment.DistanceFromWorldCenter < spawnGroup.MinSpawnFromWorldCenter){
+				if(distFromCenter < spawnGroup.MinSpawnFromWorldCenter){
 					
 					return false;
 					
@@ -245,7 +247,7 @@ namespace ModularEncountersSpawner{
 			
 			if(spawnGroup.MaxSpawnFromWorldCenter > 0){
 				
-				if(environment.DistanceFromWorldCenter > spawnGroup.MaxSpawnFromWorldCenter){
+				if(distFromCenter > spawnGroup.MaxSpawnFromWorldCenter){
 					
 					return false;
 					
@@ -338,6 +340,26 @@ namespace ModularEncountersSpawner{
 
 			}
 
+			bool requiresWater = false;
+
+			if (spawnGroup.PlanetaryInstallation) {
+
+				requiresWater = (!spawnGroup.InstallationSpawnsOnDryLand && (spawnGroup.InstallationSpawnsOnWaterSurface || spawnGroup.InstallationSpawnsUnderwater));
+
+
+			} else {
+
+				requiresWater = spawnGroup.MustSpawnUnderwater;
+			
+			}
+
+			if (requiresWater) {
+
+				if (!MES_SessionCore.Instance.WaterMod.Registered || environment.WaterInSurroundingAreaRatio < .1)
+					return false;
+
+			}
+
 			return true;
 		
 		}
@@ -356,51 +378,58 @@ namespace ModularEncountersSpawner{
 			foreach(var tag in descSplit){
 
 				//SpawnGroupEnabled
-				if(tag.Contains("[SpawnGroupEnabled") == true){
+				if(tag.Contains("[SpawnGroupEnabled:") == true){
 
-					improveSpawnGroup.SpawnGroupEnabled = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.SpawnGroupEnabled);
 										
 				}
 				
 				//SpaceCargoShip
-				if(tag.Contains("[SpaceCargoShip") == true){
+				if(tag.Contains("[SpaceCargoShip:") == true){
 
-					improveSpawnGroup.SpaceCargoShip = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.SpaceCargoShip);
 										
 				}
 				
 				//LunarCargoShip
-				if(tag.Contains("[LunarCargoShip") == true){
+				if(tag.Contains("[LunarCargoShip:") == true){
 
-					improveSpawnGroup.LunarCargoShip = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.LunarCargoShip);
 						
 				}
 				
 				//AtmosphericCargoShip
-				if(tag.Contains("[AtmosphericCargoShip") == true){
+				if(tag.Contains("[AtmosphericCargoShip:") == true){
 
-					improveSpawnGroup.AtmosphericCargoShip = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.AtmosphericCargoShip);
 						
 				}
-				
-				//SpaceRandomEncounter
-				if(tag.Contains("[SpaceRandomEncounter") == true){
 
-					improveSpawnGroup.SpaceRandomEncounter = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+				//GravityCargoShip
+				if (tag.Contains("[GravityCargoShip:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.GravityCargoShip);
+
+				}
+
+				//SpaceRandomEncounter
+				if (tag.Contains("[SpaceRandomEncounter:") == true){
+
+					TagBoolCheck(tag, ref improveSpawnGroup.SpaceRandomEncounter);
 						
 				}
 				
 				//PlanetaryInstallation
 				if(tag.Contains("[PlanetaryInstallation:") == true){
 
-					improveSpawnGroup.PlanetaryInstallation = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.PlanetaryInstallation);
 						
 				}
 				
 				//PlanetaryInstallationType
-				if(tag.Contains("[PlanetaryInstallationType") == true){
+				if(tag.Contains("[PlanetaryInstallationType:") == true){
 
-					improveSpawnGroup.PlanetaryInstallationType = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.PlanetaryInstallationType);
 					
 					if(improveSpawnGroup.PlanetaryInstallationType == ""){
 						
@@ -413,84 +442,119 @@ namespace ModularEncountersSpawner{
 				//SkipTerrainCheck
 				if(tag.Contains("[SkipTerrainCheck:") == true){
 
-					improveSpawnGroup.SkipTerrainCheck = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.SkipTerrainCheck);
 						
 				}
 
 				//RotateInstallations
-				if(tag.Contains("[RotateInstallations") == true) {
+				if(tag.Contains("[RotateInstallations:") == true) {
 
-					improveSpawnGroup.RotateInstallations = TagVector3DListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagVector3DListCheck(tag, ref improveSpawnGroup.RotateInstallations);
 
 				}
 
 				//InstallationTerrainValidation
 				if (tag.Contains("[InstallationTerrainValidation:") == true) {
 
-					improveSpawnGroup.InstallationTerrainValidation = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.InstallationTerrainValidation);
+
+				}
+
+				//InstallationSpawnsOnDryLand
+				if (tag.Contains("[InstallationSpawnsOnDryLand:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.InstallationSpawnsOnDryLand);
+
+				}
+
+				//InstallationSpawnsUnderwater
+				if (tag.Contains("[InstallationSpawnsUnderwater:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.InstallationSpawnsUnderwater);
+
+				}
+
+				//InstallationSpawnsOnWaterSurface
+				if (tag.Contains("[InstallationSpawnsOnWaterSurface:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.InstallationSpawnsOnWaterSurface);
 
 				}
 
 				//ReverseForwardDirections
-				if (tag.Contains("[ReverseForwardDirections") == true) {
+				if (tag.Contains("[ReverseForwardDirections:") == true) {
 
-					improveSpawnGroup.ReverseForwardDirections = TagBoolListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolListCheck(tag, ref improveSpawnGroup.ReverseForwardDirections);
 
 				}
 
 				//CutVoxelsAtAirtightCells
 				if(tag.Contains("[CutVoxelsAtAirtightCells:") == true){
 
-					improveSpawnGroup.CutVoxelsAtAirtightCells = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.CutVoxelsAtAirtightCells);
 						
 				}
 				
 				//BossEncounterSpace
-				if(tag.Contains("[BossEncounterSpace") == true){
+				if(tag.Contains("[BossEncounterSpace:") == true){
 
-					improveSpawnGroup.BossEncounterSpace = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.BossEncounterSpace);
 						
 				}
 				
 				//BossEncounterAtmo
-				if(tag.Contains("[BossEncounterAtmo") == true){
+				if(tag.Contains("[BossEncounterAtmo:") == true){
 
-					improveSpawnGroup.BossEncounterAtmo = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.BossEncounterAtmo);
 						
 				}
 				
 				//BossEncounterAny
-				if(tag.Contains("[BossEncounterAny") == true){
+				if(tag.Contains("[BossEncounterAny:") == true){
 
-					improveSpawnGroup.BossEncounterAny = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.BossEncounterAny);
 						
 				}
 
 				//RivalAiSpawn
-				if (tag.Contains("[RivalAiSpawn") == true) {
+				if (tag.Contains("[RivalAiSpawn:") == true) {
 
-					improveSpawnGroup.RivalAiAnySpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiAnySpawn);
 
 				}
 
 				//RivalAiSpaceSpawn
-				if (tag.Contains("[RivalAiSpaceSpawn") == true) {
+				if (tag.Contains("[RivalAiSpaceSpawn:") == true) {
 
-					improveSpawnGroup.RivalAiSpaceSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiSpaceSpawn);
 
 				}
 
 				//RivalAiAtmosphericSpawn
-				if(tag.Contains("[RivalAiAtmosphericSpawn") == true) {
+				if(tag.Contains("[RivalAiAtmosphericSpawn:") == true) {
 
-					improveSpawnGroup.RivalAiAtmosphericSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiAtmosphericSpawn);
 
 				}
 
 				//RivalAiAnySpawn
-				if(tag.Contains("[RivalAiAnySpawn") == true) {
+				if(tag.Contains("[RivalAiAnySpawn:") == true) {
 
-					improveSpawnGroup.RivalAiAnySpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiAnySpawn);
+
+				}
+
+				//CanSpawnUnderwater
+				if (tag.Contains("[CanSpawnUnderwater:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.CanSpawnUnderwater);
+
+				}
+
+				//MinWaterDepth
+				if (tag.Contains("[MinWaterDepth:") == true) {
+
+					TagDoubleCheck(tag, ref improveSpawnGroup.MinWaterDepth);
 
 				}
 
@@ -498,16 +562,16 @@ namespace ModularEncountersSpawner{
 				improveSpawnGroup.Frequency = (int)Math.Round((double)spawnGroup.Frequency * 10);
 				
 				//UniqueEncounter
-				if(tag.Contains("[UniqueEncounter") == true){
+				if(tag.Contains("[UniqueEncounter:") == true){
 
-					improveSpawnGroup.UniqueEncounter = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UniqueEncounter);
 						
 				}
 				
 				//FactionOwner
-				if(tag.Contains("[FactionOwner") == true){
+				if(tag.Contains("[FactionOwner:") == true){
 
-					improveSpawnGroup.FactionOwner = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.FactionOwner);
 					
 					if(improveSpawnGroup.FactionOwner == ""){
 						
@@ -518,1251 +582,1407 @@ namespace ModularEncountersSpawner{
 				}
 
 				//UseRandomMinerFaction
-				if(tag.Contains("[UseRandomMinerFaction") == true) {
+				if(tag.Contains("[UseRandomMinerFaction:") == true) {
 
-					improveSpawnGroup.UseRandomMinerFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseRandomMinerFaction);
 
 				}
 
 				//UseRandomBuilderFaction
-				if(tag.Contains("[UseRandomBuilderFaction") == true) {
+				if(tag.Contains("[UseRandomBuilderFaction:") == true) {
 
-					improveSpawnGroup.UseRandomBuilderFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseRandomBuilderFaction);
 
 				}
 
 				//UseRandomTraderFaction
-				if(tag.Contains("[UseRandomTraderFaction") == true) {
+				if(tag.Contains("[UseRandomTraderFaction:") == true) {
 
-					improveSpawnGroup.UseRandomTraderFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseRandomTraderFaction);
 
 				}
 
 				//IgnoreCleanupRules
-				if(tag.Contains("[IgnoreCleanupRules") == true){
+				if(tag.Contains("[IgnoreCleanupRules:") == true){
 
-					improveSpawnGroup.IgnoreCleanupRules = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreCleanupRules);
 						
 				}
 				
 				//ReplenishSystems
-				if(tag.Contains("[ReplenishSystems") == true){
+				if(tag.Contains("[ReplenishSystems:") == true){
 
-					improveSpawnGroup.ReplenishSystems = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ReplenishSystems);
 						
 				}
 
 				//UseNonPhysicalAmmo
-				if(tag.Contains("[UseNonPhysicalAmmo") == true) {
+				if(tag.Contains("[UseNonPhysicalAmmo:") == true) {
 
-					improveSpawnGroup.UseNonPhysicalAmmo = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseNonPhysicalAmmo);
 
 				}
 
 				//RemoveContainerContents
-				if(tag.Contains("[RemoveContainerContents") == true) {
+				if(tag.Contains("[RemoveContainerContents:") == true) {
 
-					improveSpawnGroup.RemoveContainerContents = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RemoveContainerContents);
 
 				}
 
 				//InitializeStoreBlocks
-				if(tag.Contains("[InitializeStoreBlocks") == true) {
+				if(tag.Contains("[InitializeStoreBlocks:") == true) {
 
-					improveSpawnGroup.InitializeStoreBlocks = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.InitializeStoreBlocks);
 
 				}
 
 				//ContainerTypesForStoreOrders
-				if(tag.Contains("[ContainerTypesForStoreOrders") == true) {
+				if(tag.Contains("[ContainerTypesForStoreOrders:") == true) {
 
-					improveSpawnGroup.ContainerTypesForStoreOrders = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.ContainerTypesForStoreOrders);
 
 				}
 
 				//ForceStaticGrid
-				if(tag.Contains("[ForceStaticGrid") == true){
+				if(tag.Contains("[ForceStaticGrid:") == true){
 
-					improveSpawnGroup.ForceStaticGrid = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ForceStaticGrid);
 					setForceStatic = true;
 					
 				}
 				
 				//AdminSpawnOnly
-				if(tag.Contains("[AdminSpawnOnly") == true){
+				if(tag.Contains("[AdminSpawnOnly:") == true){
 
-					improveSpawnGroup.AdminSpawnOnly = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.AdminSpawnOnly);
 						
 				}
 
 				//SandboxVariables
-				if(tag.Contains("[SandboxVariables") == true){
+				if(tag.Contains("[SandboxVariables:") == true){
 
-					improveSpawnGroup.SandboxVariables = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.SandboxVariables);
 						
 				}
 
 				//FalseSandboxVariables
-				if(tag.Contains("[FalseSandboxVariables") == true) {
+				if(tag.Contains("[FalseSandboxVariables:") == true) {
 
-					improveSpawnGroup.FalseSandboxVariables = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.FalseSandboxVariables);
 
 				}
 
 				//RandomNumberRoll
-				if(tag.Contains("[RandomNumberRoll") == true){
+				if(tag.Contains("[RandomNumberRoll:") == true){
 
-					improveSpawnGroup.RandomNumberRoll = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.RandomNumberRoll, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.RandomNumberRoll);
 						
 				}
 
 				//UseCommonConditions
-				if(tag.Contains("[UseCommonConditions") == true) {
+				if(tag.Contains("[UseCommonConditions:") == true) {
 
-					improveSpawnGroup.UseCommonConditions = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseCommonConditions);
+
+				}
+
+				//ChanceCeiling
+				if (tag.Contains("[ChanceCeiling:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.ChanceCeiling);
+
+				}
+
+				//SpaceCargoShipChance
+				if (tag.Contains("[SpaceCargoShipChance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.SpaceCargoShipChance);
+
+				}
+
+				//LunarCargoShipChance
+				if (tag.Contains("[LunarCargoShipChance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.LunarCargoShipChance);
+
+				}
+
+				//AtmosphericCargoShipChance
+				if (tag.Contains("[AtmosphericCargoShipChance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.AtmosphericCargoShipChance);
+
+				}
+
+				//GravityCargoShipChance
+				if (tag.Contains("[GravityCargoShipChance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.GravityCargoShipChance);
+
+				}
+
+				//RandomEncounterChance
+				if (tag.Contains("[RandomEncounterChance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.RandomEncounterChance);
+
+				}
+
+				//PlanetaryInstallationChance
+				if (tag.Contains("[PlanetaryInstallationChance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.PlanetaryInstallationChance);
+
+				}
+
+				//BossEncounterChance
+				if (tag.Contains("[BossEncounterChance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.BossEncounterChance);
 
 				}
 
 				//UseAutoPilotInSpace
-				if(tag.Contains("[UseAutoPilotInSpace") == true) {
+				if (tag.Contains("[UseAutoPilotInSpace:") == true) {
 
-					improveSpawnGroup.UseAutoPilotInSpace = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseAutoPilotInSpace);
 
 				}
 
 				//PauseAutopilotAtPlayerDistance
-				if(tag.Contains("[PauseAutopilotAtPlayerDistance") == true) {
+				if(tag.Contains("[PauseAutopilotAtPlayerDistance:") == true) {
 
-					improveSpawnGroup.PauseAutopilotAtPlayerDistance = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PauseAutopilotAtPlayerDistance, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.PauseAutopilotAtPlayerDistance);
 
 				}
 
 				//PreventOwnershipChange
-				if(tag.Contains("[PreventOwnershipChange") == true) {
+				if(tag.Contains("[PreventOwnershipChange:") == true) {
 
-					improveSpawnGroup.PreventOwnershipChange = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.PreventOwnershipChange);
 
 				}
 
 				//RandomizeWeapons
-				if(tag.Contains("[RandomizeWeapons") == true){
+				if(tag.Contains("[RandomizeWeapons:") == true){
 
-					improveSpawnGroup.RandomizeWeapons = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RandomizeWeapons);
 						
 				}
 				
 				//IgnoreWeaponRandomizerMod
-				if(tag.Contains("[IgnoreWeaponRandomizerMod") == true){
+				if(tag.Contains("[IgnoreWeaponRandomizerMod:") == true){
 
-					improveSpawnGroup.IgnoreWeaponRandomizerMod = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerMod);
 						
 				}
 				
 				//IgnoreWeaponRandomizerTargetGlobalBlacklist
-				if(tag.Contains("[IgnoreWeaponRandomizerTargetGlobalBlacklist") == true){
+				if(tag.Contains("[IgnoreWeaponRandomizerTargetGlobalBlacklist:") == true){
 
-					improveSpawnGroup.IgnoreWeaponRandomizerTargetGlobalBlacklist = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerTargetGlobalBlacklist);
 						
 				}
 				
 				//IgnoreWeaponRandomizerTargetGlobalWhitelist
-				if(tag.Contains("[IgnoreWeaponRandomizerTargetGlobalWhitelist") == true){
+				if(tag.Contains("[IgnoreWeaponRandomizerTargetGlobalWhitelist:") == true){
 
-					improveSpawnGroup.IgnoreWeaponRandomizerTargetGlobalWhitelist = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerTargetGlobalWhitelist);
 						
 				}
 				
 				//IgnoreWeaponRandomizerGlobalBlacklist
-				if(tag.Contains("[IgnoreWeaponRandomizerGlobalBlacklist") == true){
+				if(tag.Contains("[IgnoreWeaponRandomizerGlobalBlacklist:") == true){
 
-					improveSpawnGroup.IgnoreWeaponRandomizerGlobalBlacklist = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerGlobalBlacklist);
 						
 				}
 				
 				//IgnoreWeaponRandomizerGlobalWhitelist
-				if(tag.Contains("[IgnoreWeaponRandomizerGlobalWhitelist") == true){
+				if(tag.Contains("[IgnoreWeaponRandomizerGlobalWhitelist:") == true){
 
-					improveSpawnGroup.IgnoreWeaponRandomizerGlobalWhitelist = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerGlobalWhitelist);
 						
 				}
 				
 				//WeaponRandomizerTargetBlacklist
-				if(tag.Contains("[WeaponRandomizerTargetBlacklist") == true){
+				if(tag.Contains("[WeaponRandomizerTargetBlacklist:") == true){
 
-					improveSpawnGroup.WeaponRandomizerTargetBlacklist = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					 TagStringListCheck(tag, ref improveSpawnGroup.WeaponRandomizerTargetBlacklist);
 						
 				}
 				
 				//WeaponRandomizerTargetWhitelist
-				if(tag.Contains("[WeaponRandomizerTargetWhitelist") == true){
+				if(tag.Contains("[WeaponRandomizerTargetWhitelist:") == true){
 
-					improveSpawnGroup.WeaponRandomizerTargetWhitelist = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					 TagStringListCheck(tag, ref improveSpawnGroup.WeaponRandomizerTargetWhitelist);
 						
 				}
 				
 				//WeaponRandomizerBlacklist
-				if(tag.Contains("[WeaponRandomizerBlacklist") == true){
+				if(tag.Contains("[WeaponRandomizerBlacklist:") == true){
 
-					improveSpawnGroup.WeaponRandomizerBlacklist = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.WeaponRandomizerBlacklist);
 						
 				}
 				
 				//WeaponRandomizerWhitelist
-				if(tag.Contains("[WeaponRandomizerWhitelist") == true){
+				if(tag.Contains("[WeaponRandomizerWhitelist:") == true){
 
-					improveSpawnGroup.WeaponRandomizerWhitelist = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.WeaponRandomizerWhitelist);
 						
+				}
+
+				//RandomWeaponChance
+				if (tag.Contains("[RandomWeaponChance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.RandomWeaponChance);
+
+				}
+
+				//RandomWeaponSizeVariance
+				if (tag.Contains("[RandomWeaponSizeVariance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.RandomWeaponSizeVariance);
+
+				}
+
+				//NonRandomWeaponNames
+				if (tag.Contains("[NonRandomWeaponNames:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.NonRandomWeaponNames);
+
+				}
+
+				//NonRandomWeaponIds
+				if (tag.Contains("[NonRandomWeaponIds:") == true) {
+
+					TagMyDefIdCheck(tag, ref improveSpawnGroup.NonRandomWeaponIds);
+
+				}
+
+				//NonRandomWeaponReplacingOnly
+				if (tag.Contains("[NonRandomWeaponReplacingOnly:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.NonRandomWeaponReplacingOnly);
+
 				}
 
 				//AddDefenseShieldBlocks
 				if (tag.Contains("[AddDefenseShieldBlocks:") == true) {
 
-					improveSpawnGroup.AddDefenseShieldBlocks = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.AddDefenseShieldBlocks);
 
 				}
 
 				//IgnoreShieldProviderMod
 				if (tag.Contains("[IgnoreShieldProviderMod:") == true) {
 
-					improveSpawnGroup.IgnoreShieldProviderMod = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreShieldProviderMod);
+
+				}
+
+				//ShieldProviderChance
+				if (tag.Contains("[ShieldProviderChance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.ShieldProviderChance);
 
 				}
 
 				//UseBlockReplacerProfile
-				if (tag.Contains("[UseBlockReplacerProfile") == true){
+				if (tag.Contains("[UseBlockReplacerProfile:") == true){
 
-					improveSpawnGroup.UseBlockReplacerProfile = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseBlockReplacerProfile);
 						
 				}
 				
 				//BlockReplacerProfileNames
-				if(tag.Contains("[BlockReplacerProfileNames") == true){
+				if(tag.Contains("[BlockReplacerProfileNames:") == true){
 
-					improveSpawnGroup.BlockReplacerProfileNames = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.BlockReplacerProfileNames);
 					
 				}
 				
 				//UseBlockReplacer
-				if(tag.Contains("[UseBlockReplacer") == true){
+				if(tag.Contains("[UseBlockReplacer:") == true){
 
-					improveSpawnGroup.UseBlockReplacer = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseBlockReplacer);
 						
 				}
 				
 				//RelaxReplacedBlocksSize
-				if(tag.Contains("[RelaxReplacedBlocksSize") == true){
+				if(tag.Contains("[RelaxReplacedBlocksSize:") == true){
 
-					improveSpawnGroup.RelaxReplacedBlocksSize = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RelaxReplacedBlocksSize);
 						
 				}
 				
 				//AlwaysRemoveBlock
-				if(tag.Contains("[AlwaysRemoveBlock") == true){
+				if(tag.Contains("[AlwaysRemoveBlock:") == true){
 
-					improveSpawnGroup.AlwaysRemoveBlock = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.AlwaysRemoveBlock);
 						
 				}
 
 				//ConfigureSpecialNpcThrusters
-				if (tag.Contains("[ConfigureSpecialNpcThrusters") == true) {
+				if (tag.Contains("[ConfigureSpecialNpcThrusters:") == true) {
 
-					improveSpawnGroup.ConfigureSpecialNpcThrusters = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ConfigureSpecialNpcThrusters);
 
 				}
 
 				//RestrictNpcIonThrust
-				if (tag.Contains("[RestrictNpcIonThrust") == true) {
+				if (tag.Contains("[RestrictNpcIonThrust:") == true) {
 
-					improveSpawnGroup.RestrictNpcIonThrust = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RestrictNpcIonThrust);
 
 				}
 
 				//NpcIonThrustForceMultiply
-				if (tag.Contains("[NpcIonThrustForceMultiply") == true) {
+				if (tag.Contains("[NpcIonThrustForceMultiply:") == true) {
 
-					improveSpawnGroup.NpcIonThrustForceMultiply = TagFloatCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.NpcIonThrustForceMultiply, out badParse);
+					TagFloatCheck(tag, ref improveSpawnGroup.NpcIonThrustForceMultiply);
 
 				}
 
 				//NpcIonThrustPowerMultiply
-				if (tag.Contains("[NpcIonThrustPowerMultiply") == true) {
+				if (tag.Contains("[NpcIonThrustPowerMultiply:") == true) {
 
-					improveSpawnGroup.NpcIonThrustPowerMultiply = TagFloatCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.NpcIonThrustPowerMultiply, out badParse);
+					TagFloatCheck(tag, ref improveSpawnGroup.NpcIonThrustPowerMultiply);
 
 				}
 
 				//RestrictNpcAtmoThrust
-				if (tag.Contains("[RestrictNpcAtmoThrust") == true) {
+				if (tag.Contains("[RestrictNpcAtmoThrust:") == true) {
 
-					improveSpawnGroup.RestrictNpcAtmoThrust = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RestrictNpcAtmoThrust);
 
 				}
 
 				//NpcAtmoThrustForceMultiply
-				if (tag.Contains("[NpcAtmoThrustForceMultiply") == true) {
+				if (tag.Contains("[NpcAtmoThrustForceMultiply:") == true) {
 
-					improveSpawnGroup.NpcAtmoThrustForceMultiply = TagFloatCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.NpcAtmoThrustForceMultiply, out badParse);
+					TagFloatCheck(tag, ref improveSpawnGroup.NpcAtmoThrustForceMultiply);
 
 				}
 
 				//NpcAtmoThrustPowerMultiply
-				if (tag.Contains("[NpcAtmoThrustPowerMultiply") == true) {
+				if (tag.Contains("[NpcAtmoThrustPowerMultiply:") == true) {
 
-					improveSpawnGroup.NpcAtmoThrustPowerMultiply = TagFloatCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.NpcAtmoThrustPowerMultiply, out badParse);
+					TagFloatCheck(tag, ref improveSpawnGroup.NpcAtmoThrustPowerMultiply);
 
 				}
 
 				//RestrictNpcHydroThrust
-				if (tag.Contains("[RestrictNpcHydroThrust") == true) {
+				if (tag.Contains("[RestrictNpcHydroThrust:") == true) {
 
-					improveSpawnGroup.RestrictNpcHydroThrust = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RestrictNpcHydroThrust);
 
 				}
 
 				//NpcHydroThrustForceMultiply
-				if (tag.Contains("[NpcHydroThrustForceMultiply") == true) {
+				if (tag.Contains("[NpcHydroThrustForceMultiply:") == true) {
 
-					improveSpawnGroup.NpcHydroThrustForceMultiply = TagFloatCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.NpcHydroThrustForceMultiply, out badParse);
+					TagFloatCheck(tag, ref improveSpawnGroup.NpcHydroThrustForceMultiply);
 
 				}
 
 				//NpcHydroThrustPowerMultiply
-				if (tag.Contains("[NpcHydroThrustPowerMultiply") == true) {
+				if (tag.Contains("[NpcHydroThrustPowerMultiply:") == true) {
 
-					improveSpawnGroup.NpcHydroThrustPowerMultiply = TagFloatCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.NpcHydroThrustPowerMultiply, out badParse);
+					TagFloatCheck(tag, ref improveSpawnGroup.NpcHydroThrustPowerMultiply);
 
 				}
 
 				//IgnoreGlobalBlockReplacer
-				if (tag.Contains("[IgnoreGlobalBlockReplacer") == true) {
+				if (tag.Contains("[IgnoreGlobalBlockReplacer:") == true) {
 
-					improveSpawnGroup.IgnoreGlobalBlockReplacer = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreGlobalBlockReplacer);
 
 				}
 
 				//ReplaceBlockReference
-				if(tag.Contains("[ReplaceBlockReference") == true){
+				if(tag.Contains("[ReplaceBlockReference:") == true){
 
-					improveSpawnGroup.ReplaceBlockReference = TagMDIDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagMDIDictionaryCheck(tag, ref improveSpawnGroup.ReplaceBlockReference);
 						
 				}
-				
-				//ConvertToHeavyArmor
-				if(tag.Contains("[ConvertToHeavyArmor") == true){
 
-					improveSpawnGroup.ConvertToHeavyArmor = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+				//ReplaceBlockOld
+				if (tag.Contains("[ReplaceBlockOld:") == true) {
+
+					TagMyDefIdCheck(tag, ref improveSpawnGroup.ReplaceBlockOld);
+
+				}
+
+				//ReplaceBlockNew
+				if (tag.Contains("[ReplaceBlockNew:") == true) {
+
+					TagMyDefIdCheck(tag, ref improveSpawnGroup.ReplaceBlockNew);
+
+				}
+
+				//ConvertToHeavyArmor
+				if (tag.Contains("[ConvertToHeavyArmor:") == true){
+
+					TagBoolCheck(tag, ref improveSpawnGroup.ConvertToHeavyArmor);
 						
 				}
 
 				//UseRandomNameGenerator
-				if(tag.Contains("[UseRandomNameGenerator") == true) {
+				if(tag.Contains("[UseRandomNameGenerator:") == true) {
 
-					improveSpawnGroup.UseRandomNameGenerator = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseRandomNameGenerator);
 
 				}
 
 				//RandomGridNamePrefix
-				if(tag.Contains("[RandomGridNamePrefix") == true) {
+				if(tag.Contains("[RandomGridNamePrefix:") == true) {
 
-					improveSpawnGroup.RandomGridNamePrefix = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.RandomGridNamePrefix);
 
 				}
 
 				//RandomGridNamePattern
-				if(tag.Contains("[RandomGridNamePattern") == true) {
+				if(tag.Contains("[RandomGridNamePattern:") == true) {
 
-					improveSpawnGroup.RandomGridNamePattern = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.RandomGridNamePattern);
 
 				}
 
 				//ReplaceAntennaNameWithRandomizedName
-				if(tag.Contains("[ReplaceAntennaNameWithRandomizedName") == true) {
+				if(tag.Contains("[ReplaceAntennaNameWithRandomizedName:") == true) {
 
-					improveSpawnGroup.ReplaceAntennaNameWithRandomizedName = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.ReplaceAntennaNameWithRandomizedName);
 
 				}
 
 				//UseBlockNameReplacer
-				if(tag.Contains("[UseBlockNameReplacer") == true) {
+				if(tag.Contains("[UseBlockNameReplacer:") == true) {
 
-					improveSpawnGroup.UseBlockNameReplacer = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseBlockNameReplacer);
 
 				}
 
 				//BlockNameReplacerReference
-				if(tag.Contains("[BlockNameReplacerReference") == true) {
+				if(tag.Contains("[BlockNameReplacerReference:") == true) {
 
-					improveSpawnGroup.BlockNameReplacerReference = TagStringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringDictionaryCheck(tag, ref improveSpawnGroup.BlockNameReplacerReference);
+
+				}
+
+				//ReplaceBlockNameOld
+				if (tag.Contains("[ReplaceBlockNameOld:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.ReplaceBlockNameOld);
+
+				}
+
+				//ReplaceBlockNameNew
+				if (tag.Contains("[ReplaceBlockNameNew:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.ReplaceBlockNameNew);
 
 				}
 
 				//AssignContainerTypesToAllCargo
-				if(tag.Contains("[AssignContainerTypesToAllCargo") == true) {
+				if (tag.Contains("[AssignContainerTypesToAllCargo:") == true) {
 
-					improveSpawnGroup.AssignContainerTypesToAllCargo = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.AssignContainerTypesToAllCargo);
 
 				}
 
 				//UseContainerTypeAssignment
-				if(tag.Contains("[UseContainerTypeAssignment") == true) {
+				if(tag.Contains("[UseContainerTypeAssignment:") == true) {
 
-					improveSpawnGroup.UseContainerTypeAssignment = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseContainerTypeAssignment);
 
 				}
 
 				//ContainerTypeAssignmentReference
-				if(tag.Contains("[ContainerTypeAssignmentReference") == true) {
+				if (tag.Contains("[ContainerTypeAssignmentReference") == true) {
 
-					improveSpawnGroup.ContainerTypeAssignmentReference = TagStringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringDictionaryCheck(tag, ref improveSpawnGroup.ContainerTypeAssignmentReference);
+
+				}
+
+				//ContainerTypeAssignBlockName
+				if (tag.Contains("[ContainerTypeAssignBlockName:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.ContainerTypeAssignBlockName);
+
+				}
+
+				//ContainerTypeAssignSubtypeId
+				if (tag.Contains("[ContainerTypeAssignSubtypeId:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.ContainerTypeAssignSubtypeId);
 
 				}
 
 				//OverrideBlockDamageModifier
-				if(tag.Contains("[OverrideBlockDamageModifier") == true){
+				if (tag.Contains("[OverrideBlockDamageModifier:") == true){
 
-					improveSpawnGroup.OverrideBlockDamageModifier = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.OverrideBlockDamageModifier);
 						
 				}
 				
 				//BlockDamageModifier
-				if(tag.Contains("[BlockDamageModifier") == true){
+				if(tag.Contains("[BlockDamageModifier:") == true){
 
-					improveSpawnGroup.BlockDamageModifier = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.BlockDamageModifier, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.BlockDamageModifier);
 						
 				}
 
 				//GridsAreEditable
-				if(tag.Contains("[GridsAreEditable") == true) {
+				if(tag.Contains("[GridsAreEditable:") == true) {
 
-					improveSpawnGroup.GridsAreEditable = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.GridsAreEditable);
 
 				}
 
 				//GridsAreDestructable
-				if(tag.Contains("[GridsAreDestructable") == true) {
+				if(tag.Contains("[GridsAreDestructable:") == true) {
 
-					improveSpawnGroup.GridsAreDestructable = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.GridsAreDestructable);
 
 				}
 
 				//ShiftBlockColorsHue
-				if(tag.Contains("[ShiftBlockColorsHue") == true){
+				if(tag.Contains("[ShiftBlockColorsHue:") == true){
 
-					improveSpawnGroup.ShiftBlockColorsHue = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ShiftBlockColorsHue);
 						
 				}
 				
 				//RandomHueShift
-				if(tag.Contains("[RandomHueShift") == true){
+				if(tag.Contains("[RandomHueShift:") == true){
 
-					improveSpawnGroup.RandomHueShift = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RandomHueShift);
 						
 				}
 
 				//ShiftBlockColorAmount
-				if(tag.Contains("[ShiftBlockColorAmount") == true) {
+				if(tag.Contains("[ShiftBlockColorAmount:") == true) {
 
-					improveSpawnGroup.ShiftBlockColorAmount = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.ShiftBlockColorAmount, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.ShiftBlockColorAmount);
 
 				}
 
 				//AssignGridSkin
-				if(tag.Contains("[AssignGridSkin") == true){
+				if(tag.Contains("[AssignGridSkin:") == true){
 
-					improveSpawnGroup.AssignGridSkin = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.AssignGridSkin);
 						
 				}
 
 				//RecolorGrid
-				if(tag.Contains("[RecolorGrid") == true) {
+				if(tag.Contains("[RecolorGrid:") == true) {
 
-					improveSpawnGroup.RecolorGrid = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RecolorGrid);
 
 				}
 
 				//ColorReferencePairs
-				if(tag.Contains("[ColorReferencePairs") == true) {
+				if(tag.Contains("[ColorReferencePairs:") == true) {
 
-					improveSpawnGroup.ColorReferencePairs = TagVector3DictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagVector3DictionaryCheck(tag, ref improveSpawnGroup.ColorReferencePairs);
 					//Logger.AddMsg(improveSpawnGroup.ColorReferencePairs.Keys.Count.ToString() + " Color Reference Pairs");
 
 				}
 
-				//ColorSkinReferencePairs
-				if(tag.Contains("[ColorSkinReferencePairs") == true) {
+				//RecolorOld
+				if (tag.Contains("[RecolorOld:") == true) {
 
-					improveSpawnGroup.ColorSkinReferencePairs = TagVector3StringDictionaryCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagVector3Check(tag, ref improveSpawnGroup.RecolorOld);
+
+				}
+
+				//RecolorNew
+				if (tag.Contains("[RecolorNew:") == true) {
+
+					TagVector3Check(tag, ref improveSpawnGroup.RecolorNew);
+
+				}
+
+				//ColorSkinReferencePairs
+				if (tag.Contains("[ColorSkinReferencePairs:") == true) {
+
+					TagVector3StringDictionaryCheck(tag, ref improveSpawnGroup.ColorSkinReferencePairs);
 					//Logger.AddMsg(improveSpawnGroup.ColorReferencePairs.Keys.Count.ToString() + " Color-Skin Reference Pairs");
 
 				}
 
-				//ReduceBlockBuildStates
-				if(tag.Contains("[ReduceBlockBuildStates") == true){
+				//ReskinTarget
+				if (tag.Contains("[ReskinTarget:") == true) {
 
-					improveSpawnGroup.ReduceBlockBuildStates = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagVector3Check(tag, ref improveSpawnGroup.ReskinTarget);
+
+				}
+
+				//ReskinTexture
+				if (tag.Contains("[ReskinTexture:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.ReskinTexture);
+
+				}
+
+				//ReduceBlockBuildStates
+				if (tag.Contains("[ReduceBlockBuildStates:") == true){
+
+					TagBoolCheck(tag, ref improveSpawnGroup.ReduceBlockBuildStates);
 						
 				}
 				
 				//MinimumBlocksPercent
-				if(tag.Contains("[MinimumBlocksPercent") == true){
+				if(tag.Contains("[MinimumBlocksPercent:") == true){
 
-					improveSpawnGroup.MinimumBlocksPercent = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinimumBlocksPercent, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MinimumBlocksPercent);
 						
 				}
 				
 				//MaximumBlocksPercent
-				if(tag.Contains("[MaximumBlocksPercent") == true){
+				if(tag.Contains("[MaximumBlocksPercent:") == true){
 
-					improveSpawnGroup.MaximumBlocksPercent = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaximumBlocksPercent, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MaximumBlocksPercent);
 						
 				}
 				
 				//MinimumBuildPercent
-				if(tag.Contains("[MinimumBuildPercent") == true){
+				if(tag.Contains("[MinimumBuildPercent:") == true){
 
-					improveSpawnGroup.MinimumBuildPercent = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinimumBuildPercent, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MinimumBuildPercent);
 						
 				}
 				
 				//MaximumBuildPercent
-				if(tag.Contains("[MaximumBuildPercent") == true){
+				if(tag.Contains("[MaximumBuildPercent:") == true){
 
-					improveSpawnGroup.MaximumBuildPercent = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaximumBuildPercent, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MaximumBuildPercent);
 						
 				}
 				
 				//UseRivalAi
-				if(tag.Contains("[UseRivalAi") == true){
+				if(tag.Contains("[UseRivalAi:") == true){
 
-					improveSpawnGroup.UseRivalAi = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseRivalAi);
 						
 				}
 
 				//RivalAiReplaceRemoteControl
-				if(tag.Contains("[RivalAiReplaceRemoteControl") == true){
+				if(tag.Contains("[RivalAiReplaceRemoteControl:") == true){
 
-					improveSpawnGroup.RivalAiReplaceRemoteControl = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiReplaceRemoteControl);
 						
 				}
 
 				//ApplyBehaviorToNamedBlock
-				if (tag.Contains("[ApplyBehaviorToNamedBlock") == true) {
+				if (tag.Contains("[ApplyBehaviorToNamedBlock:") == true) {
 
-					improveSpawnGroup.ApplyBehaviorToNamedBlock = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.ApplyBehaviorToNamedBlock);
 
 				}
 
 				//ConvertAllRemoteControlBlocks
-				if (tag.Contains("[ConvertAllRemoteControlBlocks") == true) {
+				if (tag.Contains("[ConvertAllRemoteControlBlocks:") == true) {
 
-					improveSpawnGroup.ConvertAllRemoteControlBlocks = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ConvertAllRemoteControlBlocks);
 
 				}
 
 				//EraseIngameScripts
-				if (tag.Contains("[EraseIngameScripts") == true){
+				if (tag.Contains("[EraseIngameScripts:") == true){
 
-					improveSpawnGroup.EraseIngameScripts = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.EraseIngameScripts);
 						
 				}
 				
 				//DisableTimerBlocks
-				if(tag.Contains("[DisableTimerBlocks") == true){
+				if(tag.Contains("[DisableTimerBlocks:") == true){
 
-					improveSpawnGroup.DisableTimerBlocks = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.DisableTimerBlocks);
 						
 				}
 				
 				//DisableSensorBlocks
-				if(tag.Contains("[DisableSensorBlocks") == true){
+				if(tag.Contains("[DisableSensorBlocks:") == true){
 
-					improveSpawnGroup.DisableSensorBlocks = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.DisableSensorBlocks);
 						
 				}
 				
 				//DisableWarheads
-				if(tag.Contains("[DisableWarheads") == true){
+				if(tag.Contains("[DisableWarheads:") == true){
 
-					improveSpawnGroup.DisableWarheads = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.DisableWarheads);
 						
 				}
 				
 				//DisableThrustOverride
-				if(tag.Contains("[DisableThrustOverride") == true){
+				if(tag.Contains("[DisableThrustOverride:") == true){
 
-					improveSpawnGroup.DisableThrustOverride = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.DisableThrustOverride);
 						
 				}
 				
 				//DisableGyroOverride
-				if(tag.Contains("[DisableGyroOverride") == true){
+				if(tag.Contains("[DisableGyroOverride:") == true){
 
-					improveSpawnGroup.DisableGyroOverride = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.DisableGyroOverride);
 						
 				}
 				
 				//EraseLCDs
-				if(tag.Contains("[EraseLCDs") == true){
+				if(tag.Contains("[EraseLCDs:") == true){
 
-					improveSpawnGroup.EraseLCDs = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.EraseLCDs);
 						
 				}
 				
 				//UseTextureLCD
-				if(tag.Contains("[UseTextureLCD") == true){
+				if(tag.Contains("[UseTextureLCD:") == true){
 
-					improveSpawnGroup.UseTextureLCD = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-						
-				}
-				
-				//EraseLCDs
-				if(tag.Contains("[EraseLCDs") == true){
-
-					improveSpawnGroup.EraseLCDs = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.UseTextureLCD);
 						
 				}
 				
 				//EnableBlocksWithName
-				if(tag.Contains("[EnableBlocksWithName") == true){
+				if(tag.Contains("[EnableBlocksWithName:") == true){
 
-					improveSpawnGroup.EnableBlocksWithName = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.EnableBlocksWithName);
 						
 				}
 				
 				//DisableBlocksWithName
-				if(tag.Contains("[DisableBlocksWithName") == true){
+				if(tag.Contains("[DisableBlocksWithName:") == true){
 
-					improveSpawnGroup.DisableBlocksWithName = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.DisableBlocksWithName);
 						
 				}
 				
 				//AllowPartialNames
-				if(tag.Contains("[AllowPartialNames") == true){
+				if(tag.Contains("[AllowPartialNames:") == true){
 
-					improveSpawnGroup.AllowPartialNames = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.AllowPartialNames);
 						
 				}
 				
 				//ChangeTurretSettings
-				if(tag.Contains("[ChangeTurretSettings") == true){
+				if(tag.Contains("[ChangeTurretSettings:") == true){
 
-					improveSpawnGroup.ChangeTurretSettings = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ChangeTurretSettings);
 						
 				}
 				
 				//TurretRange
-				if(tag.Contains("[TurretRange") == true){
+				if(tag.Contains("[TurretRange:") == true){
 
-					improveSpawnGroup.TurretRange = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.TurretRange, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.TurretRange);
 						
 				}
 				
 				//TurretIdleRotation
-				if(tag.Contains("[TurretIdleRotation") == true){
+				if(tag.Contains("[TurretIdleRotation:") == true){
 
-					improveSpawnGroup.TurretIdleRotation = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.TurretIdleRotation);
 						
 				}
 				
 				//TurretTargetMeteors
-				if(tag.Contains("[TurretTargetMeteors") == true){
+				if(tag.Contains("[TurretTargetMeteors:") == true){
 
-					improveSpawnGroup.TurretTargetMeteors = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetMeteors);
 						
 				}
 				
 				//TurretTargetMissiles
-				if(tag.Contains("[TurretTargetMissiles") == true){
+				if(tag.Contains("[TurretTargetMissiles:") == true){
 
-					improveSpawnGroup.TurretTargetMissiles = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetMissiles);
 						
 				}
 				
 				//TurretTargetCharacters
-				if(tag.Contains("[TurretTargetCharacters") == true){
+				if(tag.Contains("[TurretTargetCharacters:") == true){
 
-					improveSpawnGroup.TurretTargetCharacters = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetCharacters);
 						
 				}
 				
 				//TurretTargetSmallGrids
-				if(tag.Contains("[TurretTargetSmallGrids") == true){
+				if(tag.Contains("[TurretTargetSmallGrids:") == true){
 
-					improveSpawnGroup.TurretTargetSmallGrids = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetSmallGrids);
 						
 				}
 				
 				//TurretTargetLargeGrids
-				if(tag.Contains("[TurretTargetLargeGrids") == true){
+				if(tag.Contains("[TurretTargetLargeGrids:") == true){
 
-					improveSpawnGroup.TurretTargetLargeGrids = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetLargeGrids);
 						
 				}
 				
 				//TurretTargetStations
-				if(tag.Contains("[TurretTargetStations") == true){
+				if(tag.Contains("[TurretTargetStations:") == true){
 
-					improveSpawnGroup.TurretTargetStations = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetStations);
 						
 				}
 				
 				//TurretTargetNeutrals
-				if(tag.Contains("[TurretTargetNeutrals") == true){
+				if(tag.Contains("[TurretTargetNeutrals:") == true){
 
-					improveSpawnGroup.TurretTargetNeutrals = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetNeutrals);
 						
 				}
 				
 				//ClearAuthorship
-				if(tag.Contains("[ClearAuthorship") == true){
+				if(tag.Contains("[ClearAuthorship:") == true){
 
-					improveSpawnGroup.ClearAuthorship = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ClearAuthorship);
 						
 				}
 				
 				//MinSpawnFromWorldCenter
-				if(tag.Contains("[MinSpawnFromWorldCenter") == true){
+				if(tag.Contains("[MinSpawnFromWorldCenter:") == true){
 
-					improveSpawnGroup.MinSpawnFromWorldCenter = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinSpawnFromWorldCenter, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MinSpawnFromWorldCenter);
 						
 				}
 				
 				//MaxSpawnFromWorldCenter
-				if(tag.Contains("[MaxSpawnFromWorldCenter") == true){
+				if(tag.Contains("[MaxSpawnFromWorldCenter:") == true){
 
-					improveSpawnGroup.MaxSpawnFromWorldCenter = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxSpawnFromWorldCenter, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MaxSpawnFromWorldCenter);
 						
 				}
 
-				//DirectionFromWorldCenter
-				if (tag.Contains("[DirectionFromWorldCenter") == true) {
+				//CustomWorldCenter
+				if (tag.Contains("[DirectionFromWorldCenter:") == true) {
 
-					improveSpawnGroup.DirectionFromWorldCenter = TagVector3DCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagVector3DCheck(tag, ref improveSpawnGroup.DirectionFromWorldCenter);
+
+				}
+
+				//DirectionFromWorldCenter
+				if (tag.Contains("[DirectionFromWorldCenter:") == true) {
+
+					TagVector3DCheck(tag, ref improveSpawnGroup.DirectionFromWorldCenter);
 
 				}
 
 				//MinAngleFromDirection
-				if (tag.Contains("[MinAngleFromDirection") == true) {
+				if (tag.Contains("[MinAngleFromDirection:") == true) {
 
-					improveSpawnGroup.MinAngleFromDirection = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinAngleFromDirection, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MinAngleFromDirection);
 
 				}
 
 				//MaxAngleFromDirection
-				if (tag.Contains("[MaxAngleFromDirection") == true) {
+				if (tag.Contains("[MaxAngleFromDirection:") == true) {
 
-					improveSpawnGroup.MaxAngleFromDirection = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxAngleFromDirection, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MaxAngleFromDirection);
 
 				}
 
 				//MinSpawnFromPlanetSurface
-				if (tag.Contains("[MinSpawnFromPlanetSurface") == true) {
+				if (tag.Contains("[MinSpawnFromPlanetSurface:") == true) {
 
-					improveSpawnGroup.MinSpawnFromPlanetSurface = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinSpawnFromPlanetSurface, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MinSpawnFromPlanetSurface);
 
 				}
 
 				//MaxSpawnFromPlanetSurface
-				if (tag.Contains("[MaxSpawnFromPlanetSurface") == true) {
+				if (tag.Contains("[MaxSpawnFromPlanetSurface:") == true) {
 
-					improveSpawnGroup.MaxSpawnFromPlanetSurface = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxSpawnFromPlanetSurface, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MaxSpawnFromPlanetSurface);
 
 				}
 
 				//UseDayOrNightOnly
-				if (tag.Contains("[UseDayOrNightOnly") == true) {
+				if (tag.Contains("[UseDayOrNightOnly:") == true) {
 
-					improveSpawnGroup.UseDayOrNightOnly = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseDayOrNightOnly);
 
 				}
 
 				//SpawnOnlyAtNight
-				if (tag.Contains("[SpawnOnlyAtNight") == true) {
+				if (tag.Contains("[SpawnOnlyAtNight:") == true) {
 
-					improveSpawnGroup.SpawnOnlyAtNight = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.SpawnOnlyAtNight);
 
 				}
 
 				//UseWeatherSpawning
-				if (tag.Contains("[UseWeatherSpawning") == true) {
+				if (tag.Contains("[UseWeatherSpawning:") == true) {
 
-					improveSpawnGroup.UseWeatherSpawning = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseWeatherSpawning);
 
 				}
 
 				//AllowedWeatherSystems
-				if (tag.Contains("[AllowedWeatherSystems") == true) {
+				if (tag.Contains("[AllowedWeatherSystems:") == true) {
 
-					improveSpawnGroup.AllowedWeatherSystems = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.AllowedWeatherSystems);
 
 				}
 
 				//UseTerrainTypeValidation
-				if (tag.Contains("[UseTerrainTypeValidation") == true) {
+				if (tag.Contains("[UseTerrainTypeValidation:") == true) {
 
-					improveSpawnGroup.UseTerrainTypeValidation = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseTerrainTypeValidation);
 
 				}
 
 				//AllowedTerrainTypes
-				if (tag.Contains("[AllowedTerrainTypes") == true) {
+				if (tag.Contains("[AllowedTerrainTypes:") == true) {
 
-					improveSpawnGroup.AllowedTerrainTypes = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.AllowedTerrainTypes);
 
 				}
 
 				//MinAirDensity
-				if (tag.Contains("[MinAirDensity") == true) {
+				if (tag.Contains("[MinAirDensity:") == true) {
 
-					improveSpawnGroup.MinAirDensity = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinAirDensity, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MinAirDensity);
 
 				}
 
 				//MaxAirDensity
-				if (tag.Contains("[MaxAirDensity") == true) {
+				if (tag.Contains("[MaxAirDensity:") == true) {
 
-					improveSpawnGroup.MaxAirDensity = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxAirDensity, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MaxAirDensity);
 
 				}
 
 				//MinGravity
-				if (tag.Contains("[MinGravity") == true) {
+				if (tag.Contains("[MinGravity:") == true) {
 
-					improveSpawnGroup.MinGravity = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinGravity, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MinGravity);
 
 				}
 
 				//MaxGravity
-				if (tag.Contains("[MaxGravity") == true) {
+				if (tag.Contains("[MaxGravity:") == true) {
 
-					improveSpawnGroup.MaxGravity = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxGravity, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MaxGravity);
 
 				}
 
 				//PlanetBlacklist
-				if (tag.Contains("[PlanetBlacklist") == true){
+				if (tag.Contains("[PlanetBlacklist:") == true){
 
-					improveSpawnGroup.PlanetBlacklist = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.PlanetBlacklist);
 						
 				}
 				
 				//PlanetWhitelist
-				if(tag.Contains("[PlanetWhitelist") == true){
+				if(tag.Contains("[PlanetWhitelist:") == true){
 
-					improveSpawnGroup.PlanetWhitelist = TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringListCheck(tag, ref improveSpawnGroup.PlanetWhitelist);
 						
 				}
 				
 				//PlanetRequiresVacuum
-				if(tag.Contains("[PlanetRequiresVacuum") == true){
+				if(tag.Contains("[PlanetRequiresVacuum:") == true){
 
-					improveSpawnGroup.PlanetRequiresVacuum = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.PlanetRequiresVacuum);
 						
 				}
 				
 				//PlanetRequiresAtmo
-				if(tag.Contains("[PlanetRequiresAtmo") == true){
+				if(tag.Contains("[PlanetRequiresAtmo:") == true){
 
-					improveSpawnGroup.PlanetRequiresAtmo = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.PlanetRequiresAtmo);
 					setAtmoRequired = true;
 						
 				}
 				
 				//PlanetRequiresOxygen
-				if(tag.Contains("[PlanetRequiresOxygen") == true){
+				if(tag.Contains("[PlanetRequiresOxygen:") == true){
 
-					improveSpawnGroup.PlanetRequiresOxygen = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.PlanetRequiresOxygen);
 						
 				}
 				
 				//PlanetMinimumSize
-				if(tag.Contains("[PlanetMinimumSize") == true){
+				if(tag.Contains("[PlanetMinimumSize:") == true){
 
-					improveSpawnGroup.PlanetMinimumSize = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PlanetMinimumSize, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.PlanetMinimumSize);
 						
 				}
 				
 				//PlanetMaximumSize
-				if(tag.Contains("[PlanetMaximumSize") == true){
+				if(tag.Contains("[PlanetMaximumSize:") == true){
 
-					improveSpawnGroup.PlanetMaximumSize = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PlanetMaximumSize, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.PlanetMaximumSize);
 						
 				}
 
 				//UsePlayerCountCheck
-				if(tag.Contains("[UsePlayerCountCheck") == true) {
+				if(tag.Contains("[UsePlayerCountCheck:") == true) {
 
-					improveSpawnGroup.UsePlayerCountCheck = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UsePlayerCountCheck);
 
 				}
 
 				//PlayerCountCheckRadius
-				if(tag.Contains("[PlayerCountCheckRadius") == true) {
+				if(tag.Contains("[PlayerCountCheckRadius:") == true) {
 
-					improveSpawnGroup.PlayerCountCheckRadius = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PlayerCountCheckRadius, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.PlayerCountCheckRadius);
 
 				}
 
 				//MinimumPlayers
-				if(tag.Contains("[MinimumPlayers") == true) {
+				if(tag.Contains("[MinimumPlayers:") == true) {
 
-					improveSpawnGroup.MinimumPlayers = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinimumPlayers, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MinimumPlayers);
 
 				}
 
 				//MaximumPlayers
-				if(tag.Contains("[MaximumPlayers") == true) {
+				if(tag.Contains("[MaximumPlayers:") == true) {
 
-					improveSpawnGroup.MaximumPlayers = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaximumPlayers, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MaximumPlayers);
 
 				}
 
 				//UseThreatLevelCheck
-				if(tag.Contains("[UseThreatLevelCheck") == true){
+				if(tag.Contains("[UseThreatLevelCheck:") == true){
 
-					improveSpawnGroup.UseThreatLevelCheck = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseThreatLevelCheck);
 						
 				}
 				
 				//ThreatLevelCheckRange
-				if(tag.Contains("[ThreatLevelCheckRange") == true){
+				if(tag.Contains("[ThreatLevelCheckRange:") == true){
 
-					improveSpawnGroup.ThreatLevelCheckRange = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.ThreatLevelCheckRange, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.ThreatLevelCheckRange);
 						
 				}
 				
 				//ThreatIncludeOtherNpcOwners
-				if(tag.Contains("[ThreatIncludeOtherNpcOwners") == true){
+				if(tag.Contains("[ThreatIncludeOtherNpcOwners:") == true){
 
-					improveSpawnGroup.ThreatIncludeOtherNpcOwners = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ThreatIncludeOtherNpcOwners);
 						
 				}
 				
 				//ThreatScoreMinimum
-				if(tag.Contains("[ThreatScoreMinimum") == true){
+				if(tag.Contains("[ThreatScoreMinimum:") == true){
 
-					improveSpawnGroup.ThreatScoreMinimum = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.ThreatScoreMinimum, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.ThreatScoreMinimum);
 						
 				}
 				
 				//ThreatScoreMaximum
-				if(tag.Contains("[ThreatScoreMaximum") == true){
+				if(tag.Contains("[ThreatScoreMaximum:") == true){
 
-					improveSpawnGroup.ThreatScoreMaximum = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.ThreatScoreMaximum, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.ThreatScoreMaximum);
 				
 				}
 				
 				//UsePCUCheck
-				if(tag.Contains("[UsePCUCheck") == true){
+				if(tag.Contains("[UsePCUCheck:") == true){
 
-					improveSpawnGroup.UsePCUCheck = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UsePCUCheck);
 						
 				}
 				
 				//PCUCheckRadius
-				if(tag.Contains("[PCUCheckRadius") == true){
+				if(tag.Contains("[PCUCheckRadius:") == true){
 
-					improveSpawnGroup.PCUCheckRadius = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PCUCheckRadius, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.PCUCheckRadius);
 						
 				}
 				
 				//PCUMinimum
-				if(tag.Contains("[PCUMinimum") == true){
+				if(tag.Contains("[PCUMinimum:") == true){
 
-					improveSpawnGroup.PCUMinimum = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PCUMinimum, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.PCUMinimum);
 						
 				}
 				
 				//PCUMaximum
-				if(tag.Contains("[PCUMaximum") == true){
+				if(tag.Contains("[PCUMaximum:") == true){
 
-					improveSpawnGroup.PCUMaximum = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PCUMaximum, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.PCUMaximum);
 						
 				}
 				
 				//UsePlayerCredits
-				if(tag.Contains("[UsePlayerCredits") == true){
+				if(tag.Contains("[UsePlayerCredits:") == true){
 
-					improveSpawnGroup.UsePlayerCredits = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UsePlayerCredits);
 						
 				}
 
 				//IncludeAllPlayersInRadius
-				if(tag.Contains("[IncludeAllPlayersInRadius") == true) {
+				if(tag.Contains("[IncludeAllPlayersInRadius:") == true) {
 
-					improveSpawnGroup.IncludeAllPlayersInRadius = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IncludeAllPlayersInRadius);
 
 				}
 
 				//IncludeFactionBalance
-				if(tag.Contains("[IncludeFactionBalance") == true) {
+				if(tag.Contains("[IncludeFactionBalance:") == true) {
 
-					improveSpawnGroup.IncludeFactionBalance = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.IncludeFactionBalance);
 
 				}
 
 				//PlayerCreditsCheckRadius
-				if(tag.Contains("[PlayerCreditsCheckRadius") == true){
+				if(tag.Contains("[PlayerCreditsCheckRadius:") == true){
 
-					improveSpawnGroup.PlayerCreditsCheckRadius = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PlayerCreditsCheckRadius, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.PlayerCreditsCheckRadius);
 						
 				}
 				
 				//MinimumPlayerCredits
-				if(tag.Contains("[MinimumPlayerCredits") == true){
+				if(tag.Contains("[MinimumPlayerCredits:") == true){
 
-					improveSpawnGroup.MinimumPlayerCredits = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinimumPlayerCredits, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MinimumPlayerCredits);
 						
 				}
 				
 				//MaximumPlayerCredits
-				if(tag.Contains("[MaximumPlayerCredits") == true){
+				if(tag.Contains("[MaximumPlayerCredits:") == true){
 
-					improveSpawnGroup.MaximumPlayerCredits = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaximumPlayerCredits, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MaximumPlayerCredits);
 						
 				}
 				
 				//UsePlayerFactionReputation
-				if(tag.Contains("[UsePlayerFactionReputation") == true){
+				if(tag.Contains("[UsePlayerFactionReputation:") == true){
 
-					improveSpawnGroup.UsePlayerFactionReputation = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UsePlayerFactionReputation);
 						
 				}
 				
 				//PlayerReputationCheckRadius
-				if(tag.Contains("[PlayerReputationCheckRadius") == true){
+				if(tag.Contains("[PlayerReputationCheckRadius:") == true){
 
-					improveSpawnGroup.PlayerReputationCheckRadius = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.PlayerReputationCheckRadius, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.PlayerReputationCheckRadius);
 				
 				}
 				
 				//CheckReputationAgainstOtherNPCFaction
-				if(tag.Contains("[CheckReputationAgainstOtherNPCFaction") == true){
+				if(tag.Contains("[CheckReputationAgainstOtherNPCFaction:") == true){
 
-					improveSpawnGroup.CheckReputationAgainstOtherNPCFaction = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.CheckReputationAgainstOtherNPCFaction);
 				
 				}
 				
 				//MinimumReputation
-				if(tag.Contains("[MinimumReputation") == true){
+				if(tag.Contains("[MinimumReputation:") == true){
 				
-					improveSpawnGroup.MinimumReputation = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinimumReputation, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MinimumReputation);
 				
 				}
 				
 				//MaximumReputation
-				if(tag.Contains("[MaximumReputation") == true){
+				if(tag.Contains("[MaximumReputation:") == true){
 
-					improveSpawnGroup.MaximumReputation = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaximumReputation, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.MaximumReputation);
 						
 				}
 
 				//ChargeNpcFactionForSpawn
-				if (tag.Contains("[ChargeNpcFactionForSpawn") == true) {
+				if (tag.Contains("[ChargeNpcFactionForSpawn:") == true) {
 
-					improveSpawnGroup.ChargeNpcFactionForSpawn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ChargeNpcFactionForSpawn);
 
 				}
 
 				//ChargeForSpawning
-				if (tag.Contains("[ChargeForSpawning") == true) {
+				if (tag.Contains("[ChargeForSpawning:") == true) {
 
-					improveSpawnGroup.ChargeForSpawning = TagLongCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.ChargeForSpawning, out badParse);
+					TagLongCheck(tag, ref improveSpawnGroup.ChargeForSpawning);
 
 				}
 
 				//RequireAllMods
-				if (tag.Contains("[RequiredMods") == true || tag.Contains("[RequireAllMods") == true){
+				if (tag.Contains("[RequiredMods:") == true || tag.Contains("[RequireAllMods") == true){
 
-					improveSpawnGroup.RequireAllMods = TagUlongListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagUlongListCheck(tag, ref improveSpawnGroup.RequireAllMods);
 						
 				}
 				
 				//ExcludeAnyMods
-				if(tag.Contains("[ExcludedMods") == true || tag.Contains("[ExcludeAnyMods") == true){
+				if(tag.Contains("[ExcludedMods:") == true || tag.Contains("[ExcludeAnyMods") == true){
 
-					improveSpawnGroup.ExcludeAnyMods = TagUlongListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagUlongListCheck(tag, ref improveSpawnGroup.ExcludeAnyMods);
 						
 				}
 				
 				//RequireAnyMods
-				if(tag.Contains("[RequireAnyMods") == true){
+				if(tag.Contains("[RequireAnyMods:") == true){
 
-					improveSpawnGroup.RequireAnyMods = TagUlongListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagUlongListCheck(tag, ref improveSpawnGroup.RequireAnyMods);
 						
 				}
 				
 				//ExcludeAllMods
-				if(tag.Contains("[ExcludeAllMods") == true){
+				if(tag.Contains("[ExcludeAllMods:") == true){
 
-					improveSpawnGroup.ExcludeAllMods = TagUlongListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagUlongListCheck(tag, ref improveSpawnGroup.ExcludeAllMods);
 						
 				}
 				
 				//RequiredPlayersOnline
-				if(tag.Contains("[RequiredPlayersOnline") == true){
+				if(tag.Contains("[RequiredPlayersOnline:") == true){
 
-					improveSpawnGroup.RequiredPlayersOnline = TagUlongListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagUlongListCheck(tag, ref improveSpawnGroup.RequiredPlayersOnline);
 						
 				}
 				
 				//AttachModStorageComponentToGrid
-				if(tag.Contains("[AttachModStorageComponentToGrid") == true){
+				if(tag.Contains("[AttachModStorageComponentToGrid:") == true){
 
-					improveSpawnGroup.AttachModStorageComponentToGrid = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.AttachModStorageComponentToGrid);
 						
 				}
 				
 				//StorageKey
-				if(tag.Contains("[StorageKey") == true){
+				if(tag.Contains("[StorageKey:") == true){
 
-					var storageKey = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					try{
-						
-						improveSpawnGroup.StorageKey = new Guid(storageKey);
-						
-					}catch(Exception e){
-						
-						Logger.AddMsg("Spawngroup Tag [StorageKey] Invalid for SpawnGroup" + improveSpawnGroup.SpawnGroupName);
-						badParse = true;
-						
-					}
-					
-				
+					TagGuidCheck(tag, ref improveSpawnGroup.StorageKey);
+		
 				}
 				
 				//StorageValue
-				if(tag.Contains("[StorageValue") == true){
+				if(tag.Contains("[StorageValue:") == true){
 
-					improveSpawnGroup.StorageValue = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.StorageValue);
 				
 				}
 
 				//UseKnownPlayerLocations
-				if(tag.Contains("[UseKnownPlayerLocations") == true) {
+				if(tag.Contains("[UseKnownPlayerLocations:") == true) {
 
-					improveSpawnGroup.UseKnownPlayerLocations = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.UseKnownPlayerLocations);
 
 				}
 
 				//KnownPlayerLocationMustMatchFaction
-				if(tag.Contains("[KnownPlayerLocationMustMatchFaction") == true) {
+				if(tag.Contains("[KnownPlayerLocationMustMatchFaction:") == true) {
 
-					improveSpawnGroup.KnownPlayerLocationMustMatchFaction = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.KnownPlayerLocationMustMatchFaction);
 
 				}
 
 				//KnownPlayerLocationMinSpawnedEncounters
-				if(tag.Contains("[KnownPlayerLocationMinSpawnedEncounters") == true) {
+				if(tag.Contains("[KnownPlayerLocationMinSpawnedEncounters:") == true) {
 
-					improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters);
 
 				}
 
 				//KnownPlayerLocationMaxSpawnedEncounters
-				if(tag.Contains("[KnownPlayerLocationMaxSpawnedEncounters") == true) {
+				if(tag.Contains("[KnownPlayerLocationMaxSpawnedEncounters:") == true) {
 
-					improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters = TagIntCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters, out badParse);
+					TagIntCheck(tag, ref improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters);
 
 				}
 
 				//Territory
-				if(tag.Contains("[Territory") == true){
+				if(tag.Contains("[Territory:") == true){
 
-					improveSpawnGroup.Territory = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.Territory);
 						
 				}
 				
 				//MinDistanceFromTerritoryCenter
-				if(tag.Contains("[MinDistanceFromTerritoryCenter") == true){
+				if(tag.Contains("[MinDistanceFromTerritoryCenter:") == true){
 
-					improveSpawnGroup.MinDistanceFromTerritoryCenter = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MinDistanceFromTerritoryCenter, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MinDistanceFromTerritoryCenter);
 						
 				}
 				
 				//MaxDistanceFromTerritoryCenter
-				if(tag.Contains("[MaxDistanceFromTerritoryCenter") == true){
+				if(tag.Contains("[MaxDistanceFromTerritoryCenter:") == true){
 
-					improveSpawnGroup.MaxDistanceFromTerritoryCenter = TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, improveSpawnGroup.MaxDistanceFromTerritoryCenter, out badParse);
+					TagDoubleCheck(tag, ref improveSpawnGroup.MaxDistanceFromTerritoryCenter);
 						
 				}
 				
 				//RotateFirstCockpitToForward
-				if(tag.Contains("[RotateFirstCockpitToForward") == true){
+				if(tag.Contains("[RotateFirstCockpitToForward:") == true){
 
-					improveSpawnGroup.RotateFirstCockpitToForward = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RotateFirstCockpitToForward);
 						
 				}
 				
 				//PositionAtFirstCockpit
-				if(tag.Contains("[PositionAtFirstCockpit") == true){
+				if(tag.Contains("[PositionAtFirstCockpit:") == true){
 
-					improveSpawnGroup.PositionAtFirstCockpit = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.PositionAtFirstCockpit);
 						
 				}
 				
 				//SpawnRandomCargo
-				if(tag.Contains("[SpawnRandomCargo") == true){
+				if(tag.Contains("[SpawnRandomCargo:") == true){
 
-					improveSpawnGroup.SpawnRandomCargo = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.SpawnRandomCargo);
 						
 				}
 				
 				//DisableDampeners
-				if(tag.Contains("[DisableDampeners") == true){
+				if(tag.Contains("[DisableDampeners:") == true){
 
-					improveSpawnGroup.DisableDampeners = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.DisableDampeners);
 					setDampeners = true;
 						
 				}
 				
 				//ReactorsOn
-				if(tag.Contains("[ReactorsOn") == true){
+				if(tag.Contains("[ReactorsOn:") == true){
 
-					improveSpawnGroup.ReactorsOn = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.ReactorsOn);
 						
 				}
 
 				//RemoveVoxelsIfGridRemoved
-				if(tag.Contains("[RemoveVoxelsIfGridRemoved") == true) {
+				if(tag.Contains("[RemoveVoxelsIfGridRemoved:") == true) {
 
-					improveSpawnGroup.RemoveVoxelsIfGridRemoved = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.RemoveVoxelsIfGridRemoved);
 
 				}
 
 				//BossCustomAnnounceEnable
-				if(tag.Contains("[BossCustomAnnounceEnable") == true){
+				if(tag.Contains("[BossCustomAnnounceEnable:") == true){
 
-					improveSpawnGroup.BossCustomAnnounceEnable = TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagBoolCheck(tag, ref improveSpawnGroup.BossCustomAnnounceEnable);
 						
 				}
 				
 				//BossCustomAnnounceAuthor
-				if(tag.Contains("[BossCustomAnnounceAuthor") == true){
+				if(tag.Contains("[BossCustomAnnounceAuthor:") == true){
 
-					improveSpawnGroup.BossCustomAnnounceAuthor = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.BossCustomAnnounceAuthor);
 						
 				}
 				
 				//BossCustomAnnounceMessage
-				if(tag.Contains("[BossCustomAnnounceMessage") == true){
+				if(tag.Contains("[BossCustomAnnounceMessage:") == true){
 
-					improveSpawnGroup.BossCustomAnnounceMessage = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.BossCustomAnnounceMessage);
 						
 				}
 				
 				//BossCustomGPSLabel
-				if(tag.Contains("[BossCustomGPSLabel") == true){
+				if(tag.Contains("[BossCustomGPSLabel:") == true){
 
-					improveSpawnGroup.BossCustomGPSLabel = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.BossCustomGPSLabel);
 						
 				}
 
 				//BossMusicId
-				if (tag.Contains("[BossMusicId") == true) {
+				if (tag.Contains("[BossMusicId:") == true) {
 
-					improveSpawnGroup.BossMusicId = TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
+					TagStringCheck(tag, ref improveSpawnGroup.BossMusicId);
 
 				}
 
@@ -1785,7 +2005,74 @@ namespace ModularEncountersSpawner{
 				improveSpawnGroup.ForceStaticGrid = true;
 				
 			}
-							
+
+			//Build Dictionaries
+			if (improveSpawnGroup.NonRandomWeaponNames.Count > 0 && improveSpawnGroup.NonRandomWeaponNames.Count == improveSpawnGroup.NonRandomWeaponIds.Count) {
+
+				for (int i = 0; i < improveSpawnGroup.NonRandomWeaponNames.Count; i++) {
+
+					if (!improveSpawnGroup.NonRandomWeaponReference.ContainsKey(improveSpawnGroup.NonRandomWeaponNames[i]))
+						improveSpawnGroup.NonRandomWeaponReference.Add(improveSpawnGroup.NonRandomWeaponNames[i], improveSpawnGroup.NonRandomWeaponIds[i]);
+
+				}
+
+			}
+
+			if (improveSpawnGroup.ReplaceBlockOld.Count > 0 && improveSpawnGroup.ReplaceBlockOld.Count == improveSpawnGroup.ReplaceBlockNew.Count) {
+
+				for (int i = 0; i < improveSpawnGroup.ReplaceBlockOld.Count; i++) {
+
+					if (!improveSpawnGroup.ReplaceBlockReference.ContainsKey(improveSpawnGroup.ReplaceBlockOld[i]))
+						improveSpawnGroup.ReplaceBlockReference.Add(improveSpawnGroup.ReplaceBlockOld[i], improveSpawnGroup.ReplaceBlockNew[i]);
+
+				}
+				
+			}
+
+			if (improveSpawnGroup.ReplaceBlockNameOld.Count > 0 && improveSpawnGroup.ReplaceBlockNameOld.Count == improveSpawnGroup.ReplaceBlockNameNew.Count) {
+
+				for (int i = 0; i < improveSpawnGroup.ReplaceBlockNameOld.Count; i++) {
+
+					if (!improveSpawnGroup.BlockNameReplacerReference.ContainsKey(improveSpawnGroup.ReplaceBlockNameOld[i]))
+						improveSpawnGroup.BlockNameReplacerReference.Add(improveSpawnGroup.ReplaceBlockNameOld[i], improveSpawnGroup.ReplaceBlockNameNew[i]);
+
+				}
+
+			}
+
+			if (improveSpawnGroup.ContainerTypeAssignBlockName.Count > 0 && improveSpawnGroup.ContainerTypeAssignBlockName.Count == improveSpawnGroup.ContainerTypeAssignSubtypeId.Count) {
+
+				for (int i = 0; i < improveSpawnGroup.ContainerTypeAssignBlockName.Count; i++) {
+
+					if (!improveSpawnGroup.ContainerTypeAssignmentReference.ContainsKey(improveSpawnGroup.ContainerTypeAssignBlockName[i]))
+						improveSpawnGroup.ContainerTypeAssignmentReference.Add(improveSpawnGroup.ContainerTypeAssignBlockName[i], improveSpawnGroup.ContainerTypeAssignSubtypeId[i]);
+
+				}
+
+			}
+
+			if (improveSpawnGroup.RecolorOld.Count > 0 && improveSpawnGroup.RecolorOld.Count == improveSpawnGroup.RecolorNew.Count) {
+
+				for (int i = 0; i < improveSpawnGroup.RecolorOld.Count; i++) {
+
+					if (!improveSpawnGroup.ColorReferencePairs.ContainsKey(improveSpawnGroup.RecolorOld[i]))
+						improveSpawnGroup.ColorReferencePairs.Add(improveSpawnGroup.RecolorOld[i], improveSpawnGroup.RecolorNew[i]);
+
+				}
+
+			}
+
+			if (improveSpawnGroup.ReskinTarget.Count > 0 && improveSpawnGroup.ReskinTarget.Count == improveSpawnGroup.ReskinTexture.Count) {
+
+				for (int i = 0; i < improveSpawnGroup.ReskinTarget.Count; i++) {
+
+					if (!improveSpawnGroup.ColorSkinReferencePairs.ContainsKey(improveSpawnGroup.ReskinTarget[i]))
+						improveSpawnGroup.ColorSkinReferencePairs.Add(improveSpawnGroup.ReskinTarget[i], improveSpawnGroup.ReskinTexture[i]);
+
+				}
+
+			}
+
 			return improveSpawnGroup;
 
 		}
@@ -1955,12 +2242,12 @@ namespace ModularEncountersSpawner{
 			
 		}
 
-		public static bool ModRestrictionCheck(ImprovedSpawnGroup spawnGroup){
-			
+		public static bool NeededModsForSpawnGroup(ImprovedSpawnGroup spawnGroup){
+
 			//Require All
 			if(spawnGroup.RequireAllMods.Count > 0){
-				
-				foreach(var item in spawnGroup.RequireAllMods){
+
+				foreach (var item in spawnGroup.RequireAllMods){
 				
 					if(MES_SessionCore.ActiveMods.Contains(item) == false){
 						
@@ -1974,7 +2261,7 @@ namespace ModularEncountersSpawner{
 
 			//Require Any
 			if(spawnGroup.RequireAnyMods.Count > 0){
-				
+
 				bool gotMod = false;
 				
 				foreach(var item in spawnGroup.RequireAnyMods){
@@ -2109,187 +2396,203 @@ namespace ModularEncountersSpawner{
 
 		}
 
-		public static bool TagBoolCheck(string tag, string spawnGroupName, out bool badParse){
+		public static void TagBoolCheck(string tag, ref bool original){
 			
 			bool result = false;
-			badParse = false;
 			var tagSplit = ProcessTag(tag);
-					
-			if(tagSplit.Length == 2){
-				
-				if(bool.TryParse(tagSplit[1], out result) == false){
-					
-					Logger.AddMsg("Could not process Bool tag " + tag + " from SpawnGroup " + spawnGroupName);
-					badParse = true;
-					
+
+			if (tagSplit.Length == 2) {
+
+				if (bool.TryParse(tagSplit[1], out result) == false) {
+
+					return;
+
 				}
-				
-			}else{
-				
-				Logger.AddMsg("Could not process Bool tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-				
-			}
+
+			} else {
+
+				return;
 			
-			return result;
+			}
+
+			original = result;
 			
 		}
 
-		public static float TagFloatCheck(string tag, string spawnGroupName, float defaultValue, out bool badParse) {
+		public static void TagFloatCheck(string tag, ref float original) {
 
-			float result = defaultValue;
-			badParse = false;
+			float result = 0;
 			var tagSplit = ProcessTag(tag);
 
 			if (tagSplit.Length == 2) {
 
 				if (float.TryParse(tagSplit[1], out result) == false) {
 
-					Logger.AddMsg("Could not process Float tag " + tag + " from SpawnGroup " + spawnGroupName);
-					badParse = true;
+					return;
 
 				}
 
 			} else {
 
-				Logger.AddMsg("Could not process Float tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
+				return;
 
 			}
 
-			return result;
+			original = result;
 
 		}
 
-		public static double TagDoubleCheck(string tag, string spawnGroupName, double defaultValue, out bool badParse){
+		public static void TagDoubleCheck(string tag, ref double original) {
 			
-			double result = defaultValue;
-			badParse = false;
+			double result = 0;
 			var tagSplit = ProcessTag(tag);
 					
 			if(tagSplit.Length == 2){
 				
-				if(double.TryParse(tagSplit[1], out result) == false){
-					
-					Logger.AddMsg("Could not process Double tag " + tag + " from SpawnGroup " + spawnGroupName);
-					badParse = true;
-					
+				if(double.TryParse(tagSplit[1], out result) == false) {
+
+					return;
+
 				}
-				
-			}else{
-				
-				Logger.AddMsg("Could not process Double tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-				
+
+			} else {
+
+				return;
+
 			}
-			
-			return result;
-			
+
+			original = result;
+
 		}
 		
-		public static int TagIntCheck(string tag, string spawnGroupName, int defaultValue, out bool badParse){
+		public static void TagIntCheck(string tag, ref int original) {
 			
-			int result = defaultValue;
-			badParse = false;
+			int result = 0;
 			var tagSplit = ProcessTag(tag);
 					
 			if(tagSplit.Length == 2){
 				
 				if(int.TryParse(tagSplit[1], out result) == false){
-					
-					Logger.AddMsg("Could not process Int tag " + tag + " from SpawnGroup " + spawnGroupName);
-					badParse = true;
+
+					return;
 					
 				}
 				
 			}else{
-				
-				Logger.AddMsg("Could not process Int tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
+
+				return;
 				
 			}
-			
-			return result;
-			
+
+			original = result;
+
 		}
 
-		public static long TagLongCheck(string tag, string spawnGroupName, long defaultValue, out bool badParse) {
+		public static void TagLongCheck(string tag, ref long original) {
 
-			long result = defaultValue;
-			badParse = false;
+			long result = 0;
 			var tagSplit = ProcessTag(tag);
 
 			if (tagSplit.Length == 2) {
 
 				if (long.TryParse(tagSplit[1], out result) == false) {
 
-					Logger.AddMsg("Could not process long tag " + tag + " from SpawnGroup " + spawnGroupName);
-					badParse = true;
+					return;
 
 				}
 
 			} else {
 
-				Logger.AddMsg("Could not process long tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
+				return;
 
 			}
 
-			return result;
+			original = result;
 
 		}
 
-		public static MyDefinitionId TagMyDefIdCheck(string tag, string spawnGroupName, out bool badParse){
+		public static void TagMyDefIdCheck(string tag, ref MyDefinitionId original){
 			
 			MyDefinitionId result = new MyDefinitionId();
-			badParse = false;
 			var tagSplit = ProcessTag(tag);
 			
 			if(tagSplit.Length == 2){
 				
 				if(MyDefinitionId.TryParse(tagSplit[1], out result) == false){
-					
-					Logger.AddMsg("Could not parse MyDefinitionId tag " + tag + " from SpawnGroup " + spawnGroupName);
-					badParse = true;
+
+					return;
 					
 				}
 				
 			}else{
-				
-				Logger.AddMsg("Could not process MyDefinitionId tag " + tag + " from SpawnGroup " + spawnGroupName + ". Array Length Is: " + tagSplit.Length.ToString());
-				badParse = true;
+
+				return;
 				
 			}
 			
-			return result;
+			original = result;
 			
 		}
-		
-		public static string TagStringCheck(string tag, string spawnGroupName, out bool badParse){
+
+		public static void TagMyDefIdCheck(string tag, ref List<MyDefinitionId> original) {
+
+			MyDefinitionId result = new MyDefinitionId();
+			var tagSplit = ProcessTag(tag);
+
+			if (tagSplit.Length == 2) {
+
+				if (MyDefinitionId.TryParse(tagSplit[1], out result) == false) {
+
+					return;
+
+				}
+
+			} else {
+
+				return;
+
+			}
+
+			original.Add(result);
+
+		}
+
+		public static void TagGuidCheck(string tag, ref Guid original) {
+
+			var tagSplit = ProcessTag(tag);
+
+			if (tagSplit.Length == 2) {
+
+				var temp = tagSplit[1];
+				try {
+
+					var guid = new Guid(temp);
+					original = guid;
+
+				} catch (Exception e) {
+
+					return;
+
+				}
+
+			}
+
+		}
+
+		public static void TagStringCheck(string tag, ref string original){
 			
-			string result = "";
-			badParse = false;
 			var tagSplit = ProcessTag(tag);
 			
 			if(tagSplit.Length == 2){
-				
-				result = tagSplit[1];
-				
-			}else{
-				
-				Logger.AddMsg("Could not process String tag " + tag + " from SpawnGroup " + spawnGroupName + ". Array Length Is: " + tagSplit.Length.ToString());
-				badParse = true;
+
+				original = tagSplit[1];
 				
 			}
-			
-			return result;
-			
+
 		}
 		
-		public static List<string> TagStringListCheck(string tag, string spawnGroupName, out bool badParse){
-			
-			List<string> result = new List<string>();
-			badParse = false;
+		public static void TagStringListCheck(string tag, ref List<string> result){
+
 			var tagSplit = ProcessTag(tag);
 			
 			if(tagSplit.Length == 2){
@@ -2298,7 +2601,7 @@ namespace ModularEncountersSpawner{
 				
 				foreach(var item in array){
 					
-					if(item == "" || item == " " || item == null){
+					if(string.IsNullOrWhiteSpace(item)){
 						
 						continue;
 						
@@ -2308,21 +2611,12 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-			}else{
-				
-				Logger.AddMsg("Could not process String List tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-				
 			}
-			
-			return result;
 			
 		}
 		
-		public static Dictionary<MyDefinitionId, MyDefinitionId> TagMDIDictionaryCheck(string tag, string spawnGroupName, out bool badParse){
+		public static void TagMDIDictionaryCheck(string tag, ref Dictionary<MyDefinitionId, MyDefinitionId> result) {
 			
-			Dictionary<MyDefinitionId, MyDefinitionId> result = new Dictionary<MyDefinitionId, MyDefinitionId>();
-			badParse = false;
 			var tagSplit = ProcessTag(tag);
 			
 			if(tagSplit.Length == 2){
@@ -2331,7 +2625,7 @@ namespace ModularEncountersSpawner{
 				
 				foreach(var item in array){
 					
-					if(item == "" || item == " " || item == null){
+					if(string.IsNullOrWhiteSpace(item)){
 						
 						continue;
 						
@@ -2357,21 +2651,12 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-			}else{
-				
-				Logger.AddMsg("Could not process MyDefinitionId Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-				
 			}
-			
-			return result;
 			
 		}
 
-		public static Dictionary<string, string> TagStringDictionaryCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static void TagStringDictionaryCheck(string tag, ref Dictionary<string, string> result) {
 
-			Dictionary<string, string> result = new Dictionary<string, string>();
-			badParse = false;
 			var tagSplit = ProcessTag(tag);
 
 			if(tagSplit.Length == 2) {
@@ -2380,7 +2665,7 @@ namespace ModularEncountersSpawner{
 
 				foreach(var item in array) {
 
-					if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item)) {
 
 						continue;
 
@@ -2399,21 +2684,12 @@ namespace ModularEncountersSpawner{
 
 				}
 
-			} else {
-
-				Logger.AddMsg("Could not process MyDefinitionId Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-
 			}
-
-			return result;
 
 		}
 
-		public static Dictionary<Vector3, Vector3> TagVector3DictionaryCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static void TagVector3DictionaryCheck(string tag, ref Dictionary<Vector3, Vector3> result) {
 
-			Dictionary<Vector3, Vector3> result = new Dictionary<Vector3, Vector3>();
-			badParse = false;
 			var tagSplit = ProcessTag(tag);
 
 			if(tagSplit.Length == 2) {
@@ -2422,7 +2698,7 @@ namespace ModularEncountersSpawner{
 
 				foreach(var item in array) {
 
-					if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item)) {
 
 						continue;
 
@@ -2455,47 +2731,58 @@ namespace ModularEncountersSpawner{
 
 				}
 
-			} else {
-
-				Logger.AddMsg("Could not process Vector3-Vector3 Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-
 			}
-
-			return result;
 
 		}
 
-		public static Vector3D TagVector3DCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static void TagVector3Check(string tag, ref List<Vector3> original) {
 
 			Vector3D result = Vector3D.Zero;
-			badParse = false;
+			var tagSplit = ProcessTag(tag);
+
+			if (tagSplit.Length == 2) {
+
+				if (Vector3D.TryParse(FixVectorString(tagSplit[1]), out result) == false) {
+
+					return;
+
+				}
+
+			} else {
+
+				return;
+
+			}
+
+			original.Add(result);
+
+		}
+
+		public static void TagVector3DCheck(string tag, ref Vector3D original) {
+
+			Vector3D result = Vector3D.Zero;
 			var tagSplit = ProcessTag(tag);
 
 			if(tagSplit.Length == 2) {
 
 				if(Vector3D.TryParse(FixVectorString(tagSplit[1]), out result) == false) {
 
-					Logger.AddMsg("Could not process Vector3D tag " + tag + " from SpawnGroup " + spawnGroupName);
-					badParse = true;
+					return;
 
 				}
 
 			} else {
 
-				Logger.AddMsg("Could not process Vector3D tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
+				return;
 
 			}
 
-			return result;
+			original = result;
 
 		}
 
-		public static List<bool> TagBoolListCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static void TagBoolListCheck(string tag, ref List<bool> result) {
 
-			List<bool> result = new List<bool>();
-			badParse = false;
 			var tagSplit = ProcessTag(tag);
 
 			if(tagSplit.Length == 2) {
@@ -2504,7 +2791,7 @@ namespace ModularEncountersSpawner{
 
 				foreach(var item in array) {
 
-					if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item)) {
 
 						continue;
 
@@ -2522,21 +2809,12 @@ namespace ModularEncountersSpawner{
 
 				}
 
-			} else {
-
-				Logger.AddMsg("Could not process bool List tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-
 			}
-
-			return result;
 
 		}
 
-		public static List<Vector3D> TagVector3DListCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static void TagVector3DListCheck(string tag, ref List<Vector3D> result) {
 
-			List<Vector3D> result = new List<Vector3D>();
-			badParse = false;
 			var tagSplit = ProcessTag(tag);
 
 			if(tagSplit.Length == 2) {
@@ -2545,7 +2823,7 @@ namespace ModularEncountersSpawner{
 
 				foreach(var item in array) {
 
-					if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item)) {
 
 						continue;
 
@@ -2563,21 +2841,12 @@ namespace ModularEncountersSpawner{
 
 				}
 
-			} else {
-
-				Logger.AddMsg("Could not process Vector3D List tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-
 			}
-
-			return result;
 
 		}
 
-		public static Dictionary<Vector3, string> TagVector3StringDictionaryCheck(string tag, string spawnGroupName, out bool badParse) {
+		public static void TagVector3StringDictionaryCheck(string tag, ref Dictionary<Vector3, string> result) {
 
-			Dictionary<Vector3, string> result = new Dictionary<Vector3, string>();
-			badParse = false;
 			var tagSplit = ProcessTag(tag);
 
 			if(tagSplit.Length == 2) {
@@ -2586,7 +2855,7 @@ namespace ModularEncountersSpawner{
 
 				foreach(var item in array) {
 
-					if(string.IsNullOrWhiteSpace(item) == true) {
+					if(string.IsNullOrWhiteSpace(item)) {
 
 						continue;
 
@@ -2616,21 +2885,12 @@ namespace ModularEncountersSpawner{
 
 				}
 
-			} else {
-
-				Logger.AddMsg("Could not process Vector3-Vector3 Dictionary tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-
 			}
-
-			return result;
 
 		}
 
-		public static List<ulong> TagUlongListCheck(string tag, string spawnGroupName, out bool badParse){
-			
-			List<ulong> result = new List<ulong>();
-			badParse = false;
+		public static void TagUlongListCheck(string tag, ref List<ulong> result){
+
 			var tagSplit = ProcessTag(tag);
 			
 			if(tagSplit.Length == 2){
@@ -2639,33 +2899,21 @@ namespace ModularEncountersSpawner{
 				
 				foreach(var item in array){
 					
-					if(item == "" || item == " " || item == null){
-						
+					if(string.IsNullOrWhiteSpace(item))
 						continue;
-						
-					}
-					
+
 					ulong modId = 0;
-					
-					if(ulong.TryParse(item, out modId) == false){
-						
-						Logger.AddMsg("Could not parse ulong List item " + item + " from SpawnGroup " + spawnGroupName);
-						badParse = true;
-						
-					}
+
+					if (ulong.TryParse(item, out modId) == false)
+						continue;
 					
 					result.Add(modId);
 					
 				}
 
-			}else{
-				
-				Logger.AddMsg("Could not process ulong List tag " + tag + " from SpawnGroup " + spawnGroupName);
-				badParse = true;
-				
 			}
+
 			result.RemoveAll(item => item == 0);
-			return result;
 			
 		}
 		

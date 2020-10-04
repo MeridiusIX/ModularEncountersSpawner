@@ -25,6 +25,7 @@ using VRageMath;
 using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.Api;
 
 namespace ModularEncountersSpawner.Spawners{
 	
@@ -322,6 +323,31 @@ namespace ModularEncountersSpawner.Spawners{
 				
 				//Realign to Terrain
 				var offsetSurfaceCoords = SpawnResources.GetNearestSurfacePoint(spawnPosition, planet);
+
+				if (MES_SessionCore.Instance.WaterMod.Registered && spawnGroup.InstallationSpawnsOnWaterSurface) {
+
+					for (int j = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; j >= 0; j++) {
+
+						if (j >= MES_SessionCore.Instance.WaterMod.Waters.Count)
+							continue;
+
+						var water = MES_SessionCore.Instance.WaterMod.Waters[j];
+
+						if (water.planetID != planet.EntityId)
+							continue;
+
+						if (water.IsUnderwater(offsetSurfaceCoords)) {
+
+							offsetSurfaceCoords = water.GetClosestSurfacePoint(offsetSurfaceCoords);
+
+						}
+
+						break;
+
+					}
+
+				}
+				
 				var offsetSurfaceMatrix = MatrixD.CreateWorld(offsetSurfaceCoords, forwardDir, upDir);
 				var finalCoords = Vector3D.Transform(new Vector3D(0, (double)prefab.Position.Y, 0), offsetSurfaceMatrix);
 				
@@ -365,12 +391,27 @@ namespace ModularEncountersSpawner.Spawners{
 				pendingNPC.KeenAiName = prefab.Behaviour;
 				pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
 				
-				if(spawnGroup.RandomizeWeapons == true){
+				if (string.IsNullOrEmpty(pendingNPC.KeenAiName) == false) {
+
+					if (RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(pendingNPC.KeenAiName) && spawnGroup.UseRivalAi) {
+
+						Logger.AddMsg("RivalAI Behavior Detected In Prefab: " + prefab.SubtypeId + " in SpawnGroup: " + spawnGroup.SpawnGroup.Id.SubtypeName);
+
+					} else {
+
+						Logger.AddMsg("Stock AI Detected In Prefab: " + prefab.SubtypeId + " in SpawnGroup: " + spawnGroup.SpawnGroup.Id.SubtypeName);
+
+					}
+
+
+				}
+
+				if (spawnGroup.RandomizeWeapons == true){
 						
 					pendingNPC.ReplenishedSystems = false;
 					pendingNPC.ReplacedWeapons = true;
 					
-				}else if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.General.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false){
+				}else if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.Grids.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false){
 				
 					pendingNPC.ReplenishedSystems = false;
 					pendingNPC.ReplacedWeapons = true;
@@ -604,8 +645,17 @@ namespace ModularEncountersSpawner.Spawners{
 					continue;
 					
 				}
-				
-				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
+
+				if (spawnGroup.PlanetaryInstallationChance < spawnGroup.ChanceCeiling && !specificSpawnRequest) {
+
+					var roll = SpawnResources.rnd.Next(0, spawnGroup.ChanceCeiling + 1);
+
+					if (roll > spawnGroup.PlanetaryInstallationChance)
+						continue;
+
+				}
+
+				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
 					
 					continue;
 					
@@ -797,6 +847,29 @@ namespace ModularEncountersSpawner.Spawners{
 
 			int debugSpawnPointAttempts = 0;
 			int searchDirectionAttempts = 0;
+
+			bool doWaterChecks = false;
+			Water localWater = null;
+
+			if (MES_SessionCore.Instance.WaterMod.Registered) {
+
+				for (int i = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; i >= 0; i++) {
+
+					if (i >= MES_SessionCore.Instance.WaterMod.Waters.Count)
+						continue;
+
+					var water = MES_SessionCore.Instance.WaterMod.Waters[i];
+
+					if (water.planetID != planet.EntityId)
+						continue;
+
+					doWaterChecks = true;
+					localWater = water;
+					break;
+
+				}
+
+			}
 			
 			foreach(var searchDirection in searchDirections){
 				
@@ -815,24 +888,80 @@ namespace ModularEncountersSpawner.Spawners{
 
 						if (terrain != null) {
 
-							if (!spawnGroup.AllowedTerrainTypes.Contains(terrain.MaterialTypeName))
+							if (!spawnGroup.AllowedTerrainTypes.Contains(terrain.MaterialTypeName)) {
+
+								searchIncrement += Settings.PlanetaryInstallations.SearchPathIncrement;
 								continue;
-						
+
+							}
+				
 						} else {
 
+							searchIncrement += Settings.PlanetaryInstallations.SearchPathIncrement;
 							continue;
-						
+
 						}
-					
+
 					}
+
 					
-					if(SpawnResources.IsPositionNearEntity(surfaceCoords, Settings.PlanetaryInstallations.MinimumSpawnDistanceFromOtherGrids) == true || SpawnResources.IsPositionInSafeZone(surfaceCoords) == true){
+
+					if (SpawnResources.IsPositionNearEntity(surfaceCoords, Settings.PlanetaryInstallations.MinimumSpawnDistanceFromOtherGrids) == true || SpawnResources.IsPositionInSafeZone(surfaceCoords) == true){
 						
 						searchIncrement += Settings.PlanetaryInstallations.SearchPathIncrement;
 						continue;
 						
 					}
-					
+
+					bool foundWaterSurfacePosition = false;
+
+					if (doWaterChecks) {
+
+						var surfaceUnderwater = localWater.IsUnderwater(surfaceCoords);
+
+						if (surfaceUnderwater && !spawnGroup.InstallationSpawnsOnWaterSurface && !spawnGroup.InstallationSpawnsUnderwater) {
+
+							searchIncrement += Settings.PlanetaryInstallations.SearchPathIncrement;
+							continue;
+
+						}
+
+						if (!surfaceUnderwater && !spawnGroup.InstallationSpawnsOnDryLand) {
+
+							searchIncrement += Settings.PlanetaryInstallations.SearchPathIncrement;
+							continue;
+
+						}
+
+						if (surfaceUnderwater && spawnGroup.InstallationSpawnsUnderwater && spawnGroup.MinWaterDepth > 0) {
+
+							var waterSurfaceCoords = localWater.GetClosestSurfacePoint(surfaceCoords);
+							var surfaceToWaterDist = Vector3D.Distance(surfaceCoords, waterSurfaceCoords);
+
+							if (surfaceToWaterDist < spawnGroup.MinWaterDepth) {
+
+								searchIncrement += Settings.PlanetaryInstallations.SearchPathIncrement;
+								continue;
+
+							}
+
+						}
+
+						if (!surfaceUnderwater && spawnGroup.InstallationSpawnsOnWaterSurface) {
+
+							searchIncrement += Settings.PlanetaryInstallations.SearchPathIncrement;
+							continue;
+
+						}
+
+						if (surfaceUnderwater && spawnGroup.InstallationSpawnsOnWaterSurface) {
+
+							foundWaterSurfacePosition = true;
+
+						}
+
+					}
+
 					var checkUpDir = Vector3D.Normalize(surfaceCoords - planetEntity.GetPosition());
 					var checkForwardDir = Vector3D.Normalize(MyUtils.GetRandomPerpendicularVector(ref checkUpDir));
 					var checkMatrix = MatrixD.CreateWorld(surfaceCoords, checkForwardDir, checkUpDir);
@@ -855,7 +984,7 @@ namespace ModularEncountersSpawner.Spawners{
 					var distToCore = Vector3D.Distance(surfaceCoords, planetEntity.GetPosition());
 					bool badPosition = false;
 					
-					if(spawnGroup.SkipTerrainCheck == false){
+					if(spawnGroup.SkipTerrainCheck == false || foundWaterSurfacePosition) {
 						
 						foreach(var checkDirection in checkDirections){
 							

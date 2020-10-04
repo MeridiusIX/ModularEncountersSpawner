@@ -170,42 +170,6 @@ namespace ModularEncountersSpawner.Configuration{
 					
 				}
 				
-				//EnableGlobalNPCWeaponRandomizer
-				if(receivedCommand.StartsWith("/MES.Settings.General.EnableGlobalNPCWeaponRandomizer.") == true){
-					
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.EnableGlobalNPCWeaponRandomizer.", "");
-					bool result = false;
-					
-					if(bool.TryParse(receivedValue, out result) == false){
-						
-						return "Failed To Parse Value: " + receivedValue;
-						
-					}
-					
-					Settings.General.EnableGlobalNPCWeaponRandomizer = result;
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-					
-				}
-
-				//EnableGlobalNPCShieldProvider
-				if (receivedCommand.StartsWith("/MES.Settings.General.EnableGlobalNPCShieldProvider.") == true) {
-
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.EnableGlobalNPCShieldProvider.", "");
-					bool result = false;
-
-					if (bool.TryParse(receivedValue, out result) == false) {
-
-						return "Failed To Parse Value: " + receivedValue;
-
-					}
-
-					Settings.General.EnableGlobalNPCShieldProvider = result;
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-
-				}
-
 				//EnableLegacySpaceCargoShipDetection
 				if (receivedCommand.StartsWith("/MES.Settings.General.EnableLegacySpaceCargoShipDetection.") == true){
 					
@@ -782,384 +746,6 @@ namespace ModularEncountersSpawner.Configuration{
 					
 				}
 				
-				//WeaponReplacerBlacklist.Add
-				if(receivedCommand.StartsWith("/MES.Settings.General.WeaponReplacerBlacklist.Add.") == true){
-					
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.WeaponReplacerBlacklist.Add.", "");
-				
-					
-					if(string.IsNullOrEmpty(receivedValue) == true){
-						
-						return "No Value Provided.";
-						
-					}
-					
-					var blacklist = new List<string>(Settings.General.WeaponReplacerBlacklist.ToList());
-					
-					if(blacklist.Contains(receivedValue) == true){
-						
-						return "Weapon Randomizer Blacklist Already Contains Value: " + receivedValue;
-						
-					}
-					
-					blacklist.Add(receivedValue);
-					Settings.General.WeaponReplacerBlacklist = blacklist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-					
-				}
-				
-				//WeaponReplacerBlacklist.Remove
-				if(receivedCommand.StartsWith("/MES.Settings.General.WeaponReplacerBlacklist.Remove.") == true){
-					
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.WeaponReplacerBlacklist.Remove.", "");
-				
-					
-					if(string.IsNullOrEmpty(receivedValue) == true){
-						
-						return "No Value Provided.";
-						
-					}
-					
-					var blacklist = new List<string>(Settings.General.WeaponReplacerBlacklist.ToList());
-					
-					if(blacklist.Contains(receivedValue) == false){
-						
-						return "Weapon Randomizer Blacklist Does Not Contain Value: " + receivedValue;
-						
-					}
-					
-					blacklist.Remove(receivedValue);
-					Settings.General.WeaponReplacerBlacklist = blacklist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-					
-				}
-				
-				//WeaponReplacerWhitelist.Add
-				if(receivedCommand.StartsWith("/MES.Settings.General.WeaponReplacerWhitelist.Add.") == true){
-					
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.WeaponReplacerWhitelist.Add.", "");
-				
-					
-					if(string.IsNullOrEmpty(receivedValue) == true){
-						
-						return "No Value Provided.";
-						
-					}
-					
-					var Whitelist = new List<string>(Settings.General.WeaponReplacerWhitelist.ToList());
-					
-					if(Whitelist.Contains(receivedValue) == true){
-						
-						return "Weapon Randomizer Whitelist Already Contains Value: " + receivedValue;
-						
-					}
-					
-					Whitelist.Add(receivedValue);
-					Settings.General.WeaponReplacerWhitelist = Whitelist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-					
-				}
-				
-				//WeaponReplacerWhitelist.Remove
-				if(receivedCommand.StartsWith("/MES.Settings.General.WeaponReplacerWhitelist.Remove.") == true){
-					
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.WeaponReplacerWhitelist.Remove.", "");
-				
-					
-					if(string.IsNullOrEmpty(receivedValue) == true){
-						
-						return "No Value Provided.";
-						
-					}
-					
-					var Whitelist = new List<string>(Settings.General.WeaponReplacerWhitelist.ToList());
-					
-					if(Whitelist.Contains(receivedValue) == false){
-						
-						return "Weapon Randomizer Whitelist Does Not Contain Value: " + receivedValue;
-						
-					}
-					
-					Whitelist.Remove(receivedValue);
-					Settings.General.WeaponReplacerWhitelist = Whitelist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-					
-				}
-				
-				//WeaponReplacerTargetBlacklist.Add
-				if(receivedCommand.StartsWith("/MES.Settings.General.WeaponReplacerTargetBlacklist.Add.") == true){
-					
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.WeaponReplacerTargetBlacklist.Add.", "");
-				
-					
-					if(string.IsNullOrEmpty(receivedValue) == true){
-						
-						return "No Value Provided.";
-						
-					}
-					
-					var blacklist = new List<string>(Settings.General.WeaponReplacerTargetBlacklist.ToList());
-					
-					if(blacklist.Contains(receivedValue) == true){
-						
-						return "Weapon Randomizer Target Blacklist Already Contains Value: " + receivedValue;
-						
-					}
-					
-					blacklist.Add(receivedValue);
-					Settings.General.WeaponReplacerTargetBlacklist = blacklist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-					
-				}
-				
-				//WeaponReplacerTargetBlacklist.Remove
-				if(receivedCommand.StartsWith("/MES.Settings.General.WeaponReplacerTargetBlacklist.Remove.") == true){
-					
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.WeaponReplacerTargetBlacklist.Remove.", "");
-				
-					
-					if(string.IsNullOrEmpty(receivedValue) == true){
-						
-						return "No Value Provided.";
-						
-					}
-					
-					var blacklist = new List<string>(Settings.General.WeaponReplacerTargetBlacklist.ToList());
-					
-					if(blacklist.Contains(receivedValue) == false){
-						
-						return "Weapon Randomizer Target Blacklist Does Not Contain Value: " + receivedValue;
-						
-					}
-					
-					blacklist.Remove(receivedValue);
-					Settings.General.WeaponReplacerTargetBlacklist = blacklist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-					
-				}
-				
-				//WeaponReplacerTargetWhitelist.Add
-				if(receivedCommand.StartsWith("/MES.Settings.General.WeaponReplacerTargetWhitelist.Add.") == true){
-					
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.WeaponReplacerTargetWhitelist.Add.", "");
-				
-					
-					if(string.IsNullOrEmpty(receivedValue) == true){
-						
-						return "No Value Provided.";
-						
-					}
-					
-					var Whitelist = new List<string>(Settings.General.WeaponReplacerTargetWhitelist.ToList());
-					
-					if(Whitelist.Contains(receivedValue) == true){
-						
-						return "Weapon Randomizer Target Whitelist Already Contains Value: " + receivedValue;
-						
-					}
-					
-					Whitelist.Add(receivedValue);
-					Settings.General.WeaponReplacerTargetWhitelist = Whitelist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-					
-				}
-				
-				//WeaponReplacerTargetWhitelist.Remove
-				if(receivedCommand.StartsWith("/MES.Settings.General.WeaponReplacerTargetWhitelist.Remove.") == true){
-					
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.WeaponReplacerTargetWhitelist.Remove.", "");
-				
-					
-					if(string.IsNullOrEmpty(receivedValue) == true){
-						
-						return "No Value Provided.";
-						
-					}
-					
-					var Whitelist = new List<string>(Settings.General.WeaponReplacerTargetWhitelist.ToList());
-					
-					if(Whitelist.Contains(receivedValue) == false){
-						
-						return "Weapon Randomizer Target Whitelist Does Not Contain Value: " + receivedValue;
-						
-					}
-					
-					Whitelist.Remove(receivedValue);
-					Settings.General.WeaponReplacerTargetWhitelist = Whitelist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-					
-				}
-
-				//UseGlobalBlockReplacer
-				if(receivedCommand.StartsWith("/MES.Settings.General.UseGlobalBlockReplacer.") == true) {
-
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.UseGlobalBlockReplacer.", "");
-					bool result = false;
-
-					if(bool.TryParse(receivedValue, out result) == false) {
-
-						return "Failed To Parse Value: " + receivedValue;
-
-					}
-
-					Settings.General.UseGlobalBlockReplacer = result;
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-
-				}
-
-				//GlobalBlockReplacerReference.Add
-				if(receivedCommand.StartsWith("/MES.Settings.General.GlobalBlockReplacerReference.Add.") == true) {
-
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.GlobalBlockReplacerReference.Add.", "");
-
-
-					if(string.IsNullOrEmpty(receivedValue) == true) {
-
-						return "No Value Provided.";
-
-					}
-
-					var Whitelist = new List<string>(Settings.General.GlobalBlockReplacerReference.ToList());
-
-					if(Whitelist.Contains(receivedValue) == true) {
-
-						return "Weapon Randomizer Target Whitelist Already Contains Value: " + receivedValue;
-
-					}
-
-					Whitelist.Add(receivedValue);
-					Settings.General.GlobalBlockReplacerReference = Whitelist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-
-				}
-
-				//GlobalBlockReplacerReference.Remove
-				if(receivedCommand.StartsWith("/MES.Settings.General.GlobalBlockReplacerReference.Remove.") == true) {
-
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.GlobalBlockReplacerReference.Remove.", "");
-
-
-					if(string.IsNullOrEmpty(receivedValue) == true) {
-
-						return "No Value Provided.";
-
-					}
-
-					var Whitelist = new List<string>(Settings.General.GlobalBlockReplacerReference.ToList());
-
-					if(Whitelist.Contains(receivedValue) == false) {
-
-						return "Weapon Randomizer Target Whitelist Does Not Contain Value: " + receivedValue;
-
-					}
-
-					Whitelist.Remove(receivedValue);
-					Settings.General.GlobalBlockReplacerReference = Whitelist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-
-				}
-
-				//GlobalBlockReplacerProfiles.Add
-				if(receivedCommand.StartsWith("/MES.Settings.General.GlobalBlockReplacerProfiles.Add.") == true) {
-
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.GlobalBlockReplacerProfiles.Add.", "");
-
-
-					if(string.IsNullOrEmpty(receivedValue) == true) {
-
-						return "No Value Provided.";
-
-					}
-
-					var Whitelist = new List<string>(Settings.General.GlobalBlockReplacerProfiles.ToList());
-
-					if(Whitelist.Contains(receivedValue) == true) {
-
-						return "Weapon Randomizer Target Whitelist Already Contains Value: " + receivedValue;
-
-					}
-
-					Whitelist.Add(receivedValue);
-					Settings.General.GlobalBlockReplacerProfiles = Whitelist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-
-				}
-
-				//GlobalBlockReplacerProfiles.Remove
-				if(receivedCommand.StartsWith("/MES.Settings.General.GlobalBlockReplacerProfiles.Remove.") == true) {
-
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.GlobalBlockReplacerProfiles.Remove.", "");
-
-
-					if(string.IsNullOrEmpty(receivedValue) == true) {
-
-						return "No Value Provided.";
-
-					}
-
-					var Whitelist = new List<string>(Settings.General.GlobalBlockReplacerProfiles.ToList());
-
-					if(Whitelist.Contains(receivedValue) == false) {
-
-						return "Weapon Randomizer Target Whitelist Does Not Contain Value: " + receivedValue;
-
-					}
-
-					Whitelist.Remove(receivedValue);
-					Settings.General.GlobalBlockReplacerProfiles = Whitelist.ToArray();
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-
-				}
-
-				//UseNonPhysicalAmmoForNPCs
-				if(receivedCommand.StartsWith("/MES.Settings.General.UseNonPhysicalAmmoForNPCs.") == true) {
-
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.UseNonPhysicalAmmoForNPCs.", "");
-					bool result = false;
-
-					if(bool.TryParse(receivedValue, out result) == false) {
-
-						return "Failed To Parse Value: " + receivedValue;
-
-					}
-
-					Settings.General.UseNonPhysicalAmmoForNPCs = result;
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-
-				}
-
-				//RemoveContainerInventoryFromNPCs
-				if(receivedCommand.StartsWith("/MES.Settings.General.RemoveContainerInventoryFromNPCs.") == true) {
-
-					var receivedValue = receivedCommand.Replace("/MES.Settings.General.RemoveContainerInventoryFromNPCs.", "");
-					bool result = false;
-
-					if(bool.TryParse(receivedValue, out result) == false) {
-
-						return "Failed To Parse Value: " + receivedValue;
-
-					}
-
-					Settings.General.RemoveContainerInventoryFromNPCs = result;
-					var saveSetting = Settings.General.SaveSettings(Settings.General);
-					return saveSetting;
-
-				}
-
 				//UseEconomyBuyingReputationIncrease
 				if(receivedCommand.StartsWith("/MES.Settings.General.UseEconomyBuyingReputationIncrease.") == true) {
 
@@ -1198,10 +784,466 @@ namespace ModularEncountersSpawner.Configuration{
 
 			}
 			////////////////////////////////////////////////////////
+			//                   Grids
+			////////////////////////////////////////////////////////
+
+
+			//EnableGlobalNPCWeaponRandomizer
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.EnableGlobalNPCWeaponRandomizer.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.EnableGlobalNPCWeaponRandomizer.", "");
+				bool result = false;
+
+				if (bool.TryParse(receivedValue, out result) == false) {
+
+					return "Failed To Parse Value: " + receivedValue;
+
+				}
+
+				Settings.Grids.EnableGlobalNPCWeaponRandomizer = result;
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//EnableGlobalNPCShieldProvider
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.EnableGlobalNPCShieldProvider.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.EnableGlobalNPCShieldProvider.", "");
+				bool result = false;
+
+				if (bool.TryParse(receivedValue, out result) == false) {
+
+					return "Failed To Parse Value: " + receivedValue;
+
+				}
+
+				Settings.Grids.EnableGlobalNPCShieldProvider = result;
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+
+			//WeaponReplacerBlacklist.Add
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.WeaponReplacerBlacklist.Add.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.WeaponReplacerBlacklist.Add.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var blacklist = new List<string>(Settings.Grids.WeaponReplacerBlacklist.ToList());
+
+				if (blacklist.Contains(receivedValue) == true) {
+
+					return "Weapon Randomizer Blacklist Already Contains Value: " + receivedValue;
+
+				}
+
+				blacklist.Add(receivedValue);
+				Settings.Grids.WeaponReplacerBlacklist = blacklist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//WeaponReplacerBlacklist.Remove
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.WeaponReplacerBlacklist.Remove.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.WeaponReplacerBlacklist.Remove.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var blacklist = new List<string>(Settings.Grids.WeaponReplacerBlacklist.ToList());
+
+				if (blacklist.Contains(receivedValue) == false) {
+
+					return "Weapon Randomizer Blacklist Does Not Contain Value: " + receivedValue;
+
+				}
+
+				blacklist.Remove(receivedValue);
+				Settings.Grids.WeaponReplacerBlacklist = blacklist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//WeaponReplacerWhitelist.Add
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.WeaponReplacerWhitelist.Add.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.WeaponReplacerWhitelist.Add.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var Whitelist = new List<string>(Settings.Grids.WeaponReplacerWhitelist.ToList());
+
+				if (Whitelist.Contains(receivedValue) == true) {
+
+					return "Weapon Randomizer Whitelist Already Contains Value: " + receivedValue;
+
+				}
+
+				Whitelist.Add(receivedValue);
+				Settings.Grids.WeaponReplacerWhitelist = Whitelist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//WeaponReplacerWhitelist.Remove
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.WeaponReplacerWhitelist.Remove.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.WeaponReplacerWhitelist.Remove.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var Whitelist = new List<string>(Settings.Grids.WeaponReplacerWhitelist.ToList());
+
+				if (Whitelist.Contains(receivedValue) == false) {
+
+					return "Weapon Randomizer Whitelist Does Not Contain Value: " + receivedValue;
+
+				}
+
+				Whitelist.Remove(receivedValue);
+				Settings.Grids.WeaponReplacerWhitelist = Whitelist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//WeaponReplacerTargetBlacklist.Add
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.WeaponReplacerTargetBlacklist.Add.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.WeaponReplacerTargetBlacklist.Add.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var blacklist = new List<string>(Settings.Grids.WeaponReplacerTargetBlacklist.ToList());
+
+				if (blacklist.Contains(receivedValue) == true) {
+
+					return "Weapon Randomizer Target Blacklist Already Contains Value: " + receivedValue;
+
+				}
+
+				blacklist.Add(receivedValue);
+				Settings.Grids.WeaponReplacerTargetBlacklist = blacklist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//WeaponReplacerTargetBlacklist.Remove
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.WeaponReplacerTargetBlacklist.Remove.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.WeaponReplacerTargetBlacklist.Remove.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var blacklist = new List<string>(Settings.Grids.WeaponReplacerTargetBlacklist.ToList());
+
+				if (blacklist.Contains(receivedValue) == false) {
+
+					return "Weapon Randomizer Target Blacklist Does Not Contain Value: " + receivedValue;
+
+				}
+
+				blacklist.Remove(receivedValue);
+				Settings.Grids.WeaponReplacerTargetBlacklist = blacklist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//WeaponReplacerTargetWhitelist.Add
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.WeaponReplacerTargetWhitelist.Add.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.WeaponReplacerTargetWhitelist.Add.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var Whitelist = new List<string>(Settings.Grids.WeaponReplacerTargetWhitelist.ToList());
+
+				if (Whitelist.Contains(receivedValue) == true) {
+
+					return "Weapon Randomizer Target Whitelist Already Contains Value: " + receivedValue;
+
+				}
+
+				Whitelist.Add(receivedValue);
+				Settings.Grids.WeaponReplacerTargetWhitelist = Whitelist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//WeaponReplacerTargetWhitelist.Remove
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.WeaponReplacerTargetWhitelist.Remove.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.WeaponReplacerTargetWhitelist.Remove.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var Whitelist = new List<string>(Settings.Grids.WeaponReplacerTargetWhitelist.ToList());
+
+				if (Whitelist.Contains(receivedValue) == false) {
+
+					return "Weapon Randomizer Target Whitelist Does Not Contain Value: " + receivedValue;
+
+				}
+
+				Whitelist.Remove(receivedValue);
+				Settings.Grids.WeaponReplacerTargetWhitelist = Whitelist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//UseGlobalBlockReplacer
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.UseGlobalBlockReplacer.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.UseGlobalBlockReplacer.", "");
+				bool result = false;
+
+				if (bool.TryParse(receivedValue, out result) == false) {
+
+					return "Failed To Parse Value: " + receivedValue;
+
+				}
+
+				Settings.Grids.UseGlobalBlockReplacer = result;
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//GlobalBlockReplacerReference.Add
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.GlobalBlockReplacerReference.Add.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.GlobalBlockReplacerReference.Add.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var Whitelist = new List<string>(Settings.Grids.GlobalBlockReplacerReference.ToList());
+
+				if (Whitelist.Contains(receivedValue) == true) {
+
+					return "Weapon Randomizer Target Whitelist Already Contains Value: " + receivedValue;
+
+				}
+
+				Whitelist.Add(receivedValue);
+				Settings.Grids.GlobalBlockReplacerReference = Whitelist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//GlobalBlockReplacerReference.Remove
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.GlobalBlockReplacerReference.Remove.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.GlobalBlockReplacerReference.Remove.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var Whitelist = new List<string>(Settings.Grids.GlobalBlockReplacerReference.ToList());
+
+				if (Whitelist.Contains(receivedValue) == false) {
+
+					return "Weapon Randomizer Target Whitelist Does Not Contain Value: " + receivedValue;
+
+				}
+
+				Whitelist.Remove(receivedValue);
+				Settings.Grids.GlobalBlockReplacerReference = Whitelist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//GlobalBlockReplacerProfiles.Add
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.GlobalBlockReplacerProfiles.Add.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.GlobalBlockReplacerProfiles.Add.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var Whitelist = new List<string>(Settings.Grids.GlobalBlockReplacerProfiles.ToList());
+
+				if (Whitelist.Contains(receivedValue) == true) {
+
+					return "Weapon Randomizer Target Whitelist Already Contains Value: " + receivedValue;
+
+				}
+
+				Whitelist.Add(receivedValue);
+				Settings.Grids.GlobalBlockReplacerProfiles = Whitelist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//GlobalBlockReplacerProfiles.Remove
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.GlobalBlockReplacerProfiles.Remove.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.GlobalBlockReplacerProfiles.Remove.", "");
+
+
+				if (string.IsNullOrEmpty(receivedValue) == true) {
+
+					return "No Value Provided.";
+
+				}
+
+				var Whitelist = new List<string>(Settings.Grids.GlobalBlockReplacerProfiles.ToList());
+
+				if (Whitelist.Contains(receivedValue) == false) {
+
+					return "Weapon Randomizer Target Whitelist Does Not Contain Value: " + receivedValue;
+
+				}
+
+				Whitelist.Remove(receivedValue);
+				Settings.Grids.GlobalBlockReplacerProfiles = Whitelist.ToArray();
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//UseNonPhysicalAmmoForNPCs
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.UseNonPhysicalAmmoForNPCs.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.UseNonPhysicalAmmoForNPCs.", "");
+				bool result = false;
+
+				if (bool.TryParse(receivedValue, out result) == false) {
+
+					return "Failed To Parse Value: " + receivedValue;
+
+				}
+
+				Settings.Grids.UseNonPhysicalAmmoForNPCs = result;
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//RemoveContainerInventoryFromNPCs
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.RemoveContainerInventoryFromNPCs.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.RemoveContainerInventoryFromNPCs.", "");
+				bool result = false;
+
+				if (bool.TryParse(receivedValue, out result) == false) {
+
+					return "Failed To Parse Value: " + receivedValue;
+
+				}
+
+				Settings.Grids.RemoveContainerInventoryFromNPCs = result;
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//RandomWeaponChance
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.RandomWeaponChance.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.RandomWeaponChance.", "");
+				int result = 0;
+
+				if (int.TryParse(receivedValue, out result) == false) {
+
+					return "Failed To Parse Value: " + receivedValue;
+
+				}
+
+				Settings.Grids.RandomWeaponChance = result;
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//RandomWeaponSizeVariance
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.RandomWeaponSizeVariance.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.RandomWeaponSizeVariance.", "");
+				int result = 0;
+
+				if (int.TryParse(receivedValue, out result) == false) {
+
+					return "Failed To Parse Value: " + receivedValue;
+
+				}
+
+				Settings.Grids.RandomWeaponSizeVariance = result;
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			////////////////////////////////////////////////////////
 			//                   SpaceCargoShips
 			////////////////////////////////////////////////////////
 
-			if(receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.") == true){
+			if (receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.") == true){
 				
 				//FirstSpawnTime
 				if(receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.FirstSpawnTime.") == true){
@@ -1562,9 +1604,45 @@ namespace ModularEncountersSpawner.Configuration{
 					return saveSetting;
 					
 				}
-				
+
+				//MaxShipsPerArea
+				if (receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.MaxShipsPerArea.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.SpaceCargoShips.MaxShipsPerArea.", "");
+					int result = 0;
+
+					if (int.TryParse(receivedValue, out result) == false) {
+
+						return "Failed To Parse Value: " + receivedValue;
+
+					}
+
+					Settings.SpaceCargoShips.MaxShipsPerArea = result;
+					var saveSetting = Settings.SpaceCargoShips.SaveSettings(Settings.SpaceCargoShips);
+					return saveSetting;
+
+				}
+
+				//AreaSize
+				if (receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.AreaSize.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.SpaceCargoShips.AreaSize.", "");
+					int result = 0;
+
+					if (int.TryParse(receivedValue, out result) == false) {
+
+						return "Failed To Parse Value: " + receivedValue;
+
+					}
+
+					Settings.SpaceCargoShips.AreaSize = result;
+					var saveSetting = Settings.SpaceCargoShips.SaveSettings(Settings.SpaceCargoShips);
+					return saveSetting;
+
+				}
+
 				//EnableWaveSpawner
-				if(receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.EnableWaveSpawner.") == true){
+				if (receivedCommand.StartsWith("/MES.Settings.SpaceCargoShips.EnableWaveSpawner.") == true){
 					
 					var receivedValue = receivedCommand.Replace("/MES.Settings.SpaceCargoShips.EnableWaveSpawner.", "");
 					bool result = false;

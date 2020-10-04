@@ -28,23 +28,23 @@ using ModularEncountersSpawner.Configuration;
 namespace ModularEncountersSpawner.Templates{
 	
 	public class NPCTerritory{
-		
-		public string Name {get; set;}
-		public string TagOld {get; set;}
-		public bool Active {get; set;}
-		public Vector3D Position {get; set;}
-		public string Type {get; set;}
-		public double Radius {get; set;}
-		public bool ScaleRadiusWithPlanetSize {get; set;}
-		public bool NoSpawnZone {get; set;}
-		public bool StrictTerritory {get; set;}
-		public List<string> FactionTagWhitelist {get; set;}
-		public List<string> FactionTagBlacklist {get; set;}
-		public bool AnnounceArriveDepart {get; set;}
-		public string CustomArriveMessage {get; set;}
-		public string CustomDepartMessage {get; set;}
-		public string PlanetGeneratorName {get; set;}
-		public bool BadTerritory {get; set;}
+
+		public string Name;
+		public string TagOld;
+		public bool Active;
+		public Vector3D Position;
+		public string Type;
+		public double Radius;
+		public bool ScaleRadiusWithPlanetSize;
+		public bool NoSpawnZone;
+		public bool StrictTerritory;
+		public List<string> FactionTagWhitelist;
+		public List<string> FactionTagBlacklist;
+		public bool AnnounceArriveDepart;
+		public string CustomArriveMessage;
+		public string CustomDepartMessage;
+		public string PlanetGeneratorName;
+		public bool BadTerritory;
 		
 		public NPCTerritory(){
 			

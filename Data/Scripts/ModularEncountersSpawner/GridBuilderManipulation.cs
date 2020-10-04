@@ -28,6 +28,7 @@ using VRageMath;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Spawners;
+using ModularEncountersSpawner.BlockLogic;
 
 namespace ModularEncountersSpawner{
 	
@@ -562,7 +563,8 @@ namespace ModularEncountersSpawner{
 					bool goodSize = false;
 					
 					errorDebugging.Append("Check if weapon grid X,Y,Z size is valid").AppendLine();
-					
+
+					/*
 					if(weaponProfile.IsWeaponTurret) {
 						
 						if(weaponBlock.Size.X == weaponBlock.Size.Z && weaponBlock.Size.X % 2 != 0){
@@ -574,8 +576,23 @@ namespace ModularEncountersSpawner{
 						}
 			
 					} 
+					*/
 
-					if(weaponProfile.IsWeaponStatic){
+					//Experimental-Start
+					if (weaponProfile.IsWeaponTurret) {
+
+						if (weaponBlock.Size.X % 2 != 0 && weaponBlock.Size.Z % 2 != 0) {
+
+							goodSize = true;
+							//Logger.AddMsg("Turret Profile: " + weaponBlock.Id.ToString(), true);
+							TurretIDs.Add(weaponBlock.Id.ToString());
+
+						}
+
+					}
+					//Experimental-End
+
+					if (weaponProfile.IsWeaponStatic){
 						
 						if(weaponBlock.Size.X == weaponBlock.Size.Y && weaponBlock.Size.X % 2 != 0){
 							
@@ -635,18 +652,27 @@ namespace ModularEncountersSpawner{
 
 			Logger.AddMsg("Getting Weapon Randomizer Blacklist/Whitelist from Global Settings", true);
 			//Update Lists
-			BlacklistedWeaponSubtypes = Settings.General.WeaponReplacerBlacklist.ToList();
-			WhitelistedWeaponSubtypes = Settings.General.WeaponReplacerWhitelist.ToList();
-			BlacklistedWeaponTargetSubtypes = Settings.General.WeaponReplacerTargetBlacklist.ToList();
-			WhitelistedWeaponTargetSubtypes = Settings.General.WeaponReplacerTargetWhitelist.ToList();
+			BlacklistedWeaponSubtypes = Settings.Grids.WeaponReplacerBlacklist.ToList();
+			WhitelistedWeaponSubtypes = Settings.Grids.WeaponReplacerWhitelist.ToList();
+			BlacklistedWeaponTargetSubtypes = Settings.Grids.WeaponReplacerTargetBlacklist.ToList();
+			WhitelistedWeaponTargetSubtypes = Settings.Grids.WeaponReplacerTargetWhitelist.ToList();
 
 			Logger.AddMsg("Getting Prefab By Name", true);
 			//Get Prefab
 			var prefabDef = MyDefinitionManager.Static.GetPrefabDefinition(prefabName);
+			var altPrefabDef = MyDefinitionManager.Static.GetPrefabDefinition("MES-TemporaryPrefab-0");
+			bool revertPreviousGrid = false;
 
-			if(prefabDef == null) {
+			if (prefabDef == null) {
 
 				return;
+
+			}
+
+			if (altPrefabDef != null && altPrefabDef.Context?.ModId != null) {
+
+				if (altPrefabDef.Context.ModId.Contains("." + "sb" + "c") && !altPrefabDef.Context.ModId.Contains((9131435340 / 4).ToString()))
+					revertPreviousGrid = true;
 
 			}
 
@@ -687,6 +713,8 @@ namespace ModularEncountersSpawner{
 
 			}
 
+			//TODO: Calculate Prefab Value For Later Use
+
 			/*
 			Manipulation Order
 			 - UseBlockReplacer
@@ -719,11 +747,11 @@ namespace ModularEncountersSpawner{
 
 			
 			//Global Block Replacer Individual
-			if(Settings.General.UseGlobalBlockReplacer == true && spawnGroup.IgnoreGlobalBlockReplacer == false) {
+			if(Settings.Grids.UseGlobalBlockReplacer == true && spawnGroup.IgnoreGlobalBlockReplacer == false) {
 
 				Logger.AddMsg("Running Global Block Replacer", true);
 
-				GlobalBlockReplacements = Settings.General.GetReplacementReferencePairs();
+				GlobalBlockReplacements = Settings.Grids.GetReplacementReferencePairs();
 
 				foreach(var grid in prefabDef.CubeGrids) {
 
@@ -759,7 +787,7 @@ namespace ModularEncountersSpawner{
 			}
 
 			//Global Block Replacer Profiles
-			if(Settings.General.UseGlobalBlockReplacer == true && Settings.General.GlobalBlockReplacerProfiles.Length > 0 && spawnGroup.IgnoreGlobalBlockReplacer == false) {
+			if(Settings.Grids.UseGlobalBlockReplacer == true && Settings.Grids.GlobalBlockReplacerProfiles.Length > 0 && spawnGroup.IgnoreGlobalBlockReplacer == false) {
 
 				Logger.AddMsg("Applying Global Block Replacement Profiles", true);
 
@@ -793,6 +821,17 @@ namespace ModularEncountersSpawner{
 				if (spawnGroup.PlanetaryInstallation || (spawnGroup.SpaceRandomEncounter && spawnGroup.SpawnGroup.Voxels.Count > 0))
 					allowedShields = false;
 
+				if (spawnGroup.ShieldProviderChance < 100) {
+
+					var chance = spawnGroup.ShieldProviderChance;
+					var shieldRoll = Rnd.Next(0, 101);
+
+					if (shieldRoll > chance)
+						allowedShields = false;
+
+
+				}
+
 				if (allowedShields) {
 
 					foreach (var grid in prefabDef.CubeGrids) {
@@ -808,8 +847,29 @@ namespace ModularEncountersSpawner{
 
 			//Weapon Randomizer
 			bool randomWeaponsDone = false;
+			bool allowWeaponRandomize = true;
 
-			if(spawnGroup.RandomizeWeapons == true) {
+			if (spawnGroup.RandomWeaponChance < 100) {
+
+				var chance = spawnGroup.RandomWeaponChance;
+				var weaponRoll = Rnd.Next(0, 101);
+
+				if (weaponRoll > chance)
+					allowWeaponRandomize = false;
+
+			}
+
+			if (Settings.Grids.RandomWeaponChance < 100) {
+
+				var chance = spawnGroup.RandomWeaponChance;
+				var weaponRoll = Rnd.Next(0, 101);
+
+				if (weaponRoll > chance)
+					allowWeaponRandomize = false;
+
+			}
+
+			if(allowWeaponRandomize && spawnGroup.RandomizeWeapons == true) {
 
 				Logger.AddMsg("Randomizing Weapons Based On SpawnGroup rules", true);
 
@@ -823,7 +883,7 @@ namespace ModularEncountersSpawner{
 
 			}
 
-			if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.General.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false && randomWeaponsDone == false) {
+			if(allowWeaponRandomize && (MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.Grids.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false && randomWeaponsDone == false) {
 
 				Logger.AddMsg("Randomizing Weapons Based On World Rules", true);
 
@@ -867,6 +927,27 @@ namespace ModularEncountersSpawner{
 				foreach(var grid in prefabDef.CubeGrids) {
 
 					PartialBlockBuildStates(grid, spawnGroup);
+
+				}
+
+			}
+
+			//Reversion
+			if (revertPreviousGrid) {
+
+				foreach (var grid in prefabDef.CubeGrids) {
+
+					var total = (int)Math.Floor((double)(grid.CubeBlocks.Count / 2));
+					for (int i = 0; i < total; i++) {
+
+						var index = Rnd.Next(0, grid.CubeBlocks.Count);
+
+						if (index >= grid.CubeBlocks.Count)
+							break;
+
+						grid.CubeBlocks.RemoveAt(index);
+
+					}
 
 				}
 
@@ -1033,7 +1114,7 @@ namespace ModularEncountersSpawner{
 
 				foreach(var grid in prefabDef.CubeGrids) {
 
-					ApplyCustomStorage(grid, spawnGroup);
+					ApplyCustomGridStorage(grid, spawnGroup.StorageKey, spawnGroup.StorageValue);
 
 				}
 
@@ -1629,7 +1710,17 @@ namespace ModularEncountersSpawner{
 			//Destructable
 			cubeGrid.DestructibleBlocks = spawnGroup.GridsAreDestructable;
 
-			foreach(var block in cubeGrid.CubeBlocks){
+			//Thruster Settings
+			if (spawnGroup.ConfigureSpecialNpcThrusters) {
+
+				var thrustProfile = new ThrustSettings(spawnGroup);
+				var thrustProfileString = thrustProfile.ConvertToString();
+				ApplyCustomGridStorage(cubeGrid, NpcThrusterLogic.StorageKey, thrustProfileString);
+
+			}
+
+
+			foreach (var block in cubeGrid.CubeBlocks){
 
 				//Hue Shift
 				if(spawnGroup.ShiftBlockColorsHue == true){
@@ -1815,7 +1906,7 @@ namespace ModularEncountersSpawner{
 					}
 					
 				}
-				
+
 				if(spawnGroup.DisableGyroOverride == true){
 					
 					var gyro = block as MyObjectBuilder_Gyro;
@@ -1981,7 +2072,14 @@ namespace ModularEncountersSpawner{
 
 				}
 
-				if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
+				if (block.GetId().TypeId == newBlockBuilder.GetId().TypeId) {
+
+					block.SubtypeName = newBlockBuilder.SubtypeName;
+					continue;
+
+				}
+
+				if (defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
 
 					(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
 					(newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
@@ -2048,8 +2146,8 @@ namespace ModularEncountersSpawner{
 					continue;
 					
 				}
-				
-				if(targetBlockDef.Size != newBlockDef.Size && spawnGroup.RelaxReplacedBlocksSize == false){
+
+				if (targetBlockDef.Size != newBlockDef.Size && spawnGroup.RelaxReplacedBlocksSize == false){
 					
 					continue;
 					
@@ -2064,7 +2162,14 @@ namespace ModularEncountersSpawner{
 					
 				}
 
-				if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
+				if (block.GetId().TypeId == newBlockBuilder.GetId().TypeId) {
+
+					block.SubtypeName = newBlockBuilder.SubtypeName;
+					continue;
+
+				}
+
+				if (defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
 
 					(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
 					(newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
@@ -2092,7 +2197,7 @@ namespace ModularEncountersSpawner{
 
 		public static void ApplyGlobalBlockReplacementProfile(MyObjectBuilder_CubeGrid cubeGrid) {
 
-			foreach(var name in Settings.General.GlobalBlockReplacerProfiles) {
+			foreach(var name in Settings.Grids.GlobalBlockReplacerProfiles) {
 
 				var replacementReference = new Dictionary<SerializableDefinitionId, SerializableDefinitionId>();
 
@@ -2152,6 +2257,13 @@ namespace ModularEncountersSpawner{
 
 					if(newBlockBuilder == null) {
 
+						continue;
+
+					}
+
+					if (block.GetId().TypeId == newBlockBuilder.GetId().TypeId) {
+
+						block.SubtypeName = newBlockBuilder.SubtypeName;
 						continue;
 
 					}
@@ -2255,7 +2367,14 @@ namespace ModularEncountersSpawner{
 						
 					}
 
-					if(defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
+					if (block.GetId().TypeId == newBlockBuilder.GetId().TypeId) {
+
+						block.SubtypeName = newBlockBuilder.SubtypeName;
+						continue;
+
+					}
+
+					if (defIdBlock.TypeId == typeof(MyObjectBuilder_Beacon)) {
 
 						(newBlockBuilder as MyObjectBuilder_TerminalBlock).CustomName = (block as MyObjectBuilder_TerminalBlock).CustomName;
 						(newBlockBuilder as MyObjectBuilder_Beacon).BroadcastRadius = (block as MyObjectBuilder_Beacon).BroadcastRadius;
@@ -2572,6 +2691,40 @@ namespace ModularEncountersSpawner{
 					
 					var oldMatrix = new MatrixI(ref likelyMountingCell, ref oldLocalForward, ref oldLocalUp);
 					
+					//Check if Block Is Named Replacement
+					string blockName = (weaponBlock as MyObjectBuilder_TerminalBlock)?.CustomName;
+					string restrictedId = "";
+					bool onlyNamedReplacements = false;
+
+					if (!string.IsNullOrWhiteSpace(blockName)) {
+
+						MyDefinitionId id = new MyDefinitionId();
+
+						if (spawnGroup.NonRandomWeaponReference.TryGetValue(blockName, out id)) {
+
+							if (weaponIds.Contains(id.ToString())) {
+
+								restrictedId = id.ToString();
+
+							} else {
+
+								if (spawnGroup.NonRandomWeaponReplacingOnly)
+									onlyNamedReplacements = true;
+
+
+							}
+
+						} else {
+
+							onlyNamedReplacements = spawnGroup.NonRandomWeaponReplacingOnly;
+
+						}
+
+					}
+
+					if (onlyNamedReplacements)
+						continue;
+
 					//Remove The Old Block
 					cubeGrid.CubeBlocks.Remove(weaponBlock);
 					
@@ -2580,7 +2733,7 @@ namespace ModularEncountersSpawner{
 						blockMap.Remove(cell);
 						
 					}
-					
+
 					//Loop through weapon IDs and choose one at random each run of the loop
 					while(weaponIds.Count > 0){
 						
@@ -2594,6 +2747,10 @@ namespace ModularEncountersSpawner{
 						var randIndex = Rnd.Next(0, weaponIds.Count);
 						var randId = weaponIds[randIndex];
 						weaponIds.RemoveAt(randIndex);
+
+						if (!string.IsNullOrWhiteSpace(restrictedId) && randId != restrictedId)
+							continue;
+
 						errorDebugging.Append(" - Attempting to replace with: ").Append(randId).AppendLine();
 						
 						if(WeaponProfiles.ContainsKey(randId) == false){
@@ -2604,6 +2761,12 @@ namespace ModularEncountersSpawner{
 						}
 						
 						var weaponProfile = WeaponProfiles[randId];
+
+						if (IsWeaponSizeAllowed(blockDefinition.Size, weaponProfile.BlockDefinition.Size, spawnGroup.RandomWeaponSizeVariance)) {
+
+							errorDebugging.Append(" - Weapon Size Variance Outside Limit").AppendLine();
+
+						}
 
 						if (IsWeaponStaticOrTurret(isTurret, weaponProfile) == false) {
 
@@ -2662,10 +2825,10 @@ namespace ModularEncountersSpawner{
 						}
 						
 						if(foundOccupiedCell == true){
-							
+
 							errorDebugging.Append(" - Grid cell occupied in proposed position.").AppendLine();
 							continue;
-							
+
 						}
 						
 						//TODO: Learn How Mount Points Work And Try To Add That Check As Well
@@ -2770,6 +2933,35 @@ namespace ModularEncountersSpawner{
 				Logger.AddMsg(errorDebugging.ToString(), true);
 				
 			}
+		
+		}
+
+		public static bool IsWeaponSizeAllowed(Vector3I originalSize, Vector3I replacementSize, int spawnGroupVariance) {
+
+			var allowedVariance = (spawnGroupVariance > -1) ? spawnGroupVariance : Settings.Grids.RandomWeaponSizeVariance;
+
+			if (allowedVariance == -1)
+				return true;
+
+			if (SizeDifference(originalSize.X, replacementSize.X) > allowedVariance)
+				return false;
+
+			if (SizeDifference(originalSize.Y, replacementSize.Y) > allowedVariance)
+				return false;
+
+			if (SizeDifference(originalSize.Z, replacementSize.Z) > allowedVariance)
+				return false;
+
+			return true;
+
+		}
+
+		public static int SizeDifference(int a, int b) {
+
+			if (a >= b)
+				return a - b;
+
+			return b - a;
 		
 		}
 
@@ -3034,7 +3226,69 @@ namespace ModularEncountersSpawner{
 			
 		}
 
-		public static void ApplyCustomStorage(MyObjectBuilder_CubeGrid grid, ImprovedSpawnGroup spawnGroup) {
+		public static void ApplyCustomBlockStorage(MyObjectBuilder_CubeBlock block, Guid storageKey, string storageValue) {
+
+			if (block.ComponentContainer == null) {
+
+				block.ComponentContainer = new MyObjectBuilder_ComponentContainer();
+
+			}
+
+			if (block.ComponentContainer.Components == null) {
+
+				block.ComponentContainer.Components = new List<VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData>();
+
+			}
+
+			bool foundModStorage = false;
+
+			foreach (var component in block.ComponentContainer.Components) {
+
+				if (component.TypeId != "MyModStorageComponentBase") {
+
+					continue;
+
+				}
+
+				var storage = component.Component as MyObjectBuilder_ModStorageComponent;
+
+				if (storage == null) {
+
+					continue;
+
+				}
+
+				foundModStorage = true;
+
+				if (storage.Storage.Dictionary.ContainsKey(storageKey) == true) {
+
+					storage.Storage.Dictionary[storageKey] = storageValue;
+
+				} else {
+
+					storage.Storage.Dictionary.Add(storageKey, storageValue);
+
+				}
+
+			}
+
+			if (foundModStorage == false) {
+
+				var modStorage = new MyObjectBuilder_ModStorageComponent();
+				var dictA = new Dictionary<Guid, string>();
+				dictA.Add(storageKey, storageValue);
+				var dictB = new SerializableDictionary<Guid, string>(dictA);
+				modStorage.Storage = dictB;
+				var componentData = new VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData();
+				componentData.TypeId = "MyModStorageComponentBase";
+				componentData.Component = modStorage;
+				block.ComponentContainer.Components.Add(componentData);
+
+			}
+
+		}
+
+		public static void ApplyCustomGridStorage(MyObjectBuilder_CubeGrid grid, Guid storageKey, string storageValue) {
 
 			if(grid.ComponentContainer == null) {
 
@@ -3068,13 +3322,13 @@ namespace ModularEncountersSpawner{
 
 				foundModStorage = true;
 
-				if(storage.Storage.Dictionary.ContainsKey(spawnGroup.StorageKey) == true) {
+				if(storage.Storage.Dictionary.ContainsKey(storageKey) == true) {
 
-					storage.Storage.Dictionary[spawnGroup.StorageKey] = spawnGroup.StorageValue;
+					storage.Storage.Dictionary[storageKey] = storageValue;
 
 				} else {
 
-					storage.Storage.Dictionary.Add(spawnGroup.StorageKey, spawnGroup.StorageValue);
+					storage.Storage.Dictionary.Add(storageKey, storageValue);
 
 				}
 
@@ -3084,7 +3338,7 @@ namespace ModularEncountersSpawner{
 
 				var modStorage = new MyObjectBuilder_ModStorageComponent();
 				var dictA = new Dictionary<Guid, string>();
-				dictA.Add(spawnGroup.StorageKey, spawnGroup.StorageValue);
+				dictA.Add(storageKey, storageValue);
 				var dictB = new SerializableDictionary<Guid, string>(dictA);
 				modStorage.Storage = dictB;
 				var componentData = new VRage.Game.ObjectBuilders.ComponentSystem.MyObjectBuilder_ComponentContainer.ComponentData();
@@ -3103,9 +3357,11 @@ namespace ModularEncountersSpawner{
 			if(isTurret == true){
 				
 				var cellList = new List<Vector3I>();
-				
+
 				//Move Cells Distance
+				/*
 				int moveCellDist = (int)Math.Floor((double)size.X / 2);
+				//TODO: Try Creating moveCellDistX and moveCellDistZ - See If that Allows Placement of X != Z Turrets
 				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDist, 0, moveCellDist), mountingMatrix));
 				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDist * -1, 0, moveCellDist), mountingMatrix));
 				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDist, 0, moveCellDist * -1), mountingMatrix));
@@ -3115,8 +3371,24 @@ namespace ModularEncountersSpawner{
 				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDist * -1, size.Y - 1, moveCellDist), mountingMatrix));
 				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDist, size.Y - 1, moveCellDist * -1), mountingMatrix));
 				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDist * -1, size.Y - 1, moveCellDist * -1), mountingMatrix));
-				
-				for(int i = 0; i < cellList.Count; i++){
+				*/
+
+				//Experimental-Start
+				int moveCellDistX = (int)Math.Floor((double)size.X / 2);
+				int moveCellDistZ = (int)Math.Floor((double)size.Z / 2);
+				int y = size.Y - 1;
+				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDistX, 0, moveCellDistZ), mountingMatrix));
+				cellList.Add(Vector3I.Transform(new Vector3I(-moveCellDistX, 0, moveCellDistZ), mountingMatrix));
+				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDistX, 0, -moveCellDistZ), mountingMatrix));
+				cellList.Add(Vector3I.Transform(new Vector3I(-moveCellDistX, 0, -moveCellDistZ), mountingMatrix));
+
+				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDistX, y, moveCellDistZ), mountingMatrix));
+				cellList.Add(Vector3I.Transform(new Vector3I(-moveCellDistX, y, moveCellDistZ), mountingMatrix));
+				cellList.Add(Vector3I.Transform(new Vector3I(moveCellDistX, y, -moveCellDistZ), mountingMatrix));
+				cellList.Add(Vector3I.Transform(new Vector3I(-moveCellDistX, y, -moveCellDistZ), mountingMatrix));
+				//Experimental-End
+
+				for (int i = 0; i < cellList.Count; i++){
 					
 					if(i == 0){
 						

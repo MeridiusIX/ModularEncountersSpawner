@@ -76,6 +76,7 @@ namespace ModularEncountersSpawner {
                     var outerRimCoords = -dirFromCurrentToIntersection * radiusToUse + currentLocation.Coords;
                     var finalRadius = Vector3D.Distance(outerRimCoords, coordsBetweenCenters);
                     currentLocation = new KnownPlayerLocation(faction, coordsBetweenCenters, finalRadius, duration, maxEncounters, minThreatToAvoidAbandonment);
+                    currentLocation.IncludeCustomVariables(location);
                     Locations.Remove(location);
 
                 }

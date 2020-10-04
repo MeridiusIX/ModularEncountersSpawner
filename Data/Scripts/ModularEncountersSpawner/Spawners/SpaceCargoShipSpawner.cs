@@ -195,8 +195,17 @@ namespace ModularEncountersSpawner.Spawners{
 				pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
 				
 				if(string.IsNullOrEmpty(pendingNPC.KeenAiName) == false){
+
+					if (RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(pendingNPC.KeenAiName) && spawnGroup.UseRivalAi) {
+
+						Logger.AddMsg("RivalAI Behavior Detected In Prefab: " + prefab.SubtypeId + " in SpawnGroup: " + spawnGroup.SpawnGroup.Id.SubtypeName);
+
+					} else {
+
+						Logger.AddMsg("Stock AI Detected In Prefab: " + prefab.SubtypeId + " in SpawnGroup: " + spawnGroup.SpawnGroup.Id.SubtypeName);
+
+					}
 					
-					Logger.AddMsg("Stock AI Detected In Prefab: " + prefab.SubtypeId + " in SpawnGroup: " + spawnGroup.SpawnGroup.Id.SubtypeName);
 					
 				}
 				
@@ -205,7 +214,7 @@ namespace ModularEncountersSpawner.Spawners{
 					pendingNPC.ReplenishedSystems = false;
 					pendingNPC.ReplacedWeapons = true;
 					
-				}else if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.General.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false){
+				}else if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.Grids.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false){
 				
 					pendingNPC.ReplenishedSystems = false;
 					pendingNPC.ReplacedWeapons = true;
@@ -537,8 +546,26 @@ namespace ModularEncountersSpawner.Spawners{
 					}
 					
 				}
-				
-				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
+
+				if (spawnGroup.LunarCargoShip && spawnGroup.LunarCargoShipChance < spawnGroup.ChanceCeiling && allowLunar && !specificSpawnRequest) {
+
+					var roll = SpawnResources.rnd.Next(0, spawnGroup.ChanceCeiling + 1);
+
+					if (roll > spawnGroup.LunarCargoShipChance)
+						continue;
+
+				}
+
+				if (spawnGroup.SpaceCargoShip && spawnGroup.SpaceCargoShipChance < spawnGroup.ChanceCeiling && !specificSpawnRequest) {
+
+					var roll = SpawnResources.rnd.Next(0, spawnGroup.ChanceCeiling + 1);
+
+					if (roll > spawnGroup.SpaceCargoShipChance)
+						continue;
+
+				}
+
+				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
 
 					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Common Conditions Failed");
 					continue;

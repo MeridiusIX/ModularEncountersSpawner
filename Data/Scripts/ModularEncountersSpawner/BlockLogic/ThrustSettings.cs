@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using ModularEncountersSpawner.Templates;
+using ProtoBuf;
 using Sandbox.ModAPI;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,22 @@ namespace ModularEncountersSpawner.BlockLogic {
 			RestrictNpcHydroThrust = false;
 			NpcHydroThrustForceMultiply = 1;
 			NpcHydroThrustPowerMultiply = 1;
+
+		}
+
+		public ThrustSettings(ImprovedSpawnGroup spawnGroup) {
+
+			RestrictNpcIonThrust = spawnGroup.RestrictNpcIonThrust;
+			NpcIonThrustForceMultiply = spawnGroup.NpcIonThrustForceMultiply;
+			NpcIonThrustPowerMultiply = spawnGroup.NpcIonThrustPowerMultiply;
+
+			RestrictNpcAtmoThrust = spawnGroup.RestrictNpcAtmoThrust;
+			NpcAtmoThrustForceMultiply = spawnGroup.NpcAtmoThrustForceMultiply;
+			NpcAtmoThrustPowerMultiply = spawnGroup.NpcAtmoThrustPowerMultiply;
+
+			RestrictNpcHydroThrust = spawnGroup.RestrictNpcHydroThrust;
+			NpcHydroThrustForceMultiply = spawnGroup.NpcHydroThrustForceMultiply;
+			NpcHydroThrustPowerMultiply = spawnGroup.NpcHydroThrustPowerMultiply;
 
 		}
 

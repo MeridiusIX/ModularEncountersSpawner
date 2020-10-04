@@ -25,6 +25,7 @@ using VRageMath;
 using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.Api;
 
 namespace ModularEncountersSpawner.Spawners{
 	
@@ -60,16 +61,13 @@ namespace ModularEncountersSpawner.Spawners{
 			}
 			
 			MyPlanet planet = SpawnResources.GetNearestPlanet(startCoords);
-			
-			if(SpawnResources.GetDistanceFromSurface(startCoords, planet) > Settings.PlanetaryCargoShips.PlayerSurfaceAltitude){
-				
-				return "Player Is Too Far From Planet Surface.";
-				
-			}
 
+
+			
 			KnownPlayerLocationManager.CleanExpiredLocations();
 			var validFactions = new Dictionary<string, List<string>>();
-			var spawnGroupList = GetPlanetaryCargoShips(startCoords, eligibleNames, out validFactions);
+			var environment = new EnvironmentEvaluation(startCoords);
+			var spawnGroupList = GetPlanetaryCargoShips(startCoords, eligibleNames, environment, out validFactions);
 			
 			if(Settings.General.UseModIdSelectionForSpawning == true){
 				
@@ -89,7 +87,7 @@ namespace ModularEncountersSpawner.Spawners{
 			Vector3D endPathCoords = Vector3D.Zero;
 			MatrixD startMatrix = MatrixD.CreateWorld(Vector3D.Zero, Vector3D.Forward, Vector3D.Up);
 			
-			bool successfulPath = CalculateAtmoTravelPath(spawnGroup, startCoords, planet, out startPathCoords, out endPathCoords, out startMatrix);
+			bool successfulPath = CalculateAtmoTravelPath(spawnGroup, startCoords, environment, out startPathCoords, out endPathCoords, out startMatrix);
 			
 			if(successfulPath == false){
 				
@@ -246,13 +244,28 @@ namespace ModularEncountersSpawner.Spawners{
 				pendingNPC.ForceStaticGrid = spawnGroup.ForceStaticGrid;
 				pendingNPC.KeenAiName = prefab.Behaviour;
 				pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
-				
-				if(spawnGroup.RandomizeWeapons == true){
+
+				if (string.IsNullOrEmpty(pendingNPC.KeenAiName) == false) {
+
+					if (RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(pendingNPC.KeenAiName) && spawnGroup.UseRivalAi) {
+
+						Logger.AddMsg("RivalAI Behavior Detected In Prefab: " + prefab.SubtypeId + " in SpawnGroup: " + spawnGroup.SpawnGroup.Id.SubtypeName);
+
+					} else {
+
+						Logger.AddMsg("Stock AI Detected In Prefab: " + prefab.SubtypeId + " in SpawnGroup: " + spawnGroup.SpawnGroup.Id.SubtypeName);
+
+					}
+
+
+				}
+
+				if (spawnGroup.RandomizeWeapons == true){
 						
 					pendingNPC.ReplenishedSystems = false;
 					pendingNPC.ReplacedWeapons = true;
 					
-				}else if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.General.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false){
+				}else if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.Grids.EnableGlobalNPCWeaponRandomizer == true) && spawnGroup.IgnoreWeaponRandomizerMod == false){
 				
 					pendingNPC.ReplenishedSystems = false;
 					pendingNPC.ReplacedWeapons = true;
@@ -272,41 +285,79 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 		
-		public static bool CalculateAtmoTravelPath(ImprovedSpawnGroup spawnGroup, Vector3D startCoords, MyPlanet planet, out Vector3D startPathCoords, out Vector3D endPathCoords, out MatrixD startMatrix){
+		public static bool CalculateAtmoTravelPath(ImprovedSpawnGroup spawnGroup, Vector3D startCoords, EnvironmentEvaluation environment, out Vector3D startPathCoords, out Vector3D endPathCoords, out MatrixD startMatrix){
 			
 			startPathCoords = Vector3D.Zero;
 			endPathCoords = Vector3D.Zero;
 			startMatrix = MatrixD.CreateWorld(Vector3D.Zero, Vector3D.Forward, Vector3D.Up);
 			SpawnResources.RefreshEntityLists();
 			
-			if(planet == null){
+			if(environment.NearestPlanet == null){
 				
 				return false;
 				
 			}
 			
-			var planetEntity = planet as IMyEntity;
-			
+			var planetEntity = environment.NearestPlanet as IMyEntity;
+			bool gravitySpawn = environment.AltitudeAtPosition > Settings.PlanetaryCargoShips.PlayerSurfaceAltitude;
+
+			if ((gravitySpawn && !spawnGroup.GravityCargoShip) && (!gravitySpawn && !spawnGroup.AtmosphericCargoShip))
+				return false;
+
 			for(int i = 0; i < Settings.PlanetaryCargoShips.MaxSpawnAttempts; i++){
 				
 				//Get Starting Point
-				var randDirFromPlayer = SpawnResources.GetRandomCompassDirection(startCoords, planet);
+				var randDirFromPlayer = SpawnResources.GetRandomCompassDirection(startCoords, environment.NearestPlanet);
 				var pathDist = SpawnResources.GetRandomPathDist(Settings.PlanetaryCargoShips.MinPathDistanceFromPlayer, Settings.PlanetaryCargoShips.MaxPathDistanceFromPlayer);
-				var midPointSurface = SpawnResources.GetNearestSurfacePoint(randDirFromPlayer * pathDist + startCoords, planet);
+				Vector3D midPointSurface = randDirFromPlayer * pathDist + startCoords;
+
+				if(!gravitySpawn)
+					midPointSurface = SpawnResources.GetNearestSurfacePoint(randDirFromPlayer * pathDist + startCoords, environment.NearestPlanet);
+
+				if (environment.PlanetWater != null) {
+
+					if (environment.PlanetWater.IsUnderwater(midPointSurface)) {
+
+						midPointSurface = environment.PlanetWater.GetClosestSurfacePoint(midPointSurface);
+
+					}
+				
+				}
+				
 				var upDir = Vector3D.Normalize(midPointSurface - planetEntity.GetPosition());
 				var altitudeFromMid = SpawnResources.GetRandomPathDist(Settings.PlanetaryCargoShips.MinSpawningAltitude, Settings.PlanetaryCargoShips.MaxSpawningAltitude);
+
+				if (gravitySpawn)
+					altitudeFromMid = SpawnResources.GetRandomPathDist(altitudeFromMid * -1, altitudeFromMid);
+
 				var tempStartPath = upDir * altitudeFromMid + midPointSurface;
 				
-				if(spawnGroup.PlanetRequiresAtmo == true && planet.GetAirDensity(tempStartPath) < Settings.PlanetaryCargoShips.MinAirDensity){
+				if(!gravitySpawn && spawnGroup.PlanetRequiresAtmo == true && environment.NearestPlanet.GetAirDensity(tempStartPath) < Settings.PlanetaryCargoShips.MinAirDensity){
 					
 					tempStartPath = upDir * Settings.PlanetaryCargoShips.MinSpawningAltitude + midPointSurface;
 					
-					if(spawnGroup.PlanetRequiresAtmo == true && planet.GetAirDensity(tempStartPath) < Settings.PlanetaryCargoShips.MinAirDensity){
+					if(spawnGroup.PlanetRequiresAtmo == true && environment.NearestPlanet.GetAirDensity(tempStartPath) < Settings.PlanetaryCargoShips.MinAirDensity){
 						
 						continue;
 						
 					}
 					
+				}
+
+				if (gravitySpawn && (spawnGroup.MaxGravity != -1 || spawnGroup.MinGravity != -1)) {
+
+					var gravAtTempStart = environment.Gravity.GetGravityMultiplier(tempStartPath);
+
+					if (gravAtTempStart > spawnGroup.MaxGravity || gravAtTempStart < spawnGroup.MinGravity) {
+
+						tempStartPath = midPointSurface;
+						gravAtTempStart = environment.Gravity.GetGravityMultiplier(tempStartPath);
+
+						if (gravAtTempStart > spawnGroup.MaxGravity || gravAtTempStart < spawnGroup.MinGravity)
+							continue;
+
+					}
+
 				}
 				
 				if(SpawnResources.IsPositionNearEntities(tempStartPath, Settings.PlanetaryCargoShips.MinSpawnFromGrids) == true){
@@ -318,7 +369,7 @@ namespace ModularEncountersSpawner.Spawners{
 				var startCoordsDistFromCenter = Vector3D.Distance(planetEntity.GetPosition(), tempStartPath);
 				
 				//Get Ending Point
-				var randPathDir = SpawnResources.GetRandomCompassDirection(tempStartPath, planet);
+				var randPathDir = SpawnResources.GetRandomCompassDirection(tempStartPath, environment.NearestPlanet);
 				var randPathDist = SpawnResources.GetRandomPathDist(Settings.PlanetaryCargoShips.MinPathDistance, Settings.PlanetaryCargoShips.MaxPathDistance);
 				var endPathA = randPathDir * randPathDist + tempStartPath;
 				var endPathB = -randPathDir * randPathDist + tempStartPath;
@@ -360,13 +411,26 @@ namespace ModularEncountersSpawner.Spawners{
 							
 						}
 						
-						if(SpawnResources.GetDistanceFromSurface(testPath, planet) < Settings.PlanetaryCargoShips.MinPathAltitude){
+						if(SpawnResources.GetDistanceFromSurface(testPath, environment.NearestPlanet) < Settings.PlanetaryCargoShips.MinPathAltitude){
 							
 							badPath = true;
 							break;
 							
 						}
-												
+
+						if (environment.PlanetWater != null) {
+
+							var pathToWaterDist = Vector3D.Distance(testPath, environment.PlanetWater.GetClosestSurfacePoint(testPath));
+
+							if (environment.PlanetWater.IsUnderwater(testPath) || pathToWaterDist < Settings.PlanetaryCargoShips.MinPathAltitude) {
+
+								badPath = true;
+								break;
+
+							}
+
+						}
+
 						totalSteps += Settings.PlanetaryCargoShips.PathStepCheckDistance;
 						
 					}
@@ -396,14 +460,19 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 				
-		public static List<ImprovedSpawnGroup> GetPlanetaryCargoShips(Vector3D playerCoords, List<string> eligibleNames, out Dictionary<string, List<string>> validFactions) {
+		public static List<ImprovedSpawnGroup> GetPlanetaryCargoShips(Vector3D playerCoords, List<string> eligibleNames, EnvironmentEvaluation environment, out Dictionary<string, List<string>> validFactions) {
 
 			string specificGroup = "";
 			var planetRestrictions = new List<string>(Settings.General.PlanetSpawnsDisableList.ToList());
 			validFactions = new Dictionary<string, List<string>>();
 			SpawnGroupSublists.Clear();
 			EligibleSpawnsByModId.Clear();
-			var environment = new EnvironmentEvaluation(playerCoords);
+
+			if (!environment.IsOnPlanet || environment.NearestPlanet == null) {
+
+				return new List<ImprovedSpawnGroup>();
+
+			}
 
 			if (environment.NearestPlanet != null && environment.IsOnPlanet) {
 
@@ -425,22 +494,12 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-			if (!environment.IsOnPlanet) {
-
-				return new List<ImprovedSpawnGroup>();
-
-			}
-
-			if(environment.NearestPlanet == null) {
-
-				return new List<ImprovedSpawnGroup>();
-
-			}
-			
 			var eligibleGroups = new List<ImprovedSpawnGroup>();
-			
+			bool aboveMaxPlayerAltitude = environment.AltitudeAtPosition > Settings.PlanetaryCargoShips.PlayerSurfaceAltitude;
+			Logger.AddMsg("Above PCS Altitude: " + aboveMaxPlayerAltitude, true);
+
 			//Filter Eligible Groups To List
-			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
+			foreach (var spawnGroup in SpawnGroupManager.SpawnGroups){
 
 				if (eligibleNames != null) {
 
@@ -466,19 +525,40 @@ namespace ModularEncountersSpawner.Spawners{
 
 				}
 
-				
-				
-				if(spawnGroup.AtmosphericCargoShip == false){
+				var atmoAllowed = spawnGroup.AtmosphericCargoShip && !aboveMaxPlayerAltitude;
+				var gravityAllowed = spawnGroup.GravityCargoShip && aboveMaxPlayerAltitude;
+
+				if (!atmoAllowed && !gravityAllowed) {
 					
 					continue;
 					
 				}
-				
-				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
+
+				if (spawnGroup.AtmosphericCargoShip && spawnGroup.AtmosphericCargoShipChance < spawnGroup.ChanceCeiling && atmoAllowed && !specificSpawnRequest) {
+
+					var roll = SpawnResources.rnd.Next(0, spawnGroup.ChanceCeiling + 1);
+
+					if (roll > spawnGroup.AtmosphericCargoShipChance)
+						continue;
+
+				}
+
+				if (spawnGroup.GravityCargoShip && spawnGroup.GravityCargoShipChance < spawnGroup.ChanceCeiling && gravityAllowed && !specificSpawnRequest) {
+
+					var roll = SpawnResources.rnd.Next(0, spawnGroup.ChanceCeiling + 1);
+
+					if (roll > spawnGroup.GravityCargoShipChance)
+						continue;
+
+				}
+
+				//Logger.AddMsg("Before Common Conditions", true);
+				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
 					
 					continue;
 					
 				}
+				//Logger.AddMsg("After Common Conditions", true);
 
 				var validFactionsList = SpawnResources.ValidNpcFactions(spawnGroup, playerCoords);
 

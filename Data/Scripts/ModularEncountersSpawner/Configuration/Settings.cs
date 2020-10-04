@@ -30,6 +30,7 @@ namespace ModularEncountersSpawner.Configuration{
 	public static class Settings{
 		
 		public static ConfigGeneral General = new ConfigGeneral();
+		public static ConfigGrids Grids = new ConfigGrids();
 		public static ConfigSpaceCargoShips SpaceCargoShips = new ConfigSpaceCargoShips();
 		public static ConfigPlanetaryCargoShips PlanetaryCargoShips = new ConfigPlanetaryCargoShips();
 		public static ConfigRandomEncounters RandomEncounters = new ConfigRandomEncounters();
@@ -42,6 +43,7 @@ namespace ModularEncountersSpawner.Configuration{
 		public static void InitSettings(){
 			
 			General = General.LoadSettings();
+			Grids = Grids.LoadSettings();
 			SpaceCargoShips = SpaceCargoShips.LoadSettings();
 			PlanetaryCargoShips = PlanetaryCargoShips.LoadSettings();
 			RandomEncounters = RandomEncounters.LoadSettings();

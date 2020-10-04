@@ -36,6 +36,7 @@ namespace ModularEncountersSpawner.Templates{
 		public bool SpaceCargoShip;
 		public bool LunarCargoShip;
 		public bool AtmosphericCargoShip;
+		public bool GravityCargoShip;
 		
 		public bool SpaceRandomEncounter;
 		
@@ -45,6 +46,9 @@ namespace ModularEncountersSpawner.Templates{
 		public List<Vector3D> RotateInstallations;
 		public List<bool> ReverseForwardDirections;
 		public bool InstallationTerrainValidation;
+		public bool InstallationSpawnsOnDryLand;
+		public bool InstallationSpawnsUnderwater;
+		public bool InstallationSpawnsOnWaterSurface;
 
 		public bool CutVoxelsAtAirtightCells;
 		
@@ -56,6 +60,10 @@ namespace ModularEncountersSpawner.Templates{
 		public bool RivalAiSpaceSpawn;
 		public bool RivalAiAtmosphericSpawn;
 		public bool RivalAiAnySpawn;
+
+		public bool CanSpawnUnderwater;
+		public bool MustSpawnUnderwater;
+		public double MinWaterDepth;
 
 		public bool StaticEncounter;
 		public Vector3D StaticEncounterCoords;
@@ -80,8 +88,17 @@ namespace ModularEncountersSpawner.Templates{
 		public bool AdminSpawnOnly;
 		public List<string> SandboxVariables;
 		public List<string> FalseSandboxVariables;
-		public int RandomNumberRoll;
 		public bool UseCommonConditions;
+
+		public int RandomNumberRoll;
+		public int ChanceCeiling;
+		public int SpaceCargoShipChance;
+		public int LunarCargoShipChance;
+		public int AtmosphericCargoShipChance;
+		public int GravityCargoShipChance;
+		public int RandomEncounterChance;
+		public int PlanetaryInstallationChance;
+		public int BossEncounterChance;
 
 		public bool UseAutoPilotInSpace; 
 		public double PauseAutopilotAtPlayerDistance; 
@@ -97,14 +114,23 @@ namespace ModularEncountersSpawner.Templates{
 		public List<string> WeaponRandomizerTargetBlacklist; 
 		public List<string> WeaponRandomizerTargetWhitelist; 
 		public List<string> WeaponRandomizerBlacklist;
-		public List<string> WeaponRandomizerWhitelist; 
+		public List<string> WeaponRandomizerWhitelist;
+		public int RandomWeaponChance;
+		public int RandomWeaponSizeVariance;
+		public List<string> NonRandomWeaponNames;
+		public List<MyDefinitionId> NonRandomWeaponIds;
+		public Dictionary<string, MyDefinitionId> NonRandomWeaponReference;
+		public bool NonRandomWeaponReplacingOnly;
 
 		public bool AddDefenseShieldBlocks = false;
 		public bool IgnoreShieldProviderMod = false;
+		public int ShieldProviderChance;
 
 		public bool UseBlockReplacer;
 		public Dictionary<MyDefinitionId, MyDefinitionId> ReplaceBlockReference;
-		
+		public List<MyDefinitionId> ReplaceBlockOld;
+		public List<MyDefinitionId> ReplaceBlockNew;
+
 		public bool UseBlockReplacerProfile;
 		public List<string> BlockReplacerProfileNames;
 		
@@ -135,12 +161,16 @@ namespace ModularEncountersSpawner.Templates{
 		public string ReplaceAntennaNameWithRandomizedName;
 
 		public bool UseBlockNameReplacer; 
-		public Dictionary<string, string> BlockNameReplacerReference; 
+		public Dictionary<string, string> BlockNameReplacerReference;
+		public List<string> ReplaceBlockNameOld;
+		public List<string> ReplaceBlockNameNew;
 
 		public List<string> AssignContainerTypesToAllCargo; 
 
 		public bool UseContainerTypeAssignment;
 		public Dictionary<string, string> ContainerTypeAssignmentReference;
+		public List<string> ContainerTypeAssignBlockName;
+		public List<string> ContainerTypeAssignSubtypeId;
 
 		public bool OverrideBlockDamageModifier;
 		public double BlockDamageModifier;
@@ -156,7 +186,11 @@ namespace ModularEncountersSpawner.Templates{
 
 		public bool RecolorGrid;
 		public Dictionary<Vector3, Vector3> ColorReferencePairs;
+		public List<Vector3> RecolorOld;
+		public List<Vector3> RecolorNew;
 		public Dictionary<Vector3, string> ColorSkinReferencePairs;
+		public List<Vector3> ReskinTarget;
+		public List<string> ReskinTexture;
 
 		public bool ReduceBlockBuildStates;
 		public bool AffectNonFunctionalBlock;
@@ -308,7 +342,8 @@ namespace ModularEncountersSpawner.Templates{
 			SpaceCargoShip = false;
 			LunarCargoShip = false;
 			AtmosphericCargoShip = false;
-			
+			GravityCargoShip = false;
+
 			SpaceRandomEncounter = false;
 			
 			PlanetaryInstallation = false;
@@ -317,6 +352,9 @@ namespace ModularEncountersSpawner.Templates{
 			RotateInstallations = new List<Vector3D>();
 			ReverseForwardDirections = new List<bool>();
 			InstallationTerrainValidation = false;
+			InstallationSpawnsOnDryLand = true;
+			InstallationSpawnsUnderwater = false;
+			InstallationSpawnsOnWaterSurface = false;
 
 			CutVoxelsAtAirtightCells = false;
 			
@@ -328,6 +366,10 @@ namespace ModularEncountersSpawner.Templates{
 			RivalAiSpaceSpawn = false;
 			RivalAiAtmosphericSpawn = false;
 			RivalAiAnySpawn = false;
+
+			CanSpawnUnderwater = false;
+			MustSpawnUnderwater = false;
+			MinWaterDepth = 0;
 
 			Frequency = 0; 
 			UniqueEncounter = false;
@@ -348,6 +390,15 @@ namespace ModularEncountersSpawner.Templates{
 			RandomNumberRoll = 1;
 			UseCommonConditions = true;
 
+			ChanceCeiling = 100;
+			SpaceCargoShipChance = 100;
+			LunarCargoShipChance = 100;
+			AtmosphericCargoShipChance = 100;
+			GravityCargoShipChance = 100;
+			RandomEncounterChance = 100;
+			PlanetaryInstallationChance = 100;
+			BossEncounterChance = 100;
+
 			UseAutoPilotInSpace = false;
 			PauseAutopilotAtPlayerDistance = -1;
 
@@ -363,12 +414,21 @@ namespace ModularEncountersSpawner.Templates{
 			WeaponRandomizerTargetWhitelist = new List<string>();
 			WeaponRandomizerBlacklist = new List<string>();
 			WeaponRandomizerWhitelist = new List<string>();
+			RandomWeaponChance = 100;
+			RandomWeaponSizeVariance = -1;
+			NonRandomWeaponNames = new List<string>();
+			NonRandomWeaponIds = new List<MyDefinitionId>();
+			NonRandomWeaponReference = new Dictionary<string, MyDefinitionId>();
+			NonRandomWeaponReplacingOnly = false;
 
 			AddDefenseShieldBlocks = false;
 			IgnoreShieldProviderMod = false;
-			
+			ShieldProviderChance = 100;
+
 			UseBlockReplacer = false;
 			ReplaceBlockReference = new Dictionary<MyDefinitionId, MyDefinitionId>();
+			ReplaceBlockOld = new List<MyDefinitionId>();
+			ReplaceBlockNew = new List<MyDefinitionId>();
 			
 			UseBlockReplacerProfile = false;
 			BlockReplacerProfileNames = new List<string>();
@@ -401,11 +461,15 @@ namespace ModularEncountersSpawner.Templates{
 
 			UseBlockNameReplacer = false;
 			BlockNameReplacerReference = new Dictionary<string, string>();
+			ReplaceBlockNameOld = new List<string>();
+			ReplaceBlockNameNew = new List<string>();
 
 			AssignContainerTypesToAllCargo = new List<string>();
 
 			UseContainerTypeAssignment = false;
 			ContainerTypeAssignmentReference = new Dictionary<string, string>();
+			ContainerTypeAssignBlockName = new List<string>();
+			ContainerTypeAssignSubtypeId = new List<string>();
 
 			OverrideBlockDamageModifier = false;
 			BlockDamageModifier = 1;
@@ -421,7 +485,11 @@ namespace ModularEncountersSpawner.Templates{
 
 			RecolorGrid = false;
 			ColorReferencePairs = new Dictionary<Vector3, Vector3>();
+			RecolorOld = new List<Vector3>();
+			RecolorNew = new List<Vector3>();
 			ColorSkinReferencePairs = new Dictionary<Vector3, string>();
+			ReskinTarget = new List<Vector3>();
+			ReskinTexture = new List<string>();
 			
 			ReduceBlockBuildStates = false;
 			AffectNonFunctionalBlock = true;
@@ -464,6 +532,7 @@ namespace ModularEncountersSpawner.Templates{
 			
 			MinSpawnFromWorldCenter = -1;
 			MaxSpawnFromWorldCenter = -1;
+			CustomWorldCenter = Vector3D.Zero;
 			DirectionFromWorldCenter = Vector3D.Zero;
 			MinAngleFromDirection = -1;
 			MaxAngleFromDirection = -1;

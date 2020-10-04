@@ -1,4 +1,5 @@
-﻿using ModularEncountersSpawner.Spawners;
+﻿using ModularEncountersSpawner.Api;
+using ModularEncountersSpawner.Spawners;
 using Sandbox.Game;
 using Sandbox.Game.Entities;
 using Sandbox.ModAPI;
@@ -12,6 +13,8 @@ namespace ModularEncountersSpawner.Templates {
 
 	public class EnvironmentEvaluation {
 
+		public Vector3D Position;
+
 		public double DistanceFromWorldCenter;
 		public Vector3D DirectionFromWorldCenter;
 
@@ -22,10 +25,13 @@ namespace ModularEncountersSpawner.Templates {
 		public List<string> InsideStrictKnownPlayerLocations;
 
 		public MyPlanet NearestPlanet;
+		public Water PlanetWater;
+		public MyGravityProviderComponent Gravity;
 		public bool IsOnPlanet;
 		public string NearestPlanetName;
 		public double PlanetDiameter;
 
+		public Vector3D SurfaceCoords;
 		public float OxygenAtPosition;
 		public float AtmosphereAtPosition;
 		public float GravityAtPosition;
@@ -33,6 +39,11 @@ namespace ModularEncountersSpawner.Templates {
 		public bool IsNight;
 		public string WeatherAtPosition;
 		public string CommonTerrainAtPosition;
+
+		public bool PlanetHasWater;
+		public bool PositionIsUnderWater;
+		public bool SurfaceIsUnderWater;
+		public float WaterInSurroundingAreaRatio;
 
 		public EnvironmentEvaluation() {
 
@@ -45,6 +56,7 @@ namespace ModularEncountersSpawner.Templates {
 		public EnvironmentEvaluation(Vector3D coords) : base() {
 
 			//Non Planet Checks
+			Position = coords;
 			DistanceFromWorldCenter = Vector3D.Distance(Vector3D.Zero, coords);
 			DirectionFromWorldCenter = Vector3D.Normalize(coords);
 
@@ -57,16 +69,87 @@ namespace ModularEncountersSpawner.Templates {
 			if (NearestPlanet == null || !MyAPIGateway.Entities.Exist(NearestPlanet))
 				return;
 
-			AltitudeAtPosition = Vector3D.Distance(NearestPlanet.GetClosestSurfacePointGlobal(coords), coords);
+			var upDir = Vector3D.Normalize(coords - NearestPlanet.PositionComp.WorldAABB.Center);
+			var downDir = upDir * -1;
+			var forward = Vector3D.CalculatePerpendicularVector(upDir);
+			var matrix = MatrixD.CreateWorld(coords, forward, upDir);
+			var directionList = new List<Vector3D>();
+			directionList.Add(matrix.Forward);
+			directionList.Add(matrix.Backward);
+			directionList.Add(matrix.Left);
+			directionList.Add(matrix.Right);
+			directionList.Add(Vector3D.Normalize(matrix.Forward + matrix.Right));
+			directionList.Add(Vector3D.Normalize(matrix.Forward + matrix.Left));
+			directionList.Add(Vector3D.Normalize(matrix.Backward + matrix.Right));
+			directionList.Add(Vector3D.Normalize(matrix.Backward + matrix.Left));
+
+			if (MES_SessionCore.Instance.WaterMod.Registered) {
+
+				MES_SessionCore.Instance.WaterMod.UpdateRadius();
+
+				for (int i = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; i >= 0; i++) {
+
+					if (i >= MES_SessionCore.Instance.WaterMod.Waters.Count)
+						continue;
+
+					var water = MES_SessionCore.Instance.WaterMod.Waters[i];
+
+					if (water.planetID != NearestPlanet.EntityId)
+						continue;
+
+					PlanetWater = water;
+					PlanetHasWater = true;
+					PositionIsUnderWater = water.IsUnderwater(coords);
+					SurfaceIsUnderWater = water.IsUnderwater(SurfaceCoords);
+
+					int totalChecks = 0;
+					int waterHits = 0;
+
+					for (int j = 0; j < 12; j++) {
+
+						foreach (var direction in directionList) {
+
+							try {
+
+								totalChecks++;
+								var checkCoordsRough = direction * (j * 1000) + coords;
+								var checkSurfaceCoords = NearestPlanet.GetClosestSurfacePointGlobal(checkCoordsRough);
+
+								if (water.IsUnderwater(checkSurfaceCoords))
+									waterHits++;
+
+							} catch (Exception e) {
+
+								Logger.AddMsg("Caught Exception Trying To Determine Water Data", true);
+								Logger.AddMsg(e.ToString(), true);
+
+							}
+
+						}
+
+					}
+
+					Logger.AddMsg("Water Hits: " + waterHits.ToString(), true);
+					Logger.AddMsg("Total Hits: " + totalChecks.ToString(), true);
+					WaterInSurroundingAreaRatio = (float)waterHits / (float)totalChecks;
+
+					break;
+
+				}
+
+			}
+
+			SurfaceCoords = SurfaceIsUnderWater ? PlanetWater.GetClosestSurfacePoint(coords) : NearestPlanet.GetClosestSurfacePointGlobal(coords);
+			AltitudeAtPosition = Vector3D.Distance(SurfaceCoords, coords);
 			NearestPlanetName = NearestPlanet.Generator.Id.SubtypeName;
 			PlanetDiameter = NearestPlanet.AverageRadius * 2;
 
 			var planetEntity = NearestPlanet as IMyEntity;
-			var gravityProvider = planetEntity.Components.Get<MyGravityProviderComponent>();
+			Gravity = planetEntity.Components.Get<MyGravityProviderComponent>();
 
-			if (gravityProvider != null) {
+			if (Gravity != null) {
 
-				if (gravityProvider.IsPositionInRange(coords) == true) {
+				if (Gravity.IsPositionInRange(coords) == true) {
 
 					IsOnPlanet = true;
 
@@ -78,23 +161,13 @@ namespace ModularEncountersSpawner.Templates {
 				return;
 
 			//On Planet Checks
-			GravityAtPosition = gravityProvider.GetGravityMultiplier(coords);
+			GravityAtPosition = Gravity.GetGravityMultiplier(coords);
 			AtmosphereAtPosition = NearestPlanet.GetAirDensity(coords);
 			OxygenAtPosition = NearestPlanet.GetOxygenForPosition(coords);
 			IsNight = MyVisualScriptLogicProvider.IsOnDarkSide(NearestPlanet, coords);
 			WeatherAtPosition = MyVisualScriptLogicProvider.GetWeather(coords) ?? "";
 
 			//Terrain Material Checks
-			var upDir = Vector3D.Normalize(coords - NearestPlanet.PositionComp.WorldAABB.Center);
-			var downDir = upDir * -1;
-			var forward = Vector3D.CalculatePerpendicularVector(upDir);
-			var matrix = MatrixD.CreateWorld(coords, forward, upDir);
-			var directionList = new List<Vector3D>();
-			directionList.Add(matrix.Forward);
-			directionList.Add(matrix.Backward);
-			directionList.Add(matrix.Left);
-			directionList.Add(matrix.Right);
-
 			var terrainTypes = new Dictionary<string, int>();
 
 			for (int i = 1; i < 12; i++) {

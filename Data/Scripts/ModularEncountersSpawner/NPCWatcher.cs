@@ -277,7 +277,7 @@ namespace ModularEncountersSpawner{
 
 						if(ActiveNPCs[cubeGrid].SpawnGroup != null) {
 
-							if(ActiveNPCs[cubeGrid].SpawnGroup.RemoveContainerContents == true || Settings.General.RemoveContainerInventoryFromNPCs == true) {
+							if(ActiveNPCs[cubeGrid].SpawnGroup.RemoveContainerContents == true || Settings.Grids.RemoveContainerInventoryFromNPCs == true) {
 
 								GridUtilities.RemoveGridContainerComponents(cubeGrid);
 
@@ -318,7 +318,7 @@ namespace ModularEncountersSpawner{
 
 						ActiveNPCs[cubeGrid].NonPhysicalAmmoCheck = true;
 
-						if(Settings.General.UseNonPhysicalAmmoForNPCs == true || ActiveNPCs[cubeGrid].SpawnGroup.UseNonPhysicalAmmo == true) {
+						if(Settings.Grids.UseNonPhysicalAmmoForNPCs == true || ActiveNPCs[cubeGrid].SpawnGroup.UseNonPhysicalAmmo == true) {
 
 							Logger.AddMsg("Processing Non Physical Ammo For Grid: " + cubeGrid.CustomName, true);
 							GridUtilities.NonPhysicalAmmoProcessing(cubeGrid);
@@ -605,12 +605,19 @@ namespace ModularEncountersSpawner{
 
 				for(int i = DeleteGridList.Count - 1;i >= 0;i--) {
 
-					if(MyAPIGateway.Entities.Exist(DeleteGridList[i]) == true) {
+					if(MyAPIGateway.Entities.Exist(DeleteGridList[i]) == true && !DeleteGridList[i].MarkedForClose) {
 
-						LastDeletedGrid = DeleteGridList[i];
-						DeleteGridList[i].Close();
-						DeleteGridList.RemoveAt(i);
-						return;
+						var cubeGrid = DeleteGridList[i] as MyCubeGrid;
+
+						using (cubeGrid.Pin()) {
+
+							Logger.AddMsg(" - Closing Grid...", true);
+							DeleteGridList[i].Close();
+							DeleteGridList.RemoveAt(i);
+							Logger.AddMsg(" - Closed Grid.", true);
+							return;
+
+						}
 
 					}
 
@@ -923,6 +930,7 @@ namespace ModularEncountersSpawner{
 							
 							double elevation = SpawnResources.GetDistanceFromSurface(cubeGrid.PositionComp.WorldAABB.Center, activeNPC.Planet);
 							
+							/*
 							if(elevation > Settings.PlanetaryCargoShips.DespawnAltitude && skip == false){
 								
 								errorLogger.Append("Too High From Ground").AppendLine();
@@ -931,6 +939,7 @@ namespace ModularEncountersSpawner{
 								skip = true;
 								
 							}
+							*/
 							
 							if(elevation < Settings.PlanetaryCargoShips.MinPathAltitude && skip == false/* && getElevation == true*/){
 								

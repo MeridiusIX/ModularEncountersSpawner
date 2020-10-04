@@ -439,16 +439,22 @@ namespace ModularEncountersSpawner {
 
 				//Process Stores
 				foreach(var store in storeBlockList) {
-					
-					try{
-						
+
+					errorLog.Append("   - Check If Store Inventory Exists").AppendLine();
+					var storeInv = store.GetInventory();
+
+					if (storeInv == null)
+						continue;
+
+					try {
+
 						errorLog.Append("   - Check Store For Existing Items And Remove " + store.EntityId.ToString()).AppendLine();
 						var ob = (MyObjectBuilder_StoreBlock)store.SlimBlock.GetObjectBuilder();
 
 						errorLog.Append("      - Check If ObjectBuilder Null" + store.EntityId.ToString()).AppendLine();
 						if(ob != null) {
 
-							var existingIdList = new List<long>();
+							//var existingIdList = new List<long>();
 
 							if(ob.PlayerItems != null) {
 
@@ -470,7 +476,6 @@ namespace ModularEncountersSpawner {
 
 					var itemsAvailable = new Dictionary<MyDefinitionId, int>();
 					var gasAvailable = new Dictionary<MyDefinitionId, int>();
-					var storeInv = store.GetInventory();
 					var storeitemList = storeInv.GetItems();
 
 					errorLog.Append("   - Check Items In Store Inventory To Sell").AppendLine();

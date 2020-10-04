@@ -62,66 +62,48 @@ namespace ModularEncountersSpawner.Configuration{
 
 	public class ConfigGeneral{
 		
-		public float ModVersion {get; set;}
-		public bool DebugMode { get; set; }
-		public bool EnableSpaceCargoShips {get; set;}
-		public bool EnablePlanetaryCargoShips {get; set;}
-		public bool EnableRandomEncounters {get; set;}
-		public bool EnablePlanetaryInstallations {get; set;}
-		public bool EnableBossEncounters {get; set;}
-		
-		public bool EnableGlobalNPCWeaponRandomizer {get; set;}
-		
-		//[XmlIgnoreAttribute]
-		public bool EnableGlobalNPCShieldProvider { get; set; }
-		
-		public bool EnableLegacySpaceCargoShipDetection {get; set;}
-		
-		public bool UseModIdSelectionForSpawning {get; set;}
-		public bool UseWeightedModIdSelection {get; set;}
-		public int LowWeightModIdSpawnGroups {get; set;}
-		public int LowWeightModIdModifier {get; set;}
-		public int MediumWeightModIdSpawnGroups {get; set;}
-		public int MediumWeightModIdModifier {get; set;}
-		public int HighWeightModIdSpawnGroups {get; set;}
-		public int HighWeightModIdModifier {get; set;}
-		
-		public bool UseMaxNpcGrids {get; set;}
-		public bool UseGlobalEventsTimers {get; set;}
-		
-		public bool IgnorePlanetWhitelists {get; set;}
-		public bool IgnorePlanetBlacklists {get; set;}
-		
-		public int ThreatRefreshTimerMinimum {get; set;}
-		public int ThreatReductionHandicap {get; set;}
-		
-		public int MaxGlobalNpcGrids {get; set;}
-		public int PlayerWatcherTimerTrigger {get; set;}
-		public int NpcDistanceCheckTimerTrigger {get; set;}
-		public int NpcOwnershipCheckTimerTrigger {get; set;}
-		public int NpcCleanupCheckTimerTrigger {get; set;}
-		public int NpcBlacklistCheckTimerTrigger {get; set;}
-		public int SpawnedVoxelCheckTimerTrigger {get; set;}
-		public double SpawnedVoxelMinimumGridDistance {get; set;}
-		public string[] PlanetSpawnsDisableList {get; set;}
-		public string[] NpcGridNameBlacklist {get; set;}
-		public string[] NpcSpawnGroupBlacklist {get; set;}
-		
-		public string[] WeaponReplacerBlacklist {get; set;}
-		public string[] WeaponReplacerWhitelist {get; set;}
-		public string[] WeaponReplacerTargetBlacklist {get; set;}
-		public string[] WeaponReplacerTargetWhitelist {get; set;}
-		
-		public bool UseGlobalBlockReplacer {get; set;}
-		public string[] GlobalBlockReplacerReference {get; set;}
-		public string[] GlobalBlockReplacerProfiles {get; set;}
-		
-		public bool UseNonPhysicalAmmoForNPCs { get; set;} 
+		public float ModVersion;
+		public bool DebugMode;
+		public bool EnableSpaceCargoShips;
+		public bool EnablePlanetaryCargoShips;
+		public bool EnableRandomEncounters;
+		public bool EnablePlanetaryInstallations;
+		public bool EnableBossEncounters;
 
-		public bool RemoveContainerInventoryFromNPCs { get; set; }
+		public bool EnableLegacySpaceCargoShipDetection;
+		
+		public bool UseModIdSelectionForSpawning;
+		public bool UseWeightedModIdSelection;
+		public int LowWeightModIdSpawnGroups;
+		public int LowWeightModIdModifier;
+		public int MediumWeightModIdSpawnGroups;
+		public int MediumWeightModIdModifier;
+		public int HighWeightModIdSpawnGroups;
+		public int HighWeightModIdModifier;
+		
+		public bool UseMaxNpcGrids;
+		public bool UseGlobalEventsTimers;
+		
+		public bool IgnorePlanetWhitelists;
+		public bool IgnorePlanetBlacklists;
+		
+		public int ThreatRefreshTimerMinimum;
+		public int ThreatReductionHandicap;
+		
+		public int MaxGlobalNpcGrids;
+		public int PlayerWatcherTimerTrigger;
+		public int NpcDistanceCheckTimerTrigger;
+		public int NpcOwnershipCheckTimerTrigger;
+		public int NpcCleanupCheckTimerTrigger;
+		public int NpcBlacklistCheckTimerTrigger;
+		public int SpawnedVoxelCheckTimerTrigger;
+		public double SpawnedVoxelMinimumGridDistance;
+		public string[] PlanetSpawnsDisableList;
+		public string[] NpcGridNameBlacklist;
+		public string[] NpcSpawnGroupBlacklist;
 
-		public bool UseEconomyBuyingReputationIncrease { get; set; }
-		public long EconomyBuyingReputationCostAmount { get; set; }
+		public bool UseEconomyBuyingReputationIncrease;
+		public long EconomyBuyingReputationCostAmount;
 
 		public ConfigGeneral(){
 			
@@ -132,8 +114,6 @@ namespace ModularEncountersSpawner.Configuration{
 			EnableRandomEncounters = true;
 			EnablePlanetaryInstallations = true;
 			EnableBossEncounters = true;
-			EnableGlobalNPCWeaponRandomizer = false;
-			EnableGlobalNPCShieldProvider = false;
 			EnableLegacySpaceCargoShipDetection = true;
 			UseModIdSelectionForSpawning = true;
 			UseWeightedModIdSelection = true;
@@ -160,15 +140,15 @@ namespace ModularEncountersSpawner.Configuration{
 			PlanetSpawnsDisableList = new string[]{"Planet_SubtypeId_Here", "Planet_SubtypeId_Here"};
 			NpcGridNameBlacklist = new string[]{"BlackList_Grid_Name_Here", "BlackList_Grid_Name_Here"};
 			NpcSpawnGroupBlacklist = new string[]{"BlackList_SpawnGroup_Here", "BlackList_SpawnGroup_Here"};
-			WeaponReplacerBlacklist = new string[]{"1380830774", "Large_SC_LaserDrill_HiddenStatic", "Large_SC_LaserDrill_HiddenTurret", "Large_SC_LaserDrill", "Large_SC_LaserDrillTurret", "Spotlight_Turret_Large", "Spotlight_Turret_Light_Large", "Spotlight_Turret_Small", "SmallSpotlight_Turret_Small", "ShieldChargerBase_Large", "LDualPulseLaserBase_Large", "AegisLargeBeamBase_Large", "AegisMediumeamBase_Large", "XLGigaBeamGTFBase_Large", "XLDualPulseLaserBase_Large", "1817300677"};
-			WeaponReplacerWhitelist = new string[]{};
-			WeaponReplacerTargetBlacklist = new string[]{};
-			WeaponReplacerTargetWhitelist = new string[]{};
-			UseGlobalBlockReplacer = false;
-			GlobalBlockReplacerReference = new string[]{};
-			GlobalBlockReplacerProfiles = new string[]{};
-			UseNonPhysicalAmmoForNPCs = false;
-			RemoveContainerInventoryFromNPCs = false;
+			//WeaponReplacerBlacklist = new string[]{"1380830774", "Large_SC_LaserDrill_HiddenStatic", "Large_SC_LaserDrill_HiddenTurret", "Large_SC_LaserDrill", "Large_SC_LaserDrillTurret", "Spotlight_Turret_Large", "Spotlight_Turret_Light_Large", "Spotlight_Turret_Small", "SmallSpotlight_Turret_Small", "ShieldChargerBase_Large", "LDualPulseLaserBase_Large", "AegisLargeBeamBase_Large", "AegisMediumeamBase_Large", "XLGigaBeamGTFBase_Large", "XLDualPulseLaserBase_Large", "1817300677"};
+			//WeaponReplacerWhitelist = new string[]{};
+			//WeaponReplacerTargetBlacklist = new string[]{};
+			//WeaponReplacerTargetWhitelist = new string[]{};
+			//UseGlobalBlockReplacer = false;
+			//GlobalBlockReplacerReference = new string[]{};
+			//GlobalBlockReplacerProfiles = new string[]{};
+			//UseNonPhysicalAmmoForNPCs = false;
+			//RemoveContainerInventoryFromNPCs = false;
 			UseEconomyBuyingReputationIncrease = true;
 			EconomyBuyingReputationCostAmount = 500000;
 
@@ -238,60 +218,6 @@ namespace ModularEncountersSpawner.Configuration{
 			
 			return "Settings Changed, But Could Not Be Saved To XML. Changes May Be Lost On Session Reload.";
 			
-		}
-
-		public Dictionary<MyDefinitionId, MyDefinitionId> GetReplacementReferencePairs() {
-
-			var result = new Dictionary<MyDefinitionId, MyDefinitionId>();
-
-			if(this.GlobalBlockReplacerReference.Length == 0) {
-
-				Logger.AddMsg("Global Block Replacement References 0", true);
-				return result;
-
-			}
-
-			foreach(var pair in this.GlobalBlockReplacerReference) {
-
-				var split = pair.Split('|');
-
-				if(split.Length != 2) {
-
-					Logger.AddMsg("Global Replace Bad Split: " + pair, true);
-					continue;
-
-				}
-
-				var idA = new MyDefinitionId();
-				var idB = new MyDefinitionId();
-
-				if(MyDefinitionId.TryParse(split[0], out idA) == false) {
-
-					Logger.AddMsg("Could Not Parse: " + split[0], true);
-					continue;
-
-				}
-
-				if(MyDefinitionId.TryParse(split[1], out idB) == false) {
-
-					Logger.AddMsg("Could Not Parse: " + split[1], true);
-					continue;
-
-				}
-
-				if(result.ContainsKey(idA) == true) {
-
-					Logger.AddMsg("MyDefinitionId already present: " + split[0], true);
-					continue;
-
-				}
-
-				result.Add(idA, idB);
-
-			}
-
-			return result;
-
 		}
 		
 	}

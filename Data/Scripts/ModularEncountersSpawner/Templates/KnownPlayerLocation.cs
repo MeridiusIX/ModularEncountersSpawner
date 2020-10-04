@@ -56,12 +56,15 @@ namespace ModularEncountersSpawner.Templates {
         public BoundingSphereD Sphere { get { return new BoundingSphereD(Coords, Radius); } }
 
         [ProtoMember(8)]
-        public Dictionary<string, int> CustomTracking;
+        public Dictionary<string, int> CustomCounters;
 
         [ProtoMember(9)]
         public int MinThreatForAvoidingAbandonment;
 
-        
+        [ProtoMember(10)]
+        public Dictionary<string, bool> CustomBooleans;
+
+
 
         public KnownPlayerLocation() {
 
@@ -72,7 +75,8 @@ namespace ModularEncountersSpawner.Templates {
             this.MaxSpawnedEncounters = -1;
             this.LastSighting = MyAPIGateway.Session.GameDateTime;
             this.SpawnedEncounters = 0;
-            this.CustomTracking = new Dictionary<string, int>();
+            this.CustomCounters = new Dictionary<string, int>();
+            this.CustomBooleans = new Dictionary<string, bool>();
 
         }
 
@@ -85,6 +89,43 @@ namespace ModularEncountersSpawner.Templates {
             this.MaxSpawnedEncounters = maxSpawns;
             this.MinThreatForAvoidingAbandonment = minThreat;
 
+        }
+
+        public void IncludeCustomVariables(KnownPlayerLocation oldLocation) {
+
+            foreach (var counter in oldLocation.CustomCounters.Keys) {
+
+                int counterValue = 0;
+
+                if (CustomCounters.TryGetValue(counter, out counterValue)) {
+
+                    CustomCounters[counter] += counterValue;
+
+                } else {
+
+                    CustomCounters.Add(counter, counterValue);
+
+                }
+            
+            }
+
+            foreach (var boolean in oldLocation.CustomBooleans.Keys) {
+
+                bool boolresult = false;
+
+                if (CustomBooleans.TryGetValue(boolean, out boolresult)) {
+
+                    if (oldLocation.CustomBooleans[boolean] || boolresult)
+                        CustomBooleans[boolean] = true;
+
+                } else {
+
+                    CustomBooleans.Add(boolean, boolresult);
+
+                }
+            
+            }
+        
         }
 
     }

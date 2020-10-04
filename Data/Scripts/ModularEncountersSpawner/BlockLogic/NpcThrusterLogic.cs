@@ -64,9 +64,11 @@ namespace ModularEncountersSpawner.BlockLogic{
 		public float ThrustForceMultiplier;
 		public float ThrustPowerMultiplier;
 
+		public IMyCubeGrid OriginalGrid;
+
 		public bool NpcOwned;
 
-		public Guid StorageKey = new Guid("DA22D750-3262-4C1E-A898-7FB7A7F58182");
+		public static Guid StorageKey = new Guid("DA22D750-3262-4C1E-A898-7FB7A7F58182");
 
 
 		public override void Init(MyObjectBuilder_EntityBase objectBuilder){
@@ -88,18 +90,22 @@ namespace ModularEncountersSpawner.BlockLogic{
 		
 		public override void UpdateBeforeSimulation(){
 			
-			if(Thruster == null){
+			if(Thruster == null && Entity != null){
 
+				//Logger.AddMsg("NPC Thruster Setup", true);
 				Thruster = Entity as IMyThrust;
 
 				if (Thruster == null) {
 
+					//Logger.AddMsg("NPC Thruster Is Null", true);
 					NeedsUpdate = MyEntityUpdateEnum.NONE;
 					return;
 
 				}
 
-				if (Thruster.Storage == null) {
+				OriginalGrid = Thruster.SlimBlock.CubeGrid;
+
+				if (OriginalGrid == null) {
 
 					NeedsUpdate = MyEntityUpdateEnum.NONE;
 					return;
@@ -108,10 +114,14 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 				bool gotData = false;
 
-				if (Thruster.Storage.TryGetValue(StorageKey, out SettingsString))
-					gotData = GetSettings(SettingsString);
+				if (OriginalGrid.Storage != null) {
 
-				if (!gotData && Thruster.SlimBlock.CubeGrid.Storage.TryGetValue(StorageKey, out SettingsString))
+					if (OriginalGrid.Storage.TryGetValue(StorageKey, out SettingsString))
+						gotData = GetSettings(SettingsString);
+
+				}
+
+				if (!gotData && Thruster.Storage != null && Thruster.Storage.TryGetValue(StorageKey, out SettingsString))
 					gotData = GetSettings(SettingsString);
 
 				if (!gotData) {
@@ -123,7 +133,7 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 				var thrustDef = Thruster.SlimBlock.BlockDefinition as MyThrustDefinition;
 
-				if (thrustDef == null) {
+				if (thrustDef?.ThrusterType == null) {
 
 					NeedsUpdate = MyEntityUpdateEnum.NONE;
 					return;
@@ -162,6 +172,7 @@ namespace ModularEncountersSpawner.BlockLogic{
 				GridOwnershipChange(Thruster.SlimBlock.CubeGrid);
 				WorkingChanged(Thruster);
 
+				Logger.AddMsg("NPC Thruster Configured For: " + Thruster.SlimBlock.CubeGrid.CustomName, true);
 				NeedsUpdate = MyEntityUpdateEnum.EACH_100TH_FRAME;
 
 			}
@@ -210,6 +221,9 @@ namespace ModularEncountersSpawner.BlockLogic{
 				Thruster.ThrustMultiplier = 1;
 				Thruster.PowerConsumptionMultiplier = 1;
 
+				if (RestrictThrustUse)
+					Thruster.Enabled = false;
+
 			}
 
 		}
@@ -226,6 +240,9 @@ namespace ModularEncountersSpawner.BlockLogic{
 		}
 
 		public void GridSplit(IMyCubeGrid a, IMyCubeGrid b) {
+
+			if (Thruster.MarkedForClose || Thruster.SlimBlock.CubeGrid == OriginalGrid)
+				return;
 
 			a.OnBlockOwnershipChanged -= GridOwnershipChange;
 			b.OnBlockOwnershipChanged -= GridOwnershipChange;

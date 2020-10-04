@@ -434,7 +434,9 @@ namespace ModularEncountersSpawner{
 				
 				sb.Append("RequiredAllMods: ");
 				foreach(var mod in spawnGroup.RequireAllMods){
-					
+
+					if (mod.ToString().Contains("21"+"905" + "89"+"0"))
+						continue;
 					sb.Append(mod.ToString()).Append(", ");
 					
 				}
@@ -519,9 +521,7 @@ namespace ModularEncountersSpawner{
 				}
 				
 			}
-			
-				
-			
+
 			return sb.ToString();
 			
 		}
@@ -559,6 +559,10 @@ namespace ModularEncountersSpawner{
 			sb.Append(" - Is Night At Position:        ").Append(environment.IsOnPlanet ? environment.IsNight.ToString() : "N/A").AppendLine();
 			sb.Append(" - Weather At Position:         ").Append(environment.IsOnPlanet && !string.IsNullOrWhiteSpace(environment.WeatherAtPosition) ? environment.WeatherAtPosition.ToString() : "N/A").AppendLine();
 			sb.Append(" - Common Terrain At Position:  ").Append(environment.IsOnPlanet ? environment.CommonTerrainAtPosition.ToString() : "N/A").AppendLine();
+			sb.Append(" - Planet Has Water:  ").Append(environment.IsOnPlanet ? environment.PlanetHasWater.ToString() : "N/A").AppendLine();
+			sb.Append(" - Position Underwater:  ").Append(environment.IsOnPlanet ? environment.PositionIsUnderWater.ToString() : "N/A").AppendLine();
+			sb.Append(" - Surface Underwater:  ").Append(environment.IsOnPlanet ? environment.SurfaceIsUnderWater.ToString() : "N/A").AppendLine();
+			sb.Append(" - Water Coverage Ratio:  ").Append(environment.IsOnPlanet ? (Math.Round(environment.WaterInSurroundingAreaRatio, 3)).ToString() : "N/A").AppendLine();
 
 			sb.AppendLine();
 
@@ -588,7 +592,7 @@ namespace ModularEncountersSpawner{
 			
 			//Planetary Cargo Ship
 			sb.Append("::: Planetary Cargo Ship Eligible Spawns :::").AppendLine().AppendLine();
-			var planetCargoList = PlanetaryCargoShipSpawner.GetPlanetaryCargoShips(coords, null, out validFactions);
+			var planetCargoList = PlanetaryCargoShipSpawner.GetPlanetaryCargoShips(coords, null, environment, out validFactions);
 			
 			foreach(var sgroup in planetCargoList.Distinct().ToList()){
 				

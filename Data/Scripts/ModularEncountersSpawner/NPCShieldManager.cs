@@ -34,7 +34,7 @@ namespace ModularEncountersSpawner {
 
 		public static bool IsGlobalShieldProviderEnabled() {
 
-			return (NPCShieldProviderModLoaded || Settings.General.EnableGlobalNPCShieldProvider);
+			return (NPCShieldProviderModLoaded || Settings.Grids.EnableGlobalNPCShieldProvider);
 		
 		}
 

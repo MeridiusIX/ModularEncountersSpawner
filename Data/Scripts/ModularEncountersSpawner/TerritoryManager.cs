@@ -47,224 +47,114 @@ namespace ModularEncountersSpawner{
 				//Name
 				if(tag.Contains("[Name") == true){
 
-					bool badParse = false;
-					territory.Name = SpawnGroupManager.TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+					SpawnGroupManager.TagStringCheck(tag, ref territory.Name);
 					
 				}
 				
 				//Type
 				if(tag.Contains("[Type") == true){
 					
-					bool badParse = false;
-					territory.Type = SpawnGroupManager.TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+					SpawnGroupManager.TagStringCheck(tag, ref territory.Type);
 					
 				}
 				
 				//Active
 				if(tag.Contains("[Active") == true){
-					
-					bool badParse = false;
-					territory.Active = SpawnGroupManager.TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagBoolCheck(tag, ref territory.Active);
+
 					
 				}
 				
 				//Radius
 				if(tag.Contains("[Radius") == true){
-					
-					bool badParse = false;
-					territory.Radius = SpawnGroupManager.TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, territory.Radius, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagDoubleCheck(tag, ref territory.Radius);
+
 					
 				}
 				
 				//ScaleRadiusWithPlanetSize
 				if(tag.Contains("[ScaleRadiusWithPlanetSize") == true){
-					
-					bool badParse = false;
-					territory.ScaleRadiusWithPlanetSize = SpawnGroupManager.TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
-					
+
+					SpawnGroupManager.TagBoolCheck(tag, ref territory.ScaleRadiusWithPlanetSize);
+
 				}
 				
 				//NoSpawnZone
 				if(tag.Contains("[NoSpawnZone") == true){
-					
-					bool badParse = false;
-					territory.NoSpawnZone = SpawnGroupManager.TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagBoolCheck(tag, ref territory.NoSpawnZone);
 					
 				}
 				
 				//StrictTerritory
 				if(tag.Contains("[StrictTerritory") == true){
-					
-					bool badParse = false;
-					territory.StrictTerritory = SpawnGroupManager.TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagBoolCheck(tag, ref territory.StrictTerritory);
 					
 				}
 				
 				//FactionTagWhitelist
 				if(tag.Contains("[FactionTagWhitelist") == true){
-					
-					bool badParse = false;
-					territory.FactionTagWhitelist = SpawnGroupManager.TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagStringListCheck(tag, ref territory.FactionTagWhitelist);
 					
 				}
 				
 				//FactionTagBlacklist
 				if(tag.Contains("[FactionTagBlacklist") == true){
-					
-					bool badParse = false;
-					territory.FactionTagBlacklist = SpawnGroupManager.TagStringListCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagStringListCheck(tag, ref territory.FactionTagBlacklist);
 					
 				}
 					
 				//CoordsX
 				if(tag.Contains("[CoordsX") == true){
-					
-					bool badParse = false;
-					tempCoords.X = SpawnGroupManager.TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, territory.Position.X, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagDoubleCheck(tag, ref tempCoords.X);
 					
 				}
 				
 				//CoordsY
 				if(tag.Contains("[CoordsY") == true){
-					
-					bool badParse = false;
-					tempCoords.Y = SpawnGroupManager.TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, territory.Position.Y, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagDoubleCheck(tag, ref tempCoords.Y);
 					
 				}
 				
 				//CoordsZ
 				if(tag.Contains("[CoordsZ") == true){
-					
-					bool badParse = false;
-					tempCoords.Z = SpawnGroupManager.TagDoubleCheck(tag, spawnGroup.Id.SubtypeName, territory.Position.Z, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagDoubleCheck(tag, ref tempCoords.Z);
 					
 				}
 				
 				//AnnounceArriveDepart
 				if(tag.Contains("[AnnounceArriveDepart") == true){
-					
-					bool badParse = false;
-					territory.AnnounceArriveDepart = SpawnGroupManager.TagBoolCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagBoolCheck(tag, ref territory.AnnounceArriveDepart);
 					
 				}
 				
 				//CustomArriveMessage
 				if(tag.Contains("[CustomArriveMessage") == true){
-					
-					bool badParse = false;
-					territory.CustomArriveMessage = SpawnGroupManager.TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagStringCheck(tag, ref territory.CustomArriveMessage);
 					
 				}
 				
 				//CustomDepartMessage
 				if(tag.Contains("[CustomDepartMessage") == true){
-					
-					bool badParse = false;
-					territory.CustomDepartMessage = SpawnGroupManager.TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagStringCheck(tag, ref territory.CustomDepartMessage);
 					
 				}
 				
 				//PlanetGeneratorName
 				if(tag.Contains("[PlanetGeneratorName") == true){
-					
-					bool badParse = false;
-					territory.PlanetGeneratorName = SpawnGroupManager.TagStringCheck(tag, spawnGroup.Id.SubtypeName, out badParse);
-					
-					if(territory.BadTerritory == false && badParse == true){
-						
-						territory.BadTerritory = true;
-						
-					}
+
+					SpawnGroupManager.TagStringCheck(tag, ref territory.PlanetGeneratorName);
 					
 				}
 				

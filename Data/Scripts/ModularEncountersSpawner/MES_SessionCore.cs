@@ -35,7 +35,7 @@ namespace ModularEncountersSpawner{
 	
 	public class MES_SessionCore : MySessionComponentBase{
 		
-		public static float ModVersion = 1.088f;
+		public static float ModVersion = 1.095f;
 		public static string SaveName = "";
 		public static int PlayerWatcherTimer = 0;
 		public static Dictionary<IMyPlayer, PlayerWatcher> playerWatchList = new Dictionary<IMyPlayer, PlayerWatcher>();
@@ -54,6 +54,7 @@ namespace ModularEncountersSpawner{
 		public static WaveSpawner SpaceCargoShipWaveSpawner;
 		
 		public static long modId = 1521905890;
+		public static string modScope = "";
 		
 		//Mod Message Receivers
 		public static long blockReplacerModId = 1521905890001;
@@ -77,6 +78,10 @@ namespace ModularEncountersSpawner{
 		public bool WeaponCoreLoaded { get; set; }
 		public WcApi WeaponCore = new WcApi();
 
+		//Water Mod ID and API
+		public ulong WaterModID = 2200451495;
+		public WaterModAPI WaterMod = new WaterModAPI();
+
 		bool scriptInit = false;
 		bool scriptFail = false;
 		int tickCounter = 0;
@@ -93,7 +98,21 @@ namespace ModularEncountersSpawner{
 			
 		}
 
+		public override void Init(MyObjectBuilder_SessionComponent sessionComponent) {
+			base.Init(sessionComponent);
+
+			if (MyAPIGateway.Multiplayer.IsServer) {
+
+				WaterMod.Register("Modular Encounters Spawner");
+				WaterMod.OnRegisteredEvent += WaterLogged;
+
+			}
+	
+		}
+
 		public override void LoadData() {
+
+			Logger.AddMsg("Loading Settings From Modular Encounters Spawner Version: " + ModVersion.ToString());
 
 			if (MyAPIGateway.Multiplayer.IsServer == false)
 				return;
@@ -130,14 +149,14 @@ namespace ModularEncountersSpawner{
 				if (MyAPIGateway.Session.SessionSettings.SyncDistance < 10000) {
 
 					Logger.AddMsg("Mod Disabled.");
-					Logger.AddMsg("Sync Distance Must Be Set to 10000m or Higher for Modular Encounters Spawner to Function.");
+					Logger.AddMsg("Sync Distance Must Be Set to 10000m or Higher for Modular Encounters Spawner to Function With Selective Physics Updates enabled.");
 					Logger.AddMsg("Please Adjust World Settings and Restart Server.");
 					SpawnerEnabled = false;
 					return;
 
 				}
 
-				Logger.AddMsg("Encounters Using Modular Encounters Spawner May Not Work Correctly Outside of 10000m Sync Distance.");
+				Logger.AddMsg("Encounters Using Modular Encounters Spawner May Not Work Correctly Outside of 10000m Sync Distance with Selective Physics Updates enabled.");
 				Logger.AddMsg("Consider Increasing Sync Distnace if you Encounter Issues Outside Your Current Sync Distance Range.");
 
 			}
@@ -391,8 +410,6 @@ namespace ModularEncountersSpawner{
 		
 		public void SetupScript(){
 			
-			Logger.AddMsg("Loading Settings From Spawner Version: " + ModVersion.ToString());
-
 			//Save File Validation
 			SaveName = MyAPIGateway.Session.Name;
 
@@ -400,6 +417,7 @@ namespace ModularEncountersSpawner{
 			MyAPIGateway.Multiplayer.RegisterMessageHandler(8877, ChatCommand.MESMessageHandler);
 			MyAPIGateway.Utilities.MessageEntered += ChatCommand.MESChatCommand;	
 			var thisPlayer = MyAPIGateway.Session.LocalHumanPlayer;
+			modScope = MyAPIGateway.Utilities.GamePaths.ModScopeName;
 
 			if (MyAPIGateway.Multiplayer.IsServer == false) {
 
@@ -654,11 +672,12 @@ namespace ModularEncountersSpawner{
 			}
 			
 			//Get Active Mods
-			Logger.AddMsg("Getting Active Mods.");
+			Logger.AddMsg("Getting Active Workshop Mods.");
 			foreach(var mod in MyAPIGateway.Session.Mods){
 				
 				if(mod.PublishedFileId != 0){
-					
+
+					Logger.AddMsg(" - " + mod.PublishedFileId, true);
 					ActiveMods.Add(mod.PublishedFileId);
 					
 				}
@@ -998,6 +1017,12 @@ namespace ModularEncountersSpawner{
 			}
 			
 		}
+
+		public void WaterLogged() {
+
+			Logger.AddMsg("Water Mod Detected and API Loaded.");
+		
+		}
 		
 		
 		protected override void UnloadData(){
@@ -1021,6 +1046,13 @@ namespace ModularEncountersSpawner{
 			if (ShieldApiLoaded)
 				DefenseShields.Unload();
 
+			if (WaterMod.Registered) {
+
+				WaterMod.Unregister();
+				WaterMod.OnRegisteredEvent -= WaterLogged;
+
+			}
+	
 			MyAPIGateway.Entities.OnEntityAdd -= NPCWatcher.NewEntityDetected;
 			
 		}

@@ -253,6 +253,15 @@ namespace ModularEncountersSpawner.Spawners{
 					continue;
 					
 				}
+
+				if (spawnGroup.BossEncounterChance < spawnGroup.ChanceCeiling && !specificSpawnRequest) {
+
+					var roll = SpawnResources.rnd.Next(0, spawnGroup.ChanceCeiling + 1);
+
+					if (roll > spawnGroup.BossEncounterChance)
+						continue;
+				
+				}
 				
 				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
 					
@@ -515,13 +524,28 @@ namespace ModularEncountersSpawner.Spawners{
 					pendingNPC.ForceStaticGrid = encounter.SpawnGroup.ForceStaticGrid;
 					pendingNPC.KeenAiName = prefab.Behaviour;
 					pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
-					
-					if(encounter.SpawnGroup.RandomizeWeapons == true){
+
+					if (string.IsNullOrEmpty(pendingNPC.KeenAiName) == false) {
+
+						if (RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(pendingNPC.KeenAiName) && encounter.SpawnGroup.UseRivalAi) {
+
+							Logger.AddMsg("RivalAI Behavior Detected In Prefab: " + prefab.SubtypeId + " in SpawnGroup: " + encounter.SpawnGroup.SpawnGroup.Id.SubtypeName);
+
+						} else {
+
+							Logger.AddMsg("Stock AI Detected In Prefab: " + prefab.SubtypeId + " in SpawnGroup: " + encounter.SpawnGroup.SpawnGroup.Id.SubtypeName);
+
+						}
+
+
+					}
+
+					if (encounter.SpawnGroup.RandomizeWeapons == true){
 						
 						pendingNPC.ReplenishedSystems = false;
 						pendingNPC.ReplacedWeapons = true;
 						
-					}else if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.General.EnableGlobalNPCWeaponRandomizer == true) && encounter.SpawnGroup.IgnoreWeaponRandomizerMod == false){
+					}else if((MES_SessionCore.NPCWeaponUpgradesModDetected == true || Settings.Grids.EnableGlobalNPCWeaponRandomizer == true) && encounter.SpawnGroup.IgnoreWeaponRandomizerMod == false){
 					
 						pendingNPC.ReplenishedSystems = false;
 						pendingNPC.ReplacedWeapons = true;

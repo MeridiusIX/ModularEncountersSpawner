@@ -1,0 +1,55 @@
+﻿<?xml version="1.0"?>
+<Definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SpawnGroups>
+    <!--Do Not Edit Above Here-->
+
+    <!--Copy From This Line-->
+    <SpawnGroup>
+      <Id>
+        <TypeId>SpawnGroupDefinition</TypeId>
+        <!--Do Not Edit-->
+        <SubtypeId>BargeTest</SubtypeId>
+      </Id>
+      <Description>
+
+        [Modular Encounters SpawnGroup]
+
+        [SpaceCargoShip:false]
+        [LunarCargoShip:false]
+        [SpaceRandomEncounter:false]
+        [AtmosphericCargoShip:false]
+        [PlanetaryInstallation:true]
+        [RivalAiSpawn:false]
+        [AdminSpawnOnly:true]
+        [InstallationSpawnsOnWaterSurface:true]
+        [InstallationSpawnsOnDryLand:false]
+
+        [FactionOwner:SPRT]
+        [ReplenishSystems:true]
+
+        [UseRivalAi:false]
+        [RivalAiReplaceRemoteControl:false]
+
+      </Description>
+      <IsPirate>true</IsPirate>
+      <!--Do not edit-->
+      <Frequency>5.0</Frequency>
+      <Prefabs>
+        <Prefab SubtypeId="(NPC-MES) Test Water Barge">
+          <Position>
+            <X>0.0</X>
+            <Y>0.0</Y>
+            <Z>0.0</Z>
+          </Position>
+          <Speed>25</Speed>
+          <Behaviour></Behaviour>
+        </Prefab>
+      </Prefabs>
+    </SpawnGroup>
+    <!--Copy To This Line And Paste Directly Below-->
+
+
+
+    <!--Do Not Edit Below Here-->
+  </SpawnGroups>
+</Definitions>

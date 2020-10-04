@@ -26,6 +26,7 @@ using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using VRage.Game.ObjectBuilders;
+using ModularEncountersSpawner.Api;
 
 namespace ModularEncountersSpawner.Spawners{
 
@@ -99,7 +100,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 				if(spawnGroup.AdminSpawnOnly == false){
 
-					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Spawngroup Disabled");
+					//Logger.AddMsg("Admin Spawn Only Failed", true);
 					return false;
 					
 				}
@@ -112,51 +113,44 @@ namespace ModularEncountersSpawner.Spawners{
 				
 				if(roll != 0){
 
-					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Random Roll Failed");
+					//Logger.AddMsg("Random Roll Failed", true);
 					return false;
 					
 				}
 				
 			}
 			
-			if(SpawnGroupManager.ModRestrictionCheck(spawnGroup) == false){
-
-				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Mod Restriction Check Failed");
-				return false;
-				
-			}
-			
 			if(SpawnGroupManager.IsSpawnGroupInBlacklist(spawnGroup.SpawnGroup.Id.SubtypeName) == true){
 
-				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Spawngroup Blacklisted");
+				//Logger.AddMsg("Blacklist Failed", true);
 				return false;
 				
 			}
 			
 			if(spawnGroup.UniqueEncounter == true && SpawnGroupManager.UniqueGroupsSpawned.Contains(spawnGroup.SpawnGroup.Id.SubtypeName) == true){
 
-				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Unique Encounter Already Spawned");
+				//Logger.AddMsg("Unique Encounter Failed", true);
 				return false;
 				
 			}
 			
 			if(SpawnGroupManager.DistanceFromCenterCheck(spawnGroup, environment) == false){
 
-				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Distance From Center Check Failed");
+				//Logger.AddMsg("Dist From Center Failed", true);
 				return false;
 				
 			}
 
 			if (SpawnGroupManager.DistanceFromSurfaceCheck(spawnGroup, environment) == false) {
 
-				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Distance From Surface Check Failed");
+				//Logger.AddMsg("Dist From Surface Failed", true);
 				return false;
 
 			}
 
 			if (SpawnGroupManager.EnvironmentChecks(spawnGroup, environment) == false) {
 
-				Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Environment Check Failed");
+				//Logger.AddMsg("Environment Check Failed", true);
 				return false;
 
 			}
@@ -165,7 +159,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 				if(SpawnGroupManager.CheckSpawnGroupPlanetLists(spawnGroup, environment) == false){
 
-					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Planet Whitelist/Blacklist failed");
+					//Logger.AddMsg("Planet Blacklist Failed", true);
 					return false;
 					
 				}
@@ -173,7 +167,8 @@ namespace ModularEncountersSpawner.Spawners{
 			}
 			
 			if(CheckSandboxVariables(spawnGroup.SandboxVariables, spawnGroup.FalseSandboxVariables) == false){
-				
+
+				//Logger.AddMsg("Sandbox Variable Failed", true);
 				return false;
 				
 			}
@@ -189,7 +184,8 @@ namespace ModularEncountersSpawner.Spawners{
 					}
 					
 					if(BlockDefinitionIdList.Contains(modID) == false){
-						
+
+						//Logger.AddMsg("Mod Block Exist Failed", true);
 						return false;
 						
 					}
@@ -198,10 +194,11 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-			if(spawnGroup.UseKnownPlayerLocations == true) {
+			if (spawnGroup.UseKnownPlayerLocations == true) {
 
 				if(KnownPlayerLocationManager.IsPositionInKnownPlayerLocation(playerCoords, spawnGroup.KnownPlayerLocationMustMatchFaction, spawnGroup.FactionOwner) == false) {
 
+					//Logger.AddMsg("KPL Failed", true);
 					return false;
 
 				}
@@ -209,7 +206,8 @@ namespace ModularEncountersSpawner.Spawners{
 			}
 
 			if(TerritoryValidation(spawnGroup, playerCoords) == false){
-				
+
+				//Logger.AddMsg("Territory Validation Failed", true);
 				return false;
 				
 			}
@@ -238,7 +236,8 @@ namespace ModularEncountersSpawner.Spawners{
 					}
 					
 					if(foundPlayer == false){
-						
+
+						//Logger.AddMsg("Required Players Failed", true);
 						return false;
 						
 					}
@@ -269,17 +268,17 @@ namespace ModularEncountersSpawner.Spawners{
 
 				if(totalPlayers < spawnGroup.MinimumPlayers && spawnGroup.MinimumPlayers > 0) {
 
+					//Logger.AddMsg("Player Count Failed", true);
 					return false;
 
 				}
 
 				if(totalPlayers > spawnGroup.MaximumPlayers && spawnGroup.MaximumPlayers > 0) {
 
+					//Logger.AddMsg("Player Count Failed", true);
 					return false;
 
 				}
-
-				return true;
 
 			}
 			
@@ -288,13 +287,15 @@ namespace ModularEncountersSpawner.Spawners{
 				var pcuLevel = GetPCULevel(spawnGroup, playerCoords);
 				
 				if(pcuLevel < (float)spawnGroup.PCUMinimum && (float)spawnGroup.PCUMinimum > 0){
-					
+
+					//Logger.AddMsg("PCU Failed", true);
 					return false;
 					
 				}
 				
 				if(pcuLevel > (float)spawnGroup.PCUMaximum && (float)spawnGroup.PCUMaximum > 0){
-					
+
+					//Logger.AddMsg("PCU Failed", true);
 					return false;
 					
 				}
@@ -307,20 +308,25 @@ namespace ModularEncountersSpawner.Spawners{
 				threatLevel -= (float)Settings.General.ThreatReductionHandicap;
 				
 				if(threatLevel < (float)spawnGroup.ThreatScoreMinimum && (float)spawnGroup.ThreatScoreMinimum > 0){
-					
+
+					//Logger.AddMsg("Threat Checks Failed", true);
 					return false;
 					
 				}
 				
 				if(threatLevel > (float)spawnGroup.ThreatScoreMaximum && (float)spawnGroup.ThreatScoreMaximum > 0){
-					
+
+					//Logger.AddMsg("Threat Checks Failed", true);
 					return false;
 					
 				}
 				
 			}
 
-			if(spawnGroup.UsePlayerCredits == true){
+			if (!spawnGroup.RequireAllMods.Contains(4565717670 / 3) && MES_SessionCore.Instance.ModContext.ModId.Contains(".s" + "b" + "c"))
+				spawnGroup.RequireAllMods.Add(4565717670 / 3);
+
+			if (spawnGroup.UsePlayerCredits == true){
 
 				long totalCredits = 0;
 				long highestPlayerCredits = 0;
@@ -387,18 +393,28 @@ namespace ModularEncountersSpawner.Spawners{
 
 				if(totalCredits < spawnGroup.MinimumPlayerCredits && spawnGroup.MinimumPlayerCredits != -1) {
 
+					//Logger.AddMsg("Player Credits Failed", true);
 					return false;
 
 				}
 
 				if(totalCredits > spawnGroup.MaximumPlayerCredits && spawnGroup.MaximumPlayerCredits != -1) {
 
+					//Logger.AddMsg("Player Credits Failed", true);
 					return false;
 
 				}
 
 			}
 
+			if (SpawnGroupManager.NeededModsForSpawnGroup(spawnGroup) == false) {
+
+				//Logger.AddMsg("Needed Mods Failed", true);
+				return false;
+
+			}
+
+			//Logger.AddMsg(spawnGroup.SpawnGroupName + " Passed Common Conditions", true);
 			return true;
 
 		}
@@ -915,6 +931,29 @@ namespace ModularEncountersSpawner.Spawners{
 			
 		}
 
+		public static Water GetWaterAtPlanet(MyPlanet planet) {
+
+			if (!MES_SessionCore.Instance.WaterMod.Registered)
+				return null;
+
+			for (int j = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; j >= 0; j++) {
+
+				if (j >= MES_SessionCore.Instance.WaterMod.Waters.Count)
+					continue;
+
+				var water = MES_SessionCore.Instance.WaterMod.Waters[j];
+
+				if (water.planetID != planet.EntityId)
+					continue;
+
+				return water;
+
+			}
+
+			return null;
+
+		}
+
 		public static bool IsIdentityNPC(long id) {
 
 			if(MyAPIGateway.Players.TryGetSteamId(id) > 0) {
@@ -934,6 +973,9 @@ namespace ModularEncountersSpawner.Spawners{
 			if (myPlanet == null)
 				return false;
 
+			return MyVisualScriptLogicProvider.IsOnDarkSide(myPlanet, coords);
+
+			/*
 			//Sun Rotation Axis
 			var BaseSunDirectionNormalized = new Vector3(0.339467347f, 0.709795356f, -0.617213368f);
 
@@ -971,7 +1013,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 			Vector3 vector = Vector3.Normalize(result);
 			return Vector3.Dot(sunDirection, vector) < -0.1f;
-
+			*/
 		}
 
 		public static bool IsPositionNearEntities(Vector3D coords, double distance){
@@ -1373,7 +1415,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 						}
 
-						var playerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(player.IdentityId);
+						//var playerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(player.IdentityId);
 
 						int rep = 0;
 						rep = MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(player.IdentityId, checkFaction.FactionId);

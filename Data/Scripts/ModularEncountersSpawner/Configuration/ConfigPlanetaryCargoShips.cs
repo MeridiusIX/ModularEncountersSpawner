@@ -60,95 +60,95 @@ namespace ModularEncountersSpawner.Configuration{
 
 	public class ConfigPlanetaryCargoShips{
 		
-		public float ModVersion {get; set;}
-		public int FirstSpawnTime {get; set;} //Time Until Spawn When World Starts
-		public int MinSpawnTime {get; set;} //Min Time Until Next Spawn
-		public int MaxSpawnTime {get; set;} //Max Time Until Next Spawn
-		public int MaxShipsPerArea {get; set;}
-		public double AreaSize {get; set;}
-		public int MaxSpawnAttempts {get; set;} //Number Of Attempts To Spawn Ship(s)
-		public double PlayerSurfaceAltitude {get; set;} //Player Must Be Less Than This Altitude From Surface For Spawn Attempt
-		public double MinPathDistanceFromPlayer {get; set;}
-		public double MaxPathDistanceFromPlayer {get; set;}
-		public double MinSpawnFromGrids {get; set;}
-		public float MinAirDensity {get; set;} //Acts As A Dynamic Max Altitude For Spawning
-		public double MinSpawningAltitude {get; set;} //Minimum Distance From The Surface For Spawning
-		public double MaxSpawningAltitude {get; set;}
-		public double MinPathAltitude {get; set;} //Minimum Path Altitude From Start to End
-		public double MinPathDistance {get; set;} //Minimum Path Distance Of Cargo Ship
-		public double MaxPathDistance {get; set;} //Maximum Path Distance Of Cargo Ship
-		public double PathStepCheckDistance {get; set;} //Distance Between Altitude Checks Of Path (Used To Ensure Path Isn't Obstructed By Terrain)
-		public double DespawnDistanceFromEndPath {get; set;} // Ship Will Despawn If Within This Distance Of Path End Coordinates
-		public double DespawnDistanceFromPlayer {get; set;}
-		public double DespawnAltitude {get; set;}
-		public bool UseMinimumSpeed {get; set;}
-		public float MinimumSpeed {get; set;}
-		public bool UseSpeedOverride {get; set;} //If True, The Cargo Ship Will Use Override Speed Instead Of Prefab Speed
-		public float SpeedOverride {get; set;} //Override Speed Value For Cargo Ship (If Used)
+		public float ModVersion;
+		public int FirstSpawnTime; //Time Until Spawn When World Starts
+		public int MinSpawnTime; //Min Time Until Next Spawn
+		public int MaxSpawnTime; //Max Time Until Next Spawn
+		public int MaxShipsPerArea;
+		public double AreaSize;
+		public int MaxSpawnAttempts; //Number Of Attempts To Spawn Ship(s)
+		public double PlayerSurfaceAltitude; //Player Must Be Less Than This Altitude From Surface For Spawn Attempt
+		public double MinPathDistanceFromPlayer;
+		public double MaxPathDistanceFromPlayer;
+		public double MinSpawnFromGrids;
+		public float MinAirDensity; //Acts As A Dynamic Max Altitude For Spawning
+		public double MinSpawningAltitude; //Minimum Distance From The Surface For Spawning
+		public double MaxSpawningAltitude;
+		public double MinPathAltitude; //Minimum Path Altitude From Start to End
+		public double MinPathDistance; //Minimum Path Distance Of Cargo Ship
+		public double MaxPathDistance; //Maximum Path Distance Of Cargo Ship
+		public double PathStepCheckDistance; //Distance Between Altitude Checks Of Path (Used To Ensure Path Isn't Obstructed By Terrain)
+		public double DespawnDistanceFromEndPath; // Ship Will Despawn If Within This Distance Of Path End Coordinates
+		public double DespawnDistanceFromPlayer;
+		public double DespawnAltitude;
+		public bool UseMinimumSpeed;
+		public float MinimumSpeed;
+		public bool UseSpeedOverride; //If True, The Cargo Ship Will Use Override Speed Instead Of Prefab Speed
+		public float SpeedOverride; //Override Speed Value For Cargo Ship (If Used)
 		
-		public bool UseMaxSpawnGroupFrequency {get; set;}
-		public int MaxSpawnGroupFrequency {get; set;}
+		public bool UseMaxSpawnGroupFrequency;
+		public int MaxSpawnGroupFrequency;
 		
-		public bool UseCleanupSettings {get; set;}
-		public bool CleanupUseDistance {get; set;}
-		public bool CleanupUseTimer {get; set;}
-		public bool CleanupUseBlockLimit {get; set;}
-		public bool CleanupDistanceStartsTimer {get; set;}
-		public bool CleanupResetTimerWithinDistance {get; set;}
-		public double CleanupDistanceTrigger {get; set;}
-		public int CleanupTimerTrigger {get; set;}
-		public int CleanupBlockLimitTrigger {get; set;}
-		public bool CleanupIncludeUnowned {get; set;}
-		public bool CleanupUnpoweredOverride {get; set;}
-		public double CleanupUnpoweredDistanceTrigger {get; set;}
-		public int CleanupUnpoweredTimerTrigger {get; set;}
+		public bool UseCleanupSettings;
+		public bool CleanupUseDistance;
+		public bool CleanupUseTimer;
+		public bool CleanupUseBlockLimit;
+		public bool CleanupDistanceStartsTimer;
+		public bool CleanupResetTimerWithinDistance;
+		public double CleanupDistanceTrigger;
+		public int CleanupTimerTrigger;
+		public int CleanupBlockLimitTrigger;
+		public bool CleanupIncludeUnowned;
+		public bool CleanupUnpoweredOverride;
+		public double CleanupUnpoweredDistanceTrigger;
+		public int CleanupUnpoweredTimerTrigger;
 		
-		public bool UseBlockDisable {get; set;}
-		public bool DisableAirVent {get; set;}
-		public bool DisableAntenna {get; set;}
-		public bool DisableArtificialMass {get; set;}
-		public bool DisableAssembler {get; set;}
-		public bool DisableBattery {get; set;}
-		public bool DisableBeacon {get; set;}
-		public bool DisableCollector {get; set;}
-		public bool DisableConnector {get; set;}
-		public bool DisableConveyorSorter {get; set;}
-		public bool DisableDecoy {get; set;}
-		public bool DisableDrill {get; set;}
-		public bool DisableJumpDrive {get; set;}
-		public bool DisableGasGenerator {get; set;}
-		public bool DisableGasTank {get; set;}
-		public bool DisableGatlingGun {get; set;}
-		public bool DisableGatlingTurret {get; set;}
-		public bool DisableGravityGenerator {get; set;}
-		public bool DisableGrinder {get; set;}
-		public bool DisableGyro {get; set;}
-		public bool DisableInteriorTurret {get; set;}
-		public bool DisableLandingGear {get; set;}
-		public bool DisableLaserAntenna {get; set;}
-		public bool DisableLcdPanel {get; set;}
-		public bool DisableLightBlock {get; set;}
-		public bool DisableMedicalRoom {get; set;}
-		public bool DisableMergeBlock {get; set;}
-		public bool DisableMissileTurret {get; set;}
-		public bool DisableOxygenFarm {get; set;}
-		public bool DisableParachuteHatch {get; set;}
-		public bool DisablePiston {get; set;}
-		public bool DisableProgrammableBlock {get; set;}
-		public bool DisableProjector {get; set;}
-		public bool DisableReactor {get; set;}
-		public bool DisableRefinery {get; set;}
-		public bool DisableRocketLauncher {get; set;}
-		public bool DisableReloadableRocketLauncher {get; set;}
-		public bool DisableRotor {get; set;}
-		public bool DisableSensor {get; set;}
-		public bool DisableSolarPanel {get; set;}
-		public bool DisableSoundBlock {get; set;}
-		public bool DisableSpaceBall {get; set;}
-		public bool DisableTimerBlock {get; set;}
-		public bool DisableThruster {get; set;}
-		public bool DisableWelder {get; set;}
-		public bool DisableUpgradeModule {get; set;}
+		public bool UseBlockDisable;
+		public bool DisableAirVent;
+		public bool DisableAntenna;
+		public bool DisableArtificialMass;
+		public bool DisableAssembler;
+		public bool DisableBattery;
+		public bool DisableBeacon;
+		public bool DisableCollector;
+		public bool DisableConnector;
+		public bool DisableConveyorSorter;
+		public bool DisableDecoy;
+		public bool DisableDrill;
+		public bool DisableJumpDrive;
+		public bool DisableGasGenerator;
+		public bool DisableGasTank;
+		public bool DisableGatlingGun;
+		public bool DisableGatlingTurret;
+		public bool DisableGravityGenerator;
+		public bool DisableGrinder;
+		public bool DisableGyro;
+		public bool DisableInteriorTurret;
+		public bool DisableLandingGear;
+		public bool DisableLaserAntenna;
+		public bool DisableLcdPanel;
+		public bool DisableLightBlock;
+		public bool DisableMedicalRoom;
+		public bool DisableMergeBlock;
+		public bool DisableMissileTurret;
+		public bool DisableOxygenFarm;
+		public bool DisableParachuteHatch;
+		public bool DisablePiston;
+		public bool DisableProgrammableBlock;
+		public bool DisableProjector;
+		public bool DisableReactor;
+		public bool DisableRefinery;
+		public bool DisableRocketLauncher;
+		public bool DisableReloadableRocketLauncher;
+		public bool DisableRotor;
+		public bool DisableSensor;
+		public bool DisableSolarPanel;
+		public bool DisableSoundBlock;
+		public bool DisableSpaceBall;
+		public bool DisableTimerBlock;
+		public bool DisableThruster;
+		public bool DisableWelder;
+		public bool DisableUpgradeModule;
 		
 		public ConfigPlanetaryCargoShips(){
 			
