@@ -322,7 +322,7 @@ namespace ModularEncountersSpawner{
 
 					var msgSplit = receivedData.ChatMessage.Split('.');
 
-					if (msgSplit.Length != 4) {
+					if (msgSplit.Length != 3) {
 
 						MyVisualScriptLogicProvider.ShowNotification("Invalid Command Received", 5000, "White", receivedData.PlayerId);
 						return;
