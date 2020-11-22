@@ -107,7 +107,7 @@
 			<Definition xsi:type="MyObjectBuilder_ThrustDefinition">
 			<Id>
 				<TypeId>Thrust</TypeId>
-				<SubtypeId>MES-NPC-Thrust-SciFiIon-SmallGrid-Large</SubtypeId>
+				<SubtypeId>MES-NPC-Thrust-IonSciFi-SmallGrid-Large</SubtypeId>
 			</Id>
 			<DisplayName>NPC Large SciFi Ion Thruster</DisplayName>
 			<Icon>Textures\GUI\Icons\Cubes\Small_IonThrusterLarge_SciFi.dds</Icon>
@@ -208,7 +208,7 @@
 		<Definition xsi:type="MyObjectBuilder_ThrustDefinition">
 			<Id>
 				<TypeId>Thrust</TypeId>
-				<SubtypeId>MES-NPC-Thrust-SciFiIon-LargeGrid-Small</SubtypeId>
+				<SubtypeId>MES-NPC-Thrust-IonSciFi-LargeGrid-Small</SubtypeId>
 			</Id>
 			<DisplayName>NPC SciFi Ion Thruster</DisplayName>
 			<Icon>Textures\GUI\Icons\Cubes\large_IonThrusterSmall_SciFi.dds</Icon>
@@ -308,7 +308,7 @@
 		<Definition xsi:type="MyObjectBuilder_ThrustDefinition">
 			<Id>
 				<TypeId>Thrust</TypeId>
-				<SubtypeId>MES-NPC-Thrust-SciFiIon-LargeGrid-Large</SubtypeId>
+				<SubtypeId>MES-NPC-Thrust-IonSciFi-LargeGrid-Large</SubtypeId>
 			</Id>
 			<DisplayName>NPC Large SciFi Ion Thruster</DisplayName>
 			<Icon>Textures\GUI\Icons\Cubes\large_IonThrusterLarge_SciFi.dds</Icon>
@@ -413,7 +413,7 @@
 		<Definition xsi:type="MyObjectBuilder_ThrustDefinition">
 			<Id>
 				<TypeId>Thrust</TypeId>
-				<SubtypeId>MES-NPC-Thrust-SciFiAtmo-LargeGrid-Large</SubtypeId>
+				<SubtypeId>MES-NPC-Thrust-AtmoSciFi-LargeGrid-Large</SubtypeId>
 			</Id>
 			<DisplayName>NPC Large SciFi Atmo Thruster</DisplayName>
 			<Icon>Textures\GUI\Icons\Cubes\Large_AtmosphericThrusterLarge_SciFi.dds</Icon>
@@ -517,7 +517,7 @@
 		<Definition xsi:type="MyObjectBuilder_ThrustDefinition">
 			<Id>
 				<TypeId>Thrust</TypeId>
-				<SubtypeId>MES-NPC-Thrust-SciFiAtmo-LargeGrid-Small</SubtypeId>
+				<SubtypeId>MES-NPC-Thrust-AtmoSciFi-LargeGrid-Small</SubtypeId>
 			</Id>
 			<DisplayName>NPC SciFi Atmo Thruster</DisplayName>
 			<Icon>Textures\GUI\Icons\Cubes\Large_AtmosphericThrusterSmall_SciFi.dds</Icon>
@@ -622,7 +622,7 @@
 		<Definition xsi:type="MyObjectBuilder_ThrustDefinition">
 			<Id>
 				<TypeId>Thrust</TypeId>
-				<SubtypeId>MES-NPC-Thrust-SciFiAtmo-SmallGrid-Large</SubtypeId>
+				<SubtypeId>MES-NPC-Thrust-AtmoSciFi-SmallGrid-Large</SubtypeId>
 			</Id>
 			<DisplayName>NPC Large SciFi Atmo Thruster</DisplayName>
 			<Icon>Textures\GUI\Icons\Cubes\Small_AtmosphericThrusterLarge_SciFi.dds</Icon>
@@ -726,7 +726,7 @@
 		<Definition xsi:type="MyObjectBuilder_ThrustDefinition">
 			<Id>
 				<TypeId>Thrust</TypeId>
-				<SubtypeId>MES-NPC-Thrust-SciFiAtmo-SmallGrid-Small</SubtypeId>
+				<SubtypeId>MES-NPC-Thrust-AtmoSciFi-SmallGrid-Small</SubtypeId>
 			</Id>
 			<DisplayName>NPC SciFi Atmo Thruster</DisplayName>
 			<Icon>Textures\GUI\Icons\Cubes\Small_AtmosphericThrusterSmall_SciFi.dds</Icon>

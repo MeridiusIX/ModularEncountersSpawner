@@ -295,19 +295,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 			}
 
-			if (randFactionTag != "Nobody" && spawnGroup.ChargeNpcFactionForSpawn) {
-
-				var faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(randFactionTag);
-
-				if (faction != null) {
-
-					long currentBalance = 0;
-					faction.TryGetBalanceInfo(out currentBalance);
-					faction.RequestChangeBalance(spawnGroup.ChargeForSpawning > currentBalance ? -currentBalance : -spawnGroup.ChargeForSpawning);
-
-				}
-
-			}
+			SpawnResources.ApplySpawningCosts(spawnGroup, randFactionTag);
 
 			for (int i = 0; i < spawnGroup.SpawnGroup.Prefabs.Count; i++){
 
@@ -605,10 +593,10 @@ namespace ModularEncountersSpawner.Spawners{
 			}
 			
 			var eligibleGroups = new List<ImprovedSpawnGroup>();
-			
-			
+			SpawnResources.SandboxVariableCache.Clear();
+
 			//Filter Eligible Groups To List
-			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
+			foreach (var spawnGroup in SpawnGroupManager.SpawnGroups){
 
 				if (eligibleNames != null) {
 
@@ -853,7 +841,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 			if (MES_SessionCore.Instance.WaterMod.Registered) {
 
-				for (int i = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; i >= 0; i++) {
+				for (int i = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; i >= 0; i--) {
 
 					if (i >= MES_SessionCore.Instance.WaterMod.Waters.Count)
 						continue;
@@ -956,6 +944,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 						if (surfaceUnderwater && spawnGroup.InstallationSpawnsOnWaterSurface) {
 
+							//TODO: Account For Minimum Depth in Surface Checks
 							foundWaterSurfacePosition = true;
 
 						}
@@ -991,24 +980,49 @@ namespace ModularEncountersSpawner.Spawners{
 							double terrainCheckIncrement = 0;
 							
 							while(terrainCheckIncrement < terrainVarianceCheckTarget){
-								
+
 								var checkTerrainCoords = checkDirection * terrainCheckIncrement + surfaceCoords;
 								var checkTerrainSurfaceCoords = SpawnResources.GetNearestSurfacePoint(checkTerrainCoords, planet);
-								var checkDistToCore = Vector3D.Distance(checkTerrainSurfaceCoords, planetEntity.GetPosition());
-								var elevationDiff = checkDistToCore - distToCore;
-								
-								if(elevationDiff < Settings.PlanetaryInstallations.MinimumTerrainVariance || elevationDiff > Settings.PlanetaryInstallations.MaximumTerrainVariance){
-									
-									badPosition = true;
-									break;
-									
+
+								if (!foundWaterSurfacePosition) {
+
+									var checkDistToCore = Vector3D.Distance(checkTerrainSurfaceCoords, planetEntity.GetPosition());
+									var elevationDiff = checkDistToCore - distToCore;
+
+									if (elevationDiff < Settings.PlanetaryInstallations.MinimumTerrainVariance || elevationDiff > Settings.PlanetaryInstallations.MaximumTerrainVariance) {
+
+										badPosition = true;
+										break;
+
+									}
+
+								} else {
+
+									var pointUnderwater = localWater.IsUnderwater(checkTerrainSurfaceCoords);
+
+									if (!pointUnderwater) {
+
+										badPosition = true;
+										break;
+
+									}
+
+									var pointSurfaceWater = localWater.GetClosestSurfacePoint(checkTerrainSurfaceCoords);
+
+									if (Vector3D.Distance(pointSurfaceWater, checkTerrainSurfaceCoords) < spawnGroup.MinWaterDepth) {
+
+										badPosition = true;
+										break;
+
+									}
+
 								}
-								
+
 								terrainCheckIncrement += Settings.PlanetaryInstallations.TerrainCheckIncrementDistance;
-							
+
 							}
-							
-							if(badPosition == true){
+
+							if (badPosition == true){
 								
 								break;
 								

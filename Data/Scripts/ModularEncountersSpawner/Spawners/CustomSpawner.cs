@@ -103,19 +103,9 @@ namespace ModularEncountersSpawner.Spawners{
 
 			}
 
-			if (randFactionTag != "Nobody" && spawnGroup.ChargeNpcFactionForSpawn) {
 
-				var faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(randFactionTag);
+			SpawnResources.ApplySpawningCosts(spawnGroup, randFactionTag);
 
-				if (faction != null) {
-
-					long currentBalance = 0;
-					faction.TryGetBalanceInfo(out currentBalance);
-					faction.RequestChangeBalance(spawnGroup.ChargeForSpawning > currentBalance ? -currentBalance : -spawnGroup.ChargeForSpawning);
-
-				}
-
-			}
 
 			foreach (var prefab in spawnGroup.SpawnGroup.Prefabs){
 
@@ -219,9 +209,10 @@ namespace ModularEncountersSpawner.Spawners{
 			}
 
 			var eligibleGroups = new List<ImprovedSpawnGroup>();
-			
+			SpawnResources.SandboxVariableCache.Clear();
+
 			//Filter Eligible Groups To List
-			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
+			foreach (var spawnGroup in SpawnGroupManager.SpawnGroups){
 
 				if(!spawnGroups.Contains(spawnGroup.SpawnGroupName)) {
 

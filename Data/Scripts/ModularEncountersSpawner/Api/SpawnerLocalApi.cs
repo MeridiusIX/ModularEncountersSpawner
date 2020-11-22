@@ -50,6 +50,8 @@ namespace ModularEncountersSpawner.Api {
 			dict.Add("ConvertRandomNamePatterns", new Func<string, string>(RandomNameGenerator.CreateRandomNameFromPattern));
 			dict.Add("GetNpcStartCoordinates", new Func<IMyCubeGrid, Vector3D>(GetNpcStartCoordinates));
 			dict.Add("GetNpcEndCoordinates", new Func<IMyCubeGrid, Vector3D>(GetNpcEndCoordinates));
+			dict.Add("RegisterDespawnWatcher", new Func<IMyCubeGrid, Action<IMyCubeGrid, string>, bool>(RegisterDespawnWatcher));
+			dict.Add("RegisterRemoteControlCode", new Action<IMyRemoteControl, string>(RegisterRemoteControlCode));
 			dict.Add("RemoveKnownPlayerLocation", new Action<Vector3D, string, bool>(KnownPlayerLocationManager.RemoveLocation));
 			dict.Add("SetSpawnerIgnoreForDespawn", new Func<IMyCubeGrid, bool, bool>(SetSpawnerIgnoreForDespawn));
 			dict.Add("SpawnBossEncounter", new Func<Vector3D, List<string>, bool>(SpawnBossEncounter));
@@ -113,6 +115,53 @@ namespace ModularEncountersSpawner.Api {
 				return npc.EndCoords;
 
 			return Vector3D.Zero;
+
+		}
+
+		public static bool IsPositionInKnownPlayerLocation(Vector3D coords, bool mustMatchFaction, string faction) {
+
+			bool result = false;
+
+			lock (KnownPlayerLocationManager.Locations) {
+
+				foreach (var location in KnownPlayerLocationManager.Locations) {
+
+					if (mustMatchFaction && location.NpcFaction != faction)
+						continue;
+
+					if (location.Sphere.Contains(coords) == ContainmentType.Contains) {
+
+						result = true;
+						break;
+
+					}
+				
+				}
+			
+			}
+
+			return result;
+		
+		}
+
+		public static bool RegisterDespawnWatcher(IMyCubeGrid cubeGrid, Action<IMyCubeGrid, string> action) {
+
+
+
+			return false;
+		
+		}
+
+		public static void RegisterRemoteControlCode(IMyRemoteControl remoteControl, string code) {
+
+			lock (NPCWatcher.RemoteControlCodes) {
+
+				if (remoteControl == null || NPCWatcher.RemoteControlCodes.ContainsKey(remoteControl))
+					return;
+
+				NPCWatcher.RemoteControlCodes.Add(remoteControl, code);
+
+			}
 
 		}
 

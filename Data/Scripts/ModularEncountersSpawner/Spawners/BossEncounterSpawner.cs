@@ -200,9 +200,10 @@ namespace ModularEncountersSpawner.Spawners{
 			}
 			
 			var eligibleGroups = new List<ImprovedSpawnGroup>();
-			
+			SpawnResources.SandboxVariableCache.Clear();
+
 			//Filter Eligible Groups To List
-			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
+			foreach (var spawnGroup in SpawnGroupManager.SpawnGroups){
 
 				if (eligibleNames != null) {
 
@@ -442,19 +443,7 @@ namespace ModularEncountersSpawner.Spawners{
 				Logger.SkipNextMessage = false;
 				Logger.AddMsg("Boss Encounter SpawnGroup " + encounter.SpawnGroup.SpawnGroup.Id.SubtypeName + " Now Spawning.");
 
-				if (encounter.SpawnGroup.FactionOwner != "Nobody" && encounter.SpawnGroup.ChargeNpcFactionForSpawn) {
-
-					var faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(encounter.SpawnGroup.FactionOwner);
-
-					if (faction != null) {
-
-						long currentBalance = 0;
-						faction.TryGetBalanceInfo(out currentBalance);
-						faction.RequestChangeBalance(encounter.SpawnGroup.ChargeForSpawning > currentBalance ? -currentBalance : -encounter.SpawnGroup.ChargeForSpawning);
-
-					}
-
-				}
+				SpawnResources.ApplySpawningCosts(encounter.SpawnGroup, encounter.SpawnGroup.FactionOwner);
 
 				foreach (var prefab in encounter.SpawnGroup.SpawnGroup.Prefabs){
 

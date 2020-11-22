@@ -90,6 +90,29 @@ namespace ModularEncountersSpawner.Templates{
 		public List<string> FalseSandboxVariables;
 		public bool UseCommonConditions;
 
+		public bool SettingsAutoHeal;
+		public bool SettingsAutoRespawn;
+		public bool SettingsBountyContracts;
+		public bool SettingsDestructibleBlocks;
+		public bool SettingsCopyPaste;
+		public bool SettingsContainerDrops;
+		public bool SettingsEconomy;
+		public bool SettingsEnableDrones;
+		public bool SettingsIngameScripts;
+		public bool SettingsJetpack;
+		public bool SettingsOxygen;
+		public bool SettingsResearch;
+		public bool SettingsSpawnWithTools;
+		public bool SettingsSpiders;
+		public bool SettingsSubgridDamage;
+		public bool SettingsSunRotation;
+		public bool SettingsSupergridding;
+		public bool SettingsThrusterDamage;
+		public bool SettingsVoxelDestruction;
+		public bool SettingsWeaponsEnabled;
+		public bool SettingsWeather;
+		public bool SettingsWolves;
+
 		public int RandomNumberRoll;
 		public int ChanceCeiling;
 		public int SpaceCargoShipChance;
@@ -297,6 +320,15 @@ namespace ModularEncountersSpawner.Templates{
 		public bool ChargeNpcFactionForSpawn;
 		public long ChargeForSpawning;
 
+		public bool UseSandboxCounterCosts;
+		public List<string> SandboxCounterCostNames;
+		public List<int> SandboxCounterCostAmounts;
+
+		public bool UseRemoteControlCodeRestrictions;
+		public string RemoteControlCode;
+		public double RemoteControlCodeMinDistance;
+		public double RemoteControlCodeMaxDistance;
+
 		public List<ulong> RequireAllMods;
 		public List<ulong> RequireAnyMods;
 		public List<ulong> ExcludeAllMods;
@@ -305,7 +337,8 @@ namespace ModularEncountersSpawner.Templates{
 		public List<string> ModBlockExists;
 		
 		public List<ulong> RequiredPlayersOnline;
-		
+		public List<ulong> RequiredAnyPlayersOnline;
+
 		public bool AttachModStorageComponentToGrid; 
 		public Guid StorageKey; 
 		public string StorageValue;
@@ -594,6 +627,15 @@ namespace ModularEncountersSpawner.Templates{
 			ChargeNpcFactionForSpawn = false;
 			ChargeForSpawning = 0;
 
+			UseSandboxCounterCosts = false;
+			SandboxCounterCostNames = new List<string>();
+			SandboxCounterCostAmounts = new List<int>();
+
+			UseRemoteControlCodeRestrictions = false;
+			RemoteControlCode = "";
+			RemoteControlCodeMinDistance = -1;
+			RemoteControlCodeMaxDistance = -1;
+
 			RequireAllMods = new List<ulong>();
 			RequireAnyMods = new List<ulong>();
 			ExcludeAllMods = new List<ulong>();
@@ -602,7 +644,8 @@ namespace ModularEncountersSpawner.Templates{
 			ModBlockExists = new List<string>();
 			
 			RequiredPlayersOnline = new List<ulong>();
-			
+			RequiredAnyPlayersOnline = new List<ulong>();
+
 			AttachModStorageComponentToGrid = false;
 			StorageKey = new Guid("00000000-0000-0000-0000-000000000000");
 			StorageValue = "";

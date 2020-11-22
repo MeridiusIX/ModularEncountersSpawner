@@ -346,7 +346,6 @@ namespace ModularEncountersSpawner{
 
 				requiresWater = (!spawnGroup.InstallationSpawnsOnDryLand && (spawnGroup.InstallationSpawnsOnWaterSurface || spawnGroup.InstallationSpawnsUnderwater));
 
-
 			} else {
 
 				requiresWater = spawnGroup.MustSpawnUnderwater;
@@ -1803,6 +1802,55 @@ namespace ModularEncountersSpawner{
 
 				}
 
+				//UseSandboxCounterCosts
+				if (tag.Contains("[UseSandboxCounterCosts:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.UseSandboxCounterCosts);
+
+				}
+
+				//SandboxCounterCostNames
+				if (tag.Contains("[SandboxCounterCostNames:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.SandboxCounterCostNames);
+
+				}
+
+				//SandboxCounterCostAmounts
+				if (tag.Contains("[SandboxCounterCostAmounts:") == true) {
+
+					TagIntListCheck(tag, ref improveSpawnGroup.SandboxCounterCostAmounts);
+
+				}
+
+				//UseRemoteControlCodeRestrictions
+				if (tag.Contains("[UseRemoteControlCodeRestrictions:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.UseRemoteControlCodeRestrictions);
+
+				}
+
+				//RemoteControlCode
+				if (tag.Contains("[RemoteControlCode:") == true) {
+
+					TagStringCheck(tag, ref improveSpawnGroup.RemoteControlCode);
+
+				}
+
+				//RemoteControlCodeMinDistance
+				if (tag.Contains("[RemoteControlCodeMinDistance:") == true) {
+
+					TagDoubleCheck(tag, ref improveSpawnGroup.RemoteControlCodeMinDistance);
+
+				}
+
+				//RemoteControlCodeMaxDistance
+				if (tag.Contains("[RemoteControlCodeMaxDistance:") == true) {
+
+					TagDoubleCheck(tag, ref improveSpawnGroup.RemoteControlCodeMaxDistance);
+
+				}
+
 				//RequireAllMods
 				if (tag.Contains("[RequiredMods:") == true || tag.Contains("[RequireAllMods") == true){
 
@@ -1837,9 +1885,16 @@ namespace ModularEncountersSpawner{
 					TagUlongListCheck(tag, ref improveSpawnGroup.RequiredPlayersOnline);
 						
 				}
-				
+
+				//RequiredAnyPlayersOnline
+				if (tag.Contains("[RequiredAnyPlayersOnline:") == true) {
+
+					TagUlongListCheck(tag, ref improveSpawnGroup.RequiredAnyPlayersOnline);
+
+				}
+
 				//AttachModStorageComponentToGrid
-				if(tag.Contains("[AttachModStorageComponentToGrid:") == true){
+				if (tag.Contains("[AttachModStorageComponentToGrid:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.AttachModStorageComponentToGrid);
 						
@@ -2485,6 +2540,34 @@ namespace ModularEncountersSpawner{
 			}
 
 			original = result;
+
+		}
+
+		public static void TagIntListCheck(string tag, ref List<int> result) {
+
+			var tagSplit = ProcessTag(tag);
+
+			if (tagSplit.Length == 2) {
+
+				var array = tagSplit[1].Split(',');
+
+				foreach (var item in array) {
+
+					if (string.IsNullOrWhiteSpace(item))
+						continue;
+
+					int number = 0;
+
+					if (int.TryParse(item, out number) == false)
+						continue;
+
+					result.Add(number);
+
+				}
+
+			}
+
+			result.RemoveAll(item => item == 0);
 
 		}
 

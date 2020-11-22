@@ -37,7 +37,10 @@ namespace ModularEncountersSpawner{
 		public static List<string> NPCFactionTags = new List<string>();
 		public static Dictionary<long, string> NPCFactionFounderToTag = new Dictionary<long, string>();
 		public static Dictionary<string, long> NPCFactionTagToFounder = new Dictionary<string, long>();
-		
+
+		//NPC Remote Controls and Codes
+		public static Dictionary<IMyRemoteControl, string> RemoteControlCodes = new Dictionary<IMyRemoteControl, string>();
+
 		//Drop Container Names
 		public static List<string> DropContainerNames = new List<string>();
 		public static List<string> EconomyStationNames = new List<string>();
@@ -234,7 +237,10 @@ namespace ModularEncountersSpawner{
 
 					//Keen AI Handler
 					if(ActiveNPCs[cubeGrid].KeenBehaviorCheck == false){
-						
+
+						var myCubeGrid = cubeGrid as MyCubeGrid;
+						Logger.AddMsg(cubeGrid.CustomName + " Dampeners Second Check: " + myCubeGrid.DampenersEnabled, true);
+
 						ActiveNPCs[cubeGrid].KeenBehaviorCheck = true;
 						
 						if(string.IsNullOrWhiteSpace(ActiveNPCs[cubeGrid].KeenAiName) == false){
@@ -713,7 +719,8 @@ namespace ModularEncountersSpawner{
 						if(Vector3D.Distance(cubeGrid.GetPosition(), activeNPC.EndCoords) < Settings.SpaceCargoShips.DespawnDistanceFromEndPath == activeNPC.FlagForDespawn == false){
 
 							activeNPC.FlagForDespawn = true;
-							
+							activeNPC.DespawnReason = "EndPath";
+
 						}
 
 						if(activeNPC.FlagForDespawn == true) {
@@ -723,6 +730,7 @@ namespace ModularEncountersSpawner{
 							if(player == null || Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition()) > Settings.SpaceCargoShips.DespawnDistanceFromPlayer) {
 
 								Logger.AddMsg("NPC Cargo Ship " + cubeGrid.CustomName + " Has Reached End Of Travel Path And Has Been Despawned.");
+								activeNPC.ActivateDespawnActions();
 								ActiveNPCs.Remove(cubeGrid);
 								DeleteGrid(cubeGrid);
 								continue;
@@ -968,7 +976,8 @@ namespace ModularEncountersSpawner{
 							
 							errorLogger.Append("Reached Path End").AppendLine();
 							Logger.AddMsg("Planetary Cargo Ship " + cubeGrid.CustomName + " Has Reached End Of Path And Will Be Despawned.");
-							activeNPC.FlagForDespawn = true; 
+							activeNPC.FlagForDespawn = true;
+							activeNPC.DespawnReason = "EndPath";
 							skip = true;
 							
 						}
@@ -981,6 +990,7 @@ namespace ModularEncountersSpawner{
 								
 								errorLogger.Append("Despawning Grid").AppendLine();
 								Logger.AddMsg("NPC Cargo Ship " + cubeGrid.CustomName + " Has Been Despawned.");
+								activeNPC.ActivateDespawnActions();
 								ActiveNPCs.Remove(cubeGrid);
 								DeleteGrid(cubeGrid);
 								continue;
@@ -1009,6 +1019,7 @@ namespace ModularEncountersSpawner{
 							if(player == null || Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition()) > Settings.RandomEncounters.DespawnDistanceFromPlayer){
 								
 								Logger.AddMsg("NPC Random Encounter " + cubeGrid.CustomName + " Has Been Despawned.");
+								activeNPC.ActivateDespawnActions();
 								ActiveNPCs.Remove(cubeGrid);
 								DeleteGrid(cubeGrid);
 								continue;
@@ -1037,6 +1048,7 @@ namespace ModularEncountersSpawner{
 							if(player == null || Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition()) > Settings.BossEncounters.DespawnDistanceFromPlayer){
 								
 								Logger.AddMsg("NPC Boss Encounter " + cubeGrid.CustomName + " Has Been Despawned.");
+								activeNPC.ActivateDespawnActions();
 								ActiveNPCs.Remove(cubeGrid);
 								DeleteGrid(cubeGrid);
 								continue;
@@ -1065,6 +1077,7 @@ namespace ModularEncountersSpawner{
 							if(player == null || Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition()) > Settings.PlanetaryInstallations.DespawnDistanceFromPlayer){
 								
 								Logger.AddMsg("NPC Planetary Installation " + cubeGrid.CustomName + " Has Been Despawned.");
+								activeNPC.ActivateDespawnActions();
 								ActiveNPCs.Remove(cubeGrid);
 								DeleteGrid(cubeGrid);
 								continue;
@@ -1093,6 +1106,7 @@ namespace ModularEncountersSpawner{
 							if(player == null || Vector3D.Distance(cubeGrid.GetPosition(), player.GetPosition()) > Settings.OtherNPCs.DespawnDistanceFromPlayer){
 								
 								Logger.AddMsg("NPC Grid " + cubeGrid.CustomName + " Has Been Despawned.");
+								activeNPC.ActivateDespawnActions();
 								ActiveNPCs.Remove(cubeGrid);
 								DeleteGrid(cubeGrid);
 								continue;
@@ -1378,8 +1392,13 @@ namespace ModularEncountersSpawner{
 				
 				
 			}
-						
-			if(closestIndex >= 0){
+
+			//Temp Debug
+			var myCubeGrid = cubeGrid as MyCubeGrid;
+			Logger.AddMsg(cubeGrid.CustomName + " Dampeners First Check: " + myCubeGrid.DampenersEnabled, true);
+
+
+			if (closestIndex >= 0){
 				
 				PendingNPCs[closestIndex].CubeGrid = cubeGrid;
 

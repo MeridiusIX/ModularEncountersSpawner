@@ -752,7 +752,22 @@ namespace ModularEncountersSpawner {
 
 		public static void OnSaleComplete(int amtSold, int amtRemain, long cost, long storeOwner, long customer) {
 
-			if(Settings.General.UseEconomyBuyingReputationIncrease == false || customer == 0) {
+			if(customer == 0) {
+
+				Logger.AddMsg("Buyer is Nobody", true);
+				return;
+
+			}
+
+			var faction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(storeOwner);
+
+			if (faction != null) {
+
+				faction.RequestChangeBalance(cost);
+			
+			}
+
+			if (Settings.General.UseEconomyBuyingReputationIncrease == false || customer == 0) {
 
 				Logger.AddMsg("Economy Buy Rep Increaser Disabled or Buyer is Nobody", true);
 				return;

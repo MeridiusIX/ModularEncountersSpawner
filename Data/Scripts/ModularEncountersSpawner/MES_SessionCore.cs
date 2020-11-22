@@ -35,7 +35,7 @@ namespace ModularEncountersSpawner{
 	
 	public class MES_SessionCore : MySessionComponentBase{
 		
-		public static float ModVersion = 1.095f;
+		public static float ModVersion = 1.100f;
 		public static string SaveName = "";
 		public static int PlayerWatcherTimer = 0;
 		public static Dictionary<IMyPlayer, PlayerWatcher> playerWatchList = new Dictionary<IMyPlayer, PlayerWatcher>();
@@ -135,6 +135,23 @@ namespace ModularEncountersSpawner{
 					WeaponCoreMod = true;
 
 				}
+
+			}
+
+			var allDefs = MyDefinitionManager.Static.GetAllDefinitions();
+
+			foreach (var def in allDefs) {
+
+				var block = def as MyCubeBlockDefinition;
+
+				if (block == null)
+					continue;
+
+				if (!block.Public)
+					continue;
+
+				if (!GridBuilderManipulation.DefaultPublicBlocks.Contains(block.Id))
+					GridBuilderManipulation.DefaultPublicBlocks.Add(block.Id);
 
 			}
 

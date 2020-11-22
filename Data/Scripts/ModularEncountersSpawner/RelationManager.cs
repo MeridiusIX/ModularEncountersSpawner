@@ -109,6 +109,68 @@ namespace ModularEncountersSpawner {
 			}
 			
 		}
+
+		public static bool ResetFactionReputation(string factionTag) {
+
+			if (SetupDone == false) {
+
+				SetupDone = true;
+				Setup();
+
+			}
+
+			var faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(factionTag);
+
+			if (faction == null)
+				return false;
+
+			lock (PreviouslySetRelations) {
+
+				PreviouslySetRelations.Clear();
+				string previousRelationsArray = "";
+
+				if (MyAPIGateway.Utilities.GetVariable<string>("MES-FixedDefaultNpcRelations", out previousRelationsArray) == true) {
+
+					var bytes = Convert.FromBase64String(previousRelationsArray);
+					PreviouslySetRelations = MyAPIGateway.Utilities.SerializeFromBinary<List<string>>(bytes);
+
+
+				}
+
+				for (int i = PreviouslySetRelations.Count - 1; i >= 0; i--) {
+
+					var id = PreviouslySetRelations[i];
+
+					if (id.Contains(faction.FactionId.ToString()))
+						PreviouslySetRelations.RemoveAt(i);
+
+				}
+
+				int defaultRep = -1000;
+
+				if (NeutralNpcFactions.Contains(faction.FactionId))
+					defaultRep = 0;
+
+				if (FriendsNpcFactions.Contains(faction.FactionId))
+					defaultRep = 1000;
+
+				var identities = new List<IMyIdentity>();
+				MyAPIGateway.Players.GetAllIdentites(identities);
+
+				foreach (var identity in identities) {
+
+					ulong steamId = MyAPIGateway.Players.TryGetSteamId(identity.IdentityId);
+
+					if (steamId > 0)
+						MyAPIGateway.Session.Factions.SetReputationBetweenPlayerAndFaction(identity.IdentityId, faction.FactionId, defaultRep);
+
+				}
+
+			}
+
+			return true;
+		
+		}
 		
 		public static void InitialReputationFixer(){
 
@@ -121,74 +183,79 @@ namespace ModularEncountersSpawner {
 
 			MyAPIGateway.Parallel.Start(() => {
 
-				PreviouslySetRelations.Clear();
-				string previousRelationsArray = "";
+				lock (PreviouslySetRelations) {
 
-				if(MyAPIGateway.Utilities.GetVariable<string>("MES-FixedDefaultNpcRelations", out previousRelationsArray) == true) {
+					PreviouslySetRelations.Clear();
+					string previousRelationsArray = "";
 
-					var bytes = Convert.FromBase64String(previousRelationsArray);
-					PreviouslySetRelations = MyAPIGateway.Utilities.SerializeFromBinary<List<string>>(bytes);
-					
+					if (MyAPIGateway.Utilities.GetVariable<string>("MES-FixedDefaultNpcRelations", out previousRelationsArray) == true) {
+
+						var bytes = Convert.FromBase64String(previousRelationsArray);
+						PreviouslySetRelations = MyAPIGateway.Utilities.SerializeFromBinary<List<string>>(bytes);
+
+
+					}
+
+					var playerList = new List<IMyPlayer>();
+					MyAPIGateway.Players.GetPlayers(playerList);
+
+					foreach (var player in playerList) {
+
+						if (player.IsBot == true || player.Character == null) {
+
+							continue;
+
+						}
+
+						foreach (var neutral in NeutralNpcFactions) {
+
+							string identityString = player.IdentityId.ToString() + "-" + neutral.ToString();
+
+							if (PreviouslySetRelations.Contains(identityString) == true) {
+
+								continue;
+
+							}
+
+							if (SetNeutralRelations.ContainsKey(player.IdentityId) == false) {
+
+								SetNeutralRelations.Add(player.IdentityId, neutral);
+								PreviouslySetRelations.Add(identityString);
+								RunAgain = true;
+								break;
+
+							}
+
+						}
+
+						foreach (var friends in FriendsNpcFactions) {
+
+							string identityString = player.IdentityId.ToString() + "-" + friends.ToString();
+
+							if (PreviouslySetRelations.Contains(identityString) == true) {
+
+								continue;
+
+							}
+
+							if (SetFriendsRelations.ContainsKey(player.IdentityId) == false) {
+
+								SetFriendsRelations.Add(player.IdentityId, friends);
+								PreviouslySetRelations.Add(identityString);
+								RunAgain = true;
+								break;
+
+							}
+
+						}
+
+					}
+
+					var newbytes = MyAPIGateway.Utilities.SerializeToBinary<List<string>>(PreviouslySetRelations);
+					string storage = Convert.ToBase64String(newbytes);
+					MyAPIGateway.Utilities.SetVariable<string>("MES-FixedDefaultNpcRelations", storage);
 
 				}
-				var playerList = new List<IMyPlayer>();
-				MyAPIGateway.Players.GetPlayers(playerList);
-				
-				foreach(var player in playerList){
-					
-					if(player.IsBot == true || player.Character == null){
-						
-						continue;
-						
-					}
-					
-					foreach(var neutral in NeutralNpcFactions){
-						
-						string identityString = player.IdentityId.ToString() + "-" + neutral.ToString();
-
-						if(PreviouslySetRelations.Contains(identityString) == true){
-							
-							continue;
-							
-						}
-						
-						if(SetNeutralRelations.ContainsKey(player.IdentityId) == false){
-							
-							SetNeutralRelations.Add(player.IdentityId, neutral);
-							PreviouslySetRelations.Add(identityString);
-							RunAgain = true;
-							break;
-							
-						}
-
-					}
-					
-					foreach(var friends in FriendsNpcFactions){
-						
-						string identityString = player.IdentityId.ToString() + "-" + friends.ToString();
-
-						if(PreviouslySetRelations.Contains(identityString) == true){
-							
-							continue;
-							
-						}
-						
-						if(SetFriendsRelations.ContainsKey(player.IdentityId) == false){
-							
-							SetFriendsRelations.Add(player.IdentityId, friends);
-							PreviouslySetRelations.Add(identityString);
-							RunAgain = true;
-							break;
-							
-						}
-
-					}
-					
-				}
-
-				var newbytes = MyAPIGateway.Utilities.SerializeToBinary<List<string>>(PreviouslySetRelations);
-				string storage = Convert.ToBase64String(newbytes);
-				MyAPIGateway.Utilities.SetVariable<string>("MES-FixedDefaultNpcRelations", storage);
 				
 			}, () => {
 				

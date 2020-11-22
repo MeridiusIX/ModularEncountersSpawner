@@ -49,6 +49,8 @@ namespace ModularEncountersSpawner.Spawners{
 		public static Dictionary<IMyCubeGrid, float> GridThreatLevels = new Dictionary<IMyCubeGrid, float>();
 		public static Dictionary<IMyCubeGrid, int> GridPCULevels = new Dictionary<IMyCubeGrid, int>();
 
+		public static Dictionary<string, int> SandboxVariableCache = new Dictionary<string, int>();
+
 		public static List<KnownPlayerLocation> KnownPlayerLocations = new List<KnownPlayerLocation>();
 
 		public static List<string> BlockDefinitionIdList = new List<string>();
@@ -92,6 +94,39 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 	
+		}
+
+		public static void ApplySpawningCosts(ImprovedSpawnGroup spawnGroup, string factionTag) {
+
+			if (factionTag != "Nobody" && spawnGroup.ChargeNpcFactionForSpawn) {
+
+				var faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(factionTag);
+
+				if (faction != null) {
+
+					long currentBalance = 0;
+					faction.TryGetBalanceInfo(out currentBalance);
+					faction.RequestChangeBalance(spawnGroup.ChargeForSpawning > currentBalance ? -currentBalance : -spawnGroup.ChargeForSpawning);
+
+				}
+
+			}
+
+			if (spawnGroup.UseSandboxCounterCosts) {
+
+				var count = (spawnGroup.SandboxCounterCostNames.Count >= spawnGroup.SandboxCounterCostAmounts.Count ? spawnGroup.SandboxCounterCostNames.Count : spawnGroup.SandboxCounterCostAmounts.Count);
+
+				for (int i = 0; i < spawnGroup.SandboxCounterCostNames.Count && i < count; i++) {
+
+					int amount = 0;
+					MyAPIGateway.Utilities.GetVariable<int>(spawnGroup.SandboxCounterCostNames[i], out amount);
+					amount -= spawnGroup.SandboxCounterCostAmounts[i];
+					MyAPIGateway.Utilities.SetVariable<int>(spawnGroup.SandboxCounterCostNames[i], amount);
+
+				}
+			
+			}
+
 		}
 		
 		public static bool CheckCommonConditions(ImprovedSpawnGroup spawnGroup, Vector3D playerCoords, EnvironmentEvaluation environment, bool specificSpawnRequest) {
@@ -246,7 +281,44 @@ namespace ModularEncountersSpawner.Spawners{
 				
 			}
 
-			if(spawnGroup.UsePlayerCountCheck == true) {
+			if (spawnGroup.RequiredAnyPlayersOnline.Count > 0) {
+
+				bool foundPlayer = false;
+
+				foreach (var playerSteamId in spawnGroup.RequiredAnyPlayersOnline) {
+
+					if (playerSteamId == 0) {
+
+						continue;
+
+					}
+
+					foreach (var player in MES_SessionCore.PlayerList) {
+
+						if (player.SteamUserId == playerSteamId) {
+
+							foundPlayer = true;
+							break;
+
+						}
+
+					}
+
+					if (foundPlayer)
+						break;
+
+				}
+
+				if (foundPlayer == false) {
+
+					//Logger.AddMsg("Required Any Players Failed", true);
+					return false;
+
+				}
+
+			}
+
+			if (spawnGroup.UsePlayerCountCheck == true) {
 
 				int totalPlayers = 0;
 
@@ -407,6 +479,18 @@ namespace ModularEncountersSpawner.Spawners{
 
 			}
 
+			if (spawnGroup.UseSandboxCounterCosts && !CheckSpawnCosts(spawnGroup)) {
+
+				return false;
+			
+			}
+
+			if (spawnGroup.UseRemoteControlCodeRestrictions && !CheckRemoteControlCode(spawnGroup, playerCoords)) {
+
+				return false;
+			
+			}
+
 			if (SpawnGroupManager.NeededModsForSpawnGroup(spawnGroup) == false) {
 
 				//Logger.AddMsg("Needed Mods Failed", true);
@@ -459,6 +543,70 @@ namespace ModularEncountersSpawner.Spawners{
 			var coords = direction * pathDistance + startPathCoords;
 			return coords;
 			
+		}
+
+		public static bool CheckRemoteControlCode(ImprovedSpawnGroup spawnGroup, Vector3D coords) {
+
+			lock (NPCWatcher.RemoteControlCodes) {
+
+				foreach (var remote in NPCWatcher.RemoteControlCodes.Keys) {
+
+					if (remote == null || remote.SlimBlock?.CubeGrid?.Physics == null || remote.MarkedForClose || remote.Closed)
+						continue;
+
+					if (NPCWatcher.RemoteControlCodes[remote] != spawnGroup.RemoteControlCode)
+						continue;
+
+					var distance = Vector3D.Distance(coords, remote.GetPosition());
+
+					if ((spawnGroup.RemoteControlCodeMinDistance > -1 && distance < spawnGroup.RemoteControlCodeMinDistance) || (spawnGroup.RemoteControlCodeMaxDistance > -1 && distance > spawnGroup.RemoteControlCodeMaxDistance))
+						return false;
+				
+				}
+			
+			}
+
+			return true;
+		
+		}
+
+		public static bool CheckSpawnCosts(ImprovedSpawnGroup spawnGroup) {
+
+			bool result = true;
+			var count = (spawnGroup.SandboxCounterCostNames.Count >= spawnGroup.SandboxCounterCostAmounts.Count ? spawnGroup.SandboxCounterCostNames.Count : spawnGroup.SandboxCounterCostAmounts.Count);
+
+			for (int i = 0; i < spawnGroup.SandboxCounterCostNames.Count && i < count; i++) {
+
+				if (spawnGroup.SandboxCounterCostAmounts[i] == 0)
+					continue;
+
+				int amount = 0;
+
+				if (SandboxVariableCache.TryGetValue(spawnGroup.SandboxCounterCostNames[i], out amount)) {
+				
+					//Nothing
+				
+				} else if (MyAPIGateway.Utilities.GetVariable<int>(spawnGroup.SandboxCounterCostNames[i], out amount)) {
+
+					SandboxVariableCache.Add(spawnGroup.SandboxCounterCostNames[i], amount);
+
+				} else {
+
+					result = false;
+					break;
+				
+				}
+
+				if (amount >= spawnGroup.SandboxCounterCostAmounts[i])
+					continue;
+
+				result = false;
+				break;
+
+			}
+
+			return result;
+		
 		}
 				
 		public static double GetDistanceFromSurface(Vector3D position, MyPlanet planet){

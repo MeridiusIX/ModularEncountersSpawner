@@ -60,6 +60,8 @@ namespace ModularEncountersSpawner{
 		public static List<string> WhitelistedWeaponTargetSubtypes = new List<string>();
 		public static Dictionary<string, float> PowerDrainingWeapons = new Dictionary<string, float>();
 
+		public static List<MyDefinitionId> DefaultPublicBlocks = new List<MyDefinitionId>();
+
 		public static Dictionary<MyDefinitionId, MyDefinitionId> GlobalBlockReplacements = new Dictionary<MyDefinitionId, MyDefinitionId>();
 
 		public static Dictionary<MyDefinitionId, MyDefinitionId> HeavyArmorConvertReference = new Dictionary<MyDefinitionId, MyDefinitionId>();
@@ -283,6 +285,7 @@ namespace ModularEncountersSpawner{
 
 					var replacementProfile = new BlockReplacementProfileMES();
 					replacementProfile.ReplacementReferenceName = "MES-NpcThrusters-Ion";
+					
 					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockSmallThrust"), 
 						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-Ion-SmallGrid-Small"));
 					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockLargeThrust"), 
@@ -291,6 +294,16 @@ namespace ModularEncountersSpawner{
 						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-Ion-LargeGrid-Small"));
 					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockLargeThrust"),
 						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-Ion-LargeGrid-Large"));
+
+					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockSmallThrustSciFi"),
+						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-IonSciFi-SmallGrid-Small"));
+					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockLargeThrustSciFi"),
+						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-IonSciFi-SmallGrid-Large"));
+					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockSmallThrustSciFi"),
+						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-IonSciFi-LargeGrid-Small"));
+					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockLargeThrustSciFi"),
+						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-IonSciFi-LargeGrid-Large"));
+
 					BlockReplacementProfiles.Add(replacementProfile.ReplacementReferenceName, replacementProfile);
 
 				}
@@ -299,6 +312,7 @@ namespace ModularEncountersSpawner{
 
 					var replacementProfile = new BlockReplacementProfileMES();
 					replacementProfile.ReplacementReferenceName = "MES-NpcThrusters-Atmo";
+					
 					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockSmallAtmosphericThrust"),
 						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-Atmo-SmallGrid-Small"));
 					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockLargeAtmosphericThrust"),
@@ -307,6 +321,16 @@ namespace ModularEncountersSpawner{
 						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-Atmo-LargeGrid-Small"));
 					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockLargeAtmosphericThrust"),
 						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-Atmo-LargeGrid-Large"));
+
+					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockSmallAtmosphericThrustSciFi"),
+						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-AtmoSciFi-SmallGrid-Small"));
+					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "SmallBlockLargeAtmosphericThrustSciFi"),
+						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-AtmoSciFi-SmallGrid-Large"));
+					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockSmallAtmosphericThrustSciFi"),
+						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-AtmoSciFi-LargeGrid-Small"));
+					replacementProfile.ReplacementReferenceDict.Add(new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "LargeBlockLargeAtmosphericThrustSciFi"),
+						new SerializableDefinitionId(typeof(MyObjectBuilder_Thrust), "MES-NPC-Thrust-AtmoSciFi-LargeGrid-Large"));
+
 					BlockReplacementProfiles.Add(replacementProfile.ReplacementReferenceName, replacementProfile);
 
 				}
@@ -544,10 +568,17 @@ namespace ModularEncountersSpawner{
 					
 					}
 
-					if (weaponBlock == null || definition.Public == false) {
+					if (weaponBlock == null) {
 
 						continue;
 
+					}
+
+					if (!definition.Public) {
+
+						if (!DefaultPublicBlocks.Contains(definition.Id))
+							continue;
+					
 					}
 					
 					errorDebugging.Append("Set Defintions To WeaponProfile class object").AppendLine();
@@ -818,7 +849,7 @@ namespace ModularEncountersSpawner{
 
 				bool allowedShields = true;
 
-				if (spawnGroup.PlanetaryInstallation || (spawnGroup.SpaceRandomEncounter && spawnGroup.SpawnGroup.Voxels.Count > 0))
+				if ((spawnGroup.PlanetaryInstallation && !spawnGroup.InstallationSpawnsOnWaterSurface) || (spawnGroup.SpaceRandomEncounter && spawnGroup.SpawnGroup.Voxels.Count > 0))
 					allowedShields = false;
 
 				if (spawnGroup.ShieldProviderChance < 100) {

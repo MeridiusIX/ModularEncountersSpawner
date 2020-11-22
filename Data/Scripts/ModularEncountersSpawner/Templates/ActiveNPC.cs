@@ -144,6 +144,12 @@ namespace ModularEncountersSpawner.Templates{
 		[ProtoIgnore]
 		public bool DefenseShieldActivationCheck;
 
+		[ProtoIgnore]
+		public List<Action<IMyCubeGrid, string>> DespawnActions;
+
+		[ProtoIgnore]
+		public string DespawnReason;
+
 
 		public ActiveNPC(){
 			
@@ -191,6 +197,9 @@ namespace ModularEncountersSpawner.Templates{
 			EmptyInventoryCheck = false;
 			DefenseShieldActivationCheck = false;
 
+			DespawnActions = new List<Action<IMyCubeGrid, string>>();
+			DespawnReason = "CleanUp";
+
 		}
 
 		public ActiveNPC(string dataStorage) {
@@ -230,6 +239,8 @@ namespace ModularEncountersSpawner.Templates{
 					this.HydrogenTanks = new List<IMyGasTank>();
 					this.GasGenerators = new List<IMyGasGenerator>();
 					this.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(npcData.InitialFaction);
+					this.DespawnActions = new List<Action<IMyCubeGrid, string>>();
+					this.DespawnReason = "CleanUp";
 
 				}
 
@@ -239,6 +250,16 @@ namespace ModularEncountersSpawner.Templates{
 				Logger.AddMsg("Failed To Load ActiveNPC Data from ModStorageComponent");
 
 			}
+
+		}
+
+		public void ActivateDespawnActions() {
+
+			if (DespawnActions == null)
+				return;
+
+			foreach (var action in DespawnActions)
+				action?.Invoke(this.CubeGrid, DespawnReason);
 
 		}
 

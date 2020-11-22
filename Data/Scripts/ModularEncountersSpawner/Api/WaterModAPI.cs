@@ -122,11 +122,22 @@ namespace ModularEncountersSpawner.Api {
 		/// </summary>
 		public void UpdateRadius()
 		{
+
+			if (Waters == null)
+				return;
+
 			foreach (var water in Waters)
 			{
+
+				if (water == null)
+					continue;
+
 				water.waveTimer++;
 				water.currentRadius = (float)Math.Max(water.radius + (Math.Sin((water.waveTimer) * water.waveSpeed) * water.waveHeight), 0);
 			}
+
 		}
+
 	}
+
 }

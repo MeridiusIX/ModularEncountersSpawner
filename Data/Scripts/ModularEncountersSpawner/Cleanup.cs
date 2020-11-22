@@ -117,6 +117,7 @@ namespace ModularEncountersSpawner{
 						
 						Logger.AddMsg("Cleanup: " + NPCWatcher.ActiveNPCs[cubeGrid].SpawnType + "/" + cubeGrid.CustomName + " Is Further Than Allowed Distance From Player. Grid Marked For Despawn.");
 						NPCWatcher.ActiveNPCs[cubeGrid].FlagForDespawn = true;
+						NPCWatcher.ActiveNPCs[cubeGrid].DespawnReason = "CleanUp";
 						continue;
 						
 					}
@@ -127,6 +128,7 @@ namespace ModularEncountersSpawner{
 						
 						Logger.AddMsg("Cleanup: " + NPCWatcher.ActiveNPCs[cubeGrid].SpawnType + "/" + cubeGrid.CustomName + " Timer Has Expired. Grid Marked For Despawn.");
 						NPCWatcher.ActiveNPCs[cubeGrid].FlagForDespawn = true;
+						NPCWatcher.ActiveNPCs[cubeGrid].DespawnReason = "CleanUp";
 						continue;
 						
 					}else{
@@ -166,7 +168,8 @@ namespace ModularEncountersSpawner{
 						if(blockList.Count > cleanSettings.CleanupBlockLimitTrigger){
 							
 							NPCWatcher.ActiveNPCs[cubeGrid].FlagForDespawn = true;
-							
+							NPCWatcher.ActiveNPCs[cubeGrid].DespawnReason = "CleanUp";
+
 						}
 						
 					}

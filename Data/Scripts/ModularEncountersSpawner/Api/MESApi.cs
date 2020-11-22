@@ -21,6 +21,8 @@ namespace ModularEncountersSpawner.Api {
 		private static Func<Vector3D, bool, string, bool> _isPositionInKnownPlayerLocation;
 		private static Func<IMyCubeGrid, Vector3D> _getNpcStartCoordinates;
 		private static Func<IMyCubeGrid, Vector3D> _getNpcEndCoordinates;
+		private static Func<IMyCubeGrid, Action<IMyCubeGrid, string>, bool> _registerDespawnWatcher;
+		private static Action<IMyRemoteControl, string> _registerRemoteControlCode;
 		private static Action<Vector3D, string, bool> _removeKnownPlayerLocation;
 		private static Func<IMyCubeGrid, bool, bool> _setSpawnerIgnoreForDespawn;
 		private static Func<Vector3D, List<string>, bool> _spawnBossEncounter;
@@ -112,6 +114,22 @@ namespace ModularEncountersSpawner.Api {
 		public static Vector3D GetNpcEndCoordinates(IMyCubeGrid cubeGrid) => _getNpcEndCoordinates?.Invoke(cubeGrid) ?? Vector3D.Zero;
 
 		/// <summary>
+		/// Allows you to provide an action that will be invoked when the spawner despawns a grid.
+		/// The action provided has parameters for the targeted cubegrid and a string that identifies what sort of despawn occured (CleanUp or EndPath)
+		/// </summary>
+		/// <param name="cubeGrid">The cubegrid you want to register.</param>
+		/// <param name="action">The action you want to invoke on despawn.</param>
+		/// <returns>Whether or not the handler was registered successfully.</returns>
+		public static bool RegisterDespawnWatcher(IMyCubeGrid cubeGrid, Action<IMyCubeGrid, string> action) => _registerDespawnWatcher?.Invoke(cubeGrid, action) ?? false;
+
+		/// <summary>
+		/// Registers a Remote Control and a string code with the Spawner so other Duplicate Spawn Distances can be Controlled
+		/// </summary>
+		/// <param name="remoteControl">Remote Control that is referenced</param>
+		/// <param name="code">Code associated with Remote Control (this is used in the spawngroup)</param>
+		public static void RegisterRemoteControlCode(IMyRemoteControl remoteControl, string code) => _registerRemoteControlCode?.Invoke(remoteControl, code);
+
+		/// <summary>
 		/// Allows you to remove a Known Player Location at a set of coordinates
 		/// </summary>
 		/// <param name="coords">The coordinates to check for KPLs</param>
@@ -196,6 +214,8 @@ namespace ModularEncountersSpawner.Api {
 				_convertRandomNamePatterns = (Func<string, string>)dict["ConvertRandomNamePatterns"];
 				_getNpcStartCoordinates = (Func<IMyCubeGrid, Vector3D>)dict["GetNpcStartCoordinates"];
 				_getNpcEndCoordinates = (Func<IMyCubeGrid, Vector3D>)dict["GetNpcEndCoordinates"];
+				_registerDespawnWatcher = (Func<IMyCubeGrid, Action<IMyCubeGrid, string>, bool>)dict["RegisterDespawnWatcher"];
+				_registerRemoteControlCode = (Action<IMyRemoteControl, string>)dict["RegisterRemoteControlCode"];
 				_removeKnownPlayerLocation = (Action<Vector3D, string, bool>)dict["RemoveKnownPlayerLocation"];
 				_setSpawnerIgnoreForDespawn = (Func<IMyCubeGrid, bool, bool>)dict["SetSpawnerIgnoreForDespawn"];
 				_spawnBossEncounter = (Func<Vector3D, List<string>, bool>)dict["SpawnBossEncounter"];

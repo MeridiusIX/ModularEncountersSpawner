@@ -281,9 +281,62 @@ namespace ModularEncountersSpawner{
 
 			//Debug Commands
 			if(receivedData.ChatMessage.StartsWith("/MES.") == true){
-				
+
+				//ChangeCounter
+				if (receivedData.ChatMessage.StartsWith("/MES.ChangeCounter.")) {
+
+					var msgSplit = receivedData.ChatMessage.Split('.');
+
+					if (msgSplit.Length != 4) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Invalid Command Received", 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					int existingAmount = 0;
+					int newAmount = 0;
+
+					bool amountGot = int.TryParse(msgSplit[3], out newAmount);
+					bool existingGot = MyAPIGateway.Utilities.GetVariable<int>(msgSplit[2], out existingAmount);
+
+					if (!amountGot) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Could not parse amount to modify counter", 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					MyVisualScriptLogicProvider.ShowNotification("Value for Counter: " + msgSplit[2] + " ::: " + existingAmount, 5000, "White", receivedData.PlayerId);
+
+					if((existingAmount + newAmount) != existingAmount)
+						MyVisualScriptLogicProvider.ShowNotification("New Value for Counter: " + msgSplit[2] + " ::: " + (existingAmount + newAmount), 5000, "White", receivedData.PlayerId);
+
+					MyAPIGateway.Utilities.SetVariable<int>(msgSplit[2], existingAmount + newAmount);
+					return;
+
+				}
+
+				//ResetReputation
+				if (receivedData.ChatMessage.StartsWith("/MES.ResetReputation.")) {
+
+					var msgSplit = receivedData.ChatMessage.Split('.');
+
+					if (msgSplit.Length != 4) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Invalid Command Received", 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					var result = RelationManager.ResetFactionReputation(msgSplit[2]);
+					MyVisualScriptLogicProvider.ShowNotification("Faction [" + msgSplit[2] + "] Reputation Reset Result: " + result, 5000, "White", receivedData.PlayerId);
+					return; 
+
+				}
+
 				//Enable Debug Mode
-				if(receivedData.ChatMessage.StartsWith("/MES.EnableDebugMode.") == true){
+				if (receivedData.ChatMessage.StartsWith("/MES.EnableDebugMode.") == true){
 					
 					var msgSplit = receivedData.ChatMessage.Split('.');
 					

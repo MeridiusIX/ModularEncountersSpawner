@@ -87,53 +87,57 @@ namespace ModularEncountersSpawner.Templates {
 
 				MES_SessionCore.Instance.WaterMod.UpdateRadius();
 
-				for (int i = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; i >= 0; i++) {
+				if (MES_SessionCore.Instance.WaterMod.Waters != null) {
 
-					if (i >= MES_SessionCore.Instance.WaterMod.Waters.Count)
-						continue;
+					for (int i = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; i >= 0; i--) {
 
-					var water = MES_SessionCore.Instance.WaterMod.Waters[i];
+						if (i >= MES_SessionCore.Instance.WaterMod.Waters.Count)
+							continue;
 
-					if (water.planetID != NearestPlanet.EntityId)
-						continue;
+						var water = MES_SessionCore.Instance.WaterMod.Waters[i];
 
-					PlanetWater = water;
-					PlanetHasWater = true;
-					PositionIsUnderWater = water.IsUnderwater(coords);
-					SurfaceIsUnderWater = water.IsUnderwater(SurfaceCoords);
+						if (water == null || water.planetID != NearestPlanet.EntityId)
+							continue;
 
-					int totalChecks = 0;
-					int waterHits = 0;
+						PlanetWater = water;
+						PlanetHasWater = true;
+						PositionIsUnderWater = water.IsUnderwater(coords);
+						SurfaceIsUnderWater = water.IsUnderwater(SurfaceCoords);
 
-					for (int j = 0; j < 12; j++) {
+						int totalChecks = 0;
+						int waterHits = 0;
 
-						foreach (var direction in directionList) {
+						for (int j = 0; j < 12; j++) {
 
-							try {
+							foreach (var direction in directionList) {
 
-								totalChecks++;
-								var checkCoordsRough = direction * (j * 1000) + coords;
-								var checkSurfaceCoords = NearestPlanet.GetClosestSurfacePointGlobal(checkCoordsRough);
+								try {
 
-								if (water.IsUnderwater(checkSurfaceCoords))
-									waterHits++;
+									totalChecks++;
+									var checkCoordsRough = direction * (j * 1000) + coords;
+									var checkSurfaceCoords = NearestPlanet.GetClosestSurfacePointGlobal(checkCoordsRough);
 
-							} catch (Exception e) {
+									if (water.IsUnderwater(checkSurfaceCoords))
+										waterHits++;
 
-								Logger.AddMsg("Caught Exception Trying To Determine Water Data", true);
-								Logger.AddMsg(e.ToString(), true);
+								} catch (Exception e) {
+
+									Logger.AddMsg("Caught Exception Trying To Determine Water Data", true);
+									Logger.AddMsg(e.ToString(), true);
+
+								}
 
 							}
 
 						}
 
+						Logger.AddMsg("Water Hits: " + waterHits.ToString(), true);
+						Logger.AddMsg("Total Hits: " + totalChecks.ToString(), true);
+						WaterInSurroundingAreaRatio = (float)waterHits / (float)totalChecks;
+
+						break;
+
 					}
-
-					Logger.AddMsg("Water Hits: " + waterHits.ToString(), true);
-					Logger.AddMsg("Total Hits: " + totalChecks.ToString(), true);
-					WaterInSurroundingAreaRatio = (float)waterHits / (float)totalChecks;
-
-					break;
 
 				}
 
