@@ -1,4 +1,5 @@
 ﻿using ModularEncountersSpawner.Api;
+using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Spawners;
 using Sandbox.Game;
 using Sandbox.Game.Entities;
@@ -39,6 +40,8 @@ namespace ModularEncountersSpawner.Templates {
 		public bool IsNight;
 		public string WeatherAtPosition;
 		public string CommonTerrainAtPosition;
+
+		public float AirTravelViabilityRatio;
 
 		public bool PlanetHasWater;
 		public bool PositionIsUnderWater;
@@ -171,6 +174,32 @@ namespace ModularEncountersSpawner.Templates {
 			IsNight = MyVisualScriptLogicProvider.IsOnDarkSide(NearestPlanet, coords);
 			WeatherAtPosition = MyVisualScriptLogicProvider.GetWeather(coords) ?? "";
 
+			//Atmo Travel Viability
+			float airTravelChecks = 0;
+			float airTravelHits = 0;
+
+			for (int i = -3; i < 4; i++) {
+
+				for (int j = -3; j < 4; j++) {
+
+					airTravelChecks++;
+					var tempForward = matrix.Forward * (j * 500) + matrix.Translation;
+					var roughCoords = matrix.Right * (i * 500) + tempForward;
+					var surface = NearestPlanet.GetClosestSurfacePointGlobal(roughCoords);
+					var up = Vector3D.Normalize(surface - NearestPlanet.PositionComp.WorldAABB.Center);
+					var minAltitude = up * Settings.PlanetaryCargoShips.MinSpawningAltitude + surface;
+					var airDensity = NearestPlanet.GetAirDensity(minAltitude);
+
+					if (airDensity >= Settings.PlanetaryCargoShips.MinAirDensity)
+						airTravelHits++;
+
+				}
+			
+			}
+
+			if(airTravelChecks > 0 && airTravelHits > 0)
+				AirTravelViabilityRatio = airTravelHits / airTravelChecks;
+
 			//Terrain Material Checks
 			var terrainTypes = new Dictionary<string, int>();
 
@@ -182,6 +211,7 @@ namespace ModularEncountersSpawner.Templates {
 
 						var checkCoordsRough = direction * (i * 15) + coords;
 						var checkSurfaceCoords = NearestPlanet.GetClosestSurfacePointGlobal(checkCoordsRough);
+						
 						var checkMaterial = NearestPlanet.GetMaterialAt(ref checkSurfaceCoords);
 
 						if (checkMaterial == null)

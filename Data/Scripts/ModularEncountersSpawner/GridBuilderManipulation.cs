@@ -2228,7 +2228,9 @@ namespace ModularEncountersSpawner{
 
 		public static void ApplyGlobalBlockReplacementProfile(MyObjectBuilder_CubeGrid cubeGrid) {
 
-			foreach(var name in Settings.Grids.GlobalBlockReplacerProfiles) {
+			Logger.AddMsg(" - Total Global Replacement Profiles: " + Settings.Grids.GlobalBlockReplacerProfiles.Length, true);
+
+			foreach (var name in Settings.Grids.GlobalBlockReplacerProfiles) {
 
 				var replacementReference = new Dictionary<SerializableDefinitionId, SerializableDefinitionId>();
 
@@ -2238,6 +2240,7 @@ namespace ModularEncountersSpawner{
 
 				} else {
 
+					Logger.AddMsg(" - Block Replacement Profile Not Found: " + name, true);
 					continue;
 
 				}
@@ -2328,7 +2331,9 @@ namespace ModularEncountersSpawner{
 		}
 
 		public static void ApplyBlockReplacementProfile(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup){
-			
+
+			Logger.AddMsg(" - Total SpawnGroup Replacement Profiles: " + spawnGroup.BlockReplacerProfileNames.Count, true);
+
 			foreach(var name in spawnGroup.BlockReplacerProfileNames){
 
 				var replacementReference = new Dictionary<SerializableDefinitionId, SerializableDefinitionId>();
@@ -2338,7 +2343,8 @@ namespace ModularEncountersSpawner{
 					replacementReference = BlockReplacementProfiles[name].ReplacementReferenceDict;
 					
 				}else{
-					
+
+					Logger.AddMsg(" - Block Replacement Profile Not Found: " + name, true);
 					continue;
 					
 				}
@@ -2397,6 +2403,8 @@ namespace ModularEncountersSpawner{
 						continue;
 						
 					}
+
+					Logger.AddMsg(" - Replacing: [" + block.GetId() + "] with [" + newBlockBuilder.GetId() + "]", true);
 
 					if (block.GetId().TypeId == newBlockBuilder.GetId().TypeId) {
 

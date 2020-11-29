@@ -156,7 +156,7 @@ namespace ModularEncountersSpawner.Configuration{
 			FirstSpawnTime = 300;
 			MinSpawnTime = 780;
 			MaxSpawnTime = 1020;
-			MaxShipsPerArea = 1;
+			MaxShipsPerArea = 2;
 			AreaSize = 20000;
 			MaxSpawnAttempts = 25;
 			PlayerSurfaceAltitude = 6000;

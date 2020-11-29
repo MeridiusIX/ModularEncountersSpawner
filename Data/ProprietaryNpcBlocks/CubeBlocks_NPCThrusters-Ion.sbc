@@ -23,7 +23,7 @@
         <Component Subtype="SteelPlate" Count="1" />
         <Component Subtype="Construction" Count="1" />
         <Component Subtype="LargeTube" Count="1" />
-        <Component Subtype="Thrust" Count="1">
+        <Component Subtype="MESThrust" Count="1">
           <DeconstructId>
             <TypeId>Ore</TypeId>
             <SubtypeId>Scrap</SubtypeId>
@@ -123,7 +123,7 @@
         <Component Subtype="SteelPlate" Count="1" />
         <Component Subtype="Construction" Count="1" />
         <Component Subtype="LargeTube" Count="5" />
-        <Component Subtype="Thrust" Count="12">
+        <Component Subtype="MESThrust" Count="12">
         <DeconstructId>
           <TypeId>Ore</TypeId>
           <SubtypeId>Scrap</SubtypeId>
@@ -224,7 +224,7 @@
         <Component Subtype="SteelPlate" Count="15" />
         <Component Subtype="Construction" Count="40" />
         <Component Subtype="LargeTube" Count="8" />
-        <Component Subtype="Thrust" Count="80">
+        <Component Subtype="MESThrust" Count="80">
         <DeconstructId>
           <TypeId>Ore</TypeId>
           <SubtypeId>Scrap</SubtypeId>
@@ -324,7 +324,7 @@
         <Component Subtype="SteelPlate" Count="100" />
         <Component Subtype="Construction" Count="70" />
         <Component Subtype="LargeTube" Count="40" />
-        <Component Subtype="Thrust" Count="960">
+        <Component Subtype="MESThrust" Count="960">
           <DeconstructId>
             <TypeId>Ore</TypeId>
             <SubtypeId>Scrap</SubtypeId>

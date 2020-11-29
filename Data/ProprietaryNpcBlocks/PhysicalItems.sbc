@@ -28,6 +28,64 @@
 						<MinimumAcquisitionAmount>-1</MinimumAcquisitionAmount>
 						<MaximumAcquisitionAmount>-1</MaximumAcquisitionAmount>
 				</PhysicalItem>
+			
+
 				
 		</PhysicalItems>
+
+	<Components>
+	
+	<Component>
+		<Id>
+			<TypeId>Component</TypeId>
+			<SubtypeId>MESThrust</SubtypeId>
+		</Id>
+		<DisplayName>Proprietary Thrust Component</DisplayName>
+		<Icon>Textures\GUI\Icons\component\thrust_components_component.dds</Icon>
+		<Size>
+			<X>0.2</X>
+			<Y>0.2</Y>
+			<Z>0.2</Z>
+		</Size>
+		<Mass>40</Mass>
+		<Volume>10</Volume>
+		<Model>Models\Components\thrust_components_component.mwm</Model>
+		<PhysicalMaterial>Metal</PhysicalMaterial>
+		<MaxIntegrity>30</MaxIntegrity>
+		<DropProbability>0.2</DropProbability>
+		<Health>12</Health>
+		<MinimumOfferAmount>100</MinimumOfferAmount>
+		<MaximumOfferAmount>500</MaximumOfferAmount>
+		<MinimumOrderAmount>50</MinimumOrderAmount>
+		<MaximumOrderAmount>500</MaximumOrderAmount>
+		<CanPlayerOrder>true</CanPlayerOrder>
+
+		<MinimumAcquisitionAmount>10</MinimumAcquisitionAmount>
+		<MaximumAcquisitionAmount>100</MaximumAcquisitionAmount>
+		
+	</Component>
+		
+		</Components>
+
+	<Blueprints>
+
+		<Blueprint>
+			<Id>
+				<TypeId>BlueprintDefinition</TypeId>
+				<SubtypeId>MESThrustComponent</SubtypeId>
+			</Id>
+			<DisplayName>Proprietrary Thrust Component</DisplayName>
+			<Icon>Textures\GUI\Icons\component\thrust_components_component.dds</Icon>
+			<Prerequisites>
+				<Item Amount="30" TypeId="Ingot" SubtypeId="Iron" />
+				<Item Amount="10" TypeId="Ingot" SubtypeId="Cobalt" />
+				<Item Amount="1" TypeId="Ingot" SubtypeId="Gold" />
+				<Item Amount="0.4" TypeId="Ingot" SubtypeId="Platinum" />
+			</Prerequisites>
+			<Result Amount="1" TypeId="Component" SubtypeId="Thrust" />
+			<BaseProductionTimeInSeconds>4</BaseProductionTimeInSeconds>
+		</Blueprint>
+		
+	</Blueprints>
+	
 </Definitions>

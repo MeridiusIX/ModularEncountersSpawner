@@ -1,34 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sandbox.Common;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.Definitions;
 using Sandbox.Definitions;
-using Sandbox.Game;
 using Sandbox.Game.Entities;
-using Sandbox.Game.EntityComponents;
-using Sandbox.Game.GameSystems;
 using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using SpaceEngineers.Game.ModAPI;
-using VRage.Game;
-using VRage.Game.Components;
-using VRage.Game.Entity;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
-using VRage.ObjectBuilders;
-using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
-using ModularEncountersSpawner.Api;
 
-namespace ModularEncountersSpawner.Spawners{
-	
+namespace ModularEncountersSpawner.Spawners {
+
 	public static class PlanetaryCargoShipSpawner{
 		
 		public static Dictionary<string, List<ImprovedSpawnGroup>> SpawnGroupSublists = new Dictionary<string, List<ImprovedSpawnGroup>>();
@@ -321,17 +304,21 @@ namespace ModularEncountersSpawner.Spawners{
 					altitudeFromMid = SpawnResources.GetRandomPathDist(altitudeFromMid * -1, altitudeFromMid);
 
 				var tempStartPath = upDir * altitudeFromMid + midPointSurface;
-				
-				if(!gravitySpawn && spawnGroup.PlanetRequiresAtmo == true && environment.NearestPlanet.GetAirDensity(tempStartPath) < Settings.PlanetaryCargoShips.MinAirDensity){
-					
-					tempStartPath = upDir * Settings.PlanetaryCargoShips.MinSpawningAltitude + midPointSurface;
-					
-					if(spawnGroup.PlanetRequiresAtmo == true && environment.NearestPlanet.GetAirDensity(tempStartPath) < Settings.PlanetaryCargoShips.MinAirDensity){
-						
-						continue;
-						
+
+				if (!spawnGroup.SkipAirDensityCheck) {
+
+					if (!gravitySpawn && spawnGroup.PlanetRequiresAtmo == true && environment.NearestPlanet.GetAirDensity(tempStartPath) < Settings.PlanetaryCargoShips.MinAirDensity) {
+
+						tempStartPath = upDir * Settings.PlanetaryCargoShips.MinSpawningAltitude + midPointSurface;
+
+						if (spawnGroup.PlanetRequiresAtmo == true && environment.NearestPlanet.GetAirDensity(tempStartPath) < Settings.PlanetaryCargoShips.MinAirDensity) {
+
+							continue;
+
+						}
+
 					}
-					
+
 				}
 
 				if (gravitySpawn && (spawnGroup.MaxGravity != -1 || spawnGroup.MinGravity != -1)) {
@@ -541,6 +528,12 @@ namespace ModularEncountersSpawner.Spawners{
 					if (roll > spawnGroup.GravityCargoShipChance)
 						continue;
 
+				}
+
+				if (!spawnGroup.SkipAirDensityCheck && environment.AirTravelViabilityRatio < 0.25f) {
+
+					continue;
+				
 				}
 
 				//Logger.AddMsg("Before Common Conditions", true);

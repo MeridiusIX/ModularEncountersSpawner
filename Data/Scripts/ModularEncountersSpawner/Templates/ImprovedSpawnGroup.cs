@@ -37,6 +37,8 @@ namespace ModularEncountersSpawner.Templates{
 		public bool LunarCargoShip;
 		public bool AtmosphericCargoShip;
 		public bool GravityCargoShip;
+
+		public bool SkipAirDensityCheck;
 		
 		public bool SpaceRandomEncounter;
 		
@@ -376,6 +378,8 @@ namespace ModularEncountersSpawner.Templates{
 			LunarCargoShip = false;
 			AtmosphericCargoShip = false;
 			GravityCargoShip = false;
+
+			SkipAirDensityCheck = false;
 
 			SpaceRandomEncounter = false;
 			

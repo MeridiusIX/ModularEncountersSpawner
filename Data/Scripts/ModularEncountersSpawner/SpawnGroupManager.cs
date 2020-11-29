@@ -411,6 +411,13 @@ namespace ModularEncountersSpawner{
 
 				}
 
+				//SkipAirDensityCheck
+				if (tag.Contains("[SkipAirDensityCheck:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.SkipAirDensityCheck);
+
+				}
+
 				//SpaceRandomEncounter
 				if (tag.Contains("[SpaceRandomEncounter:") == true){
 
@@ -2051,7 +2058,8 @@ namespace ModularEncountersSpawner{
 				
 			if(improveSpawnGroup.AtmosphericCargoShip == true && setAtmoRequired == false){
 				
-				improveSpawnGroup.PlanetRequiresAtmo = true;
+				if(!improveSpawnGroup.SkipAirDensityCheck)
+					improveSpawnGroup.PlanetRequiresAtmo = true;
 				
 			}
 			
