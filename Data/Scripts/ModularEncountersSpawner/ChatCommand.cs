@@ -335,6 +335,41 @@ namespace ModularEncountersSpawner{
 
 				}
 
+				//CreateKPL
+				if (receivedData.ChatMessage.StartsWith("/MES.CreateKPL.")) {
+
+					var msgSplit = receivedData.ChatMessage.Split('.');
+
+					if (msgSplit.Length < 3) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Invalid Command Received", 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					string faction = msgSplit[2];
+					double radius = 10000;
+					int duration = -1;
+					int maxEncounters = -1;
+					int minThreat = -1;
+
+					if (msgSplit.Length >= 4)
+						double.TryParse(msgSplit[3], out radius);
+
+					if (msgSplit.Length >= 5)
+						int.TryParse(msgSplit[4], out duration);
+
+					if (msgSplit.Length >= 6)
+						int.TryParse(msgSplit[5], out maxEncounters);
+
+					if (msgSplit.Length >= 7)
+						int.TryParse(msgSplit[6], out minThreat);
+
+					KnownPlayerLocationManager.AddKnownPlayerLocation(receivedData.PlayerPosition, faction, radius, duration, maxEncounters, minThreat);
+					return;
+
+				}
+
 				//Enable Debug Mode
 				if (receivedData.ChatMessage.StartsWith("/MES.EnableDebugMode.") == true){
 					

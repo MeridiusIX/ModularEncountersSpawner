@@ -77,12 +77,9 @@
 			<DisplayName>Proprietrary Thrust Component</DisplayName>
 			<Icon>Textures\GUI\Icons\component\thrust_components_component.dds</Icon>
 			<Prerequisites>
-				<Item Amount="30" TypeId="Ingot" SubtypeId="Iron" />
-				<Item Amount="10" TypeId="Ingot" SubtypeId="Cobalt" />
-				<Item Amount="1" TypeId="Ingot" SubtypeId="Gold" />
-				<Item Amount="0.4" TypeId="Ingot" SubtypeId="Platinum" />
+				<Item Amount="41" TypeId="Ingot" SubtypeId="Iron" />
 			</Prerequisites>
-			<Result Amount="1" TypeId="Component" SubtypeId="Thrust" />
+			<Result Amount="1" TypeId="Component" SubtypeId="MESThrust" />
 			<BaseProductionTimeInSeconds>4</BaseProductionTimeInSeconds>
 		</Blueprint>
 		

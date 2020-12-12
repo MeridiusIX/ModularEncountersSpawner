@@ -217,6 +217,11 @@ namespace ModularEncountersSpawner.Templates{
 		public List<Vector3> ReskinTarget;
 		public List<string> ReskinTexture;
 
+		public bool SkinRandomBlocks;
+		public List<string> SkinRandomBlocksTextures;
+		public int MinPercentageSkinRandomBlocks;
+		public int MaxPercentageSkinRandomBlocks;
+
 		public bool ReduceBlockBuildStates;
 		public bool AffectNonFunctionalBlock;
 		public bool AffectFunctionalBlock;
@@ -527,7 +532,12 @@ namespace ModularEncountersSpawner.Templates{
 			ColorSkinReferencePairs = new Dictionary<Vector3, string>();
 			ReskinTarget = new List<Vector3>();
 			ReskinTexture = new List<string>();
-			
+
+			SkinRandomBlocks = false;
+			SkinRandomBlocksTextures = new List<string>();
+			MinPercentageSkinRandomBlocks = 10;
+			MaxPercentageSkinRandomBlocks = 40;
+
 			ReduceBlockBuildStates = false;
 			AffectNonFunctionalBlock = true;
 			AffectFunctionalBlock = false;

@@ -1468,6 +1468,9 @@ namespace ModularEncountersSpawner.Spawners{
 
 			if (!string.IsNullOrWhiteSpace(factionOverride) || (spawnGroup.UseRandomBuilderFaction == false && spawnGroup.UseRandomMinerFaction == false && spawnGroup.UseRandomTraderFaction == false)) {
 
+				if(Settings.General.NpcSpawnGroupBlacklist.Contains(initialFactionTag))
+					return resultList;
+
 				var initialFaction = MyAPIGateway.Session.Factions.TryGetFactionByTag(initialFactionTag);
 
 				if(initialFaction != null) {
@@ -1524,6 +1527,9 @@ namespace ModularEncountersSpawner.Spawners{
 			if(spawnGroup.UsePlayerFactionReputation == true) {
 
 				foreach(var faction in factionList.ToList()) {
+
+					if (Settings.General.NpcSpawnGroupBlacklist.Contains(faction.Tag))
+						continue;
 
 					bool validFaction = false;
 					bool specificFactionCheck = false;

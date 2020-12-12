@@ -949,9 +949,21 @@ namespace ModularEncountersSpawner{
 
 			}
 
+			//Partial Block Construction
+			if (spawnGroup.SkinRandomBlocks == true) {
+
+				Logger.AddMsg("Skinning Random Blocks", true);
+
+				foreach (var grid in prefabDef.CubeGrids) {
+
+					RandomBlockSkinning(grid, spawnGroup);
+
+				}
+
+			}
 
 			//Partial Block Construction
-			if(spawnGroup.ReduceBlockBuildStates == true) {
+			if (spawnGroup.ReduceBlockBuildStates == true) {
 
 				Logger.AddMsg("Reducing Block States", true);
 
@@ -1613,7 +1625,53 @@ namespace ModularEncountersSpawner{
 			}
 			
 		}
-		
+
+		public static void RandomBlockSkinning(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup) {
+
+			if (spawnGroup.MinPercentageSkinRandomBlocks >= spawnGroup.MaxPercentageSkinRandomBlocks) {
+
+				return;
+
+			}
+
+			if (spawnGroup.SkinRandomBlocksTextures.Count == 0)
+				return;
+
+			int skinCount = spawnGroup.SkinRandomBlocksTextures.Count;
+			bool singleSkin = (spawnGroup.SkinRandomBlocksTextures.Count == 1);
+
+			var targetBlocks = cubeGrid.CubeBlocks.ToList();
+
+			var percentOfBlocks = (double)Rnd.Next(spawnGroup.MinPercentageSkinRandomBlocks, spawnGroup.MaxPercentageSkinRandomBlocks) / 100;
+			var actualPercentOfBlocks = (int)Math.Floor((double)targetBlocks.Count * percentOfBlocks);
+
+			if (actualPercentOfBlocks <= 0) {
+
+				return;
+
+			}
+
+			while (targetBlocks.Count > actualPercentOfBlocks) {
+
+				if (targetBlocks.Count <= 1) {
+
+					break;
+
+				}
+
+				targetBlocks.RemoveAt(Rnd.Next(0, targetBlocks.Count));
+
+			}
+
+			foreach (var block in targetBlocks) {
+
+				var index = singleSkin ? 0 : Rnd.Next(0, skinCount);
+				block.SkinSubtypeId = spawnGroup.SkinRandomBlocksTextures[index];
+
+			}
+
+		}
+
 		public static void PartialBlockBuildStates(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup){
 			
 			if(spawnGroup.MinimumBlocksPercent >= spawnGroup.MaximumBlocksPercent){

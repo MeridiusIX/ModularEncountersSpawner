@@ -1234,6 +1234,34 @@ namespace ModularEncountersSpawner{
 
 				}
 
+				//SkinRandomBlocks
+				if (tag.Contains("[SkinRandomBlocks:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.SkinRandomBlocks);
+
+				}
+
+				//SkinRandomBlocksTextures
+				if (tag.Contains("[SkinRandomBlocksTextures:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.SkinRandomBlocksTextures);
+
+				}
+
+				//MinPercentageSkinRandomBlocks
+				if (tag.Contains("[MinPercentageSkinRandomBlocks:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.MinPercentageSkinRandomBlocks);
+
+				}
+
+				//MaxPercentageSkinRandomBlocks
+				if (tag.Contains("[MaxPercentageSkinRandomBlocks:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.MaxPercentageSkinRandomBlocks);
+
+				}
+
 				//ReduceBlockBuildStates
 				if (tag.Contains("[ReduceBlockBuildStates:") == true){
 

@@ -401,7 +401,8 @@ namespace ModularEncountersSpawner.Spawners{
 					foreach(var entity in SpawnResources.EntityList){
 						
 						if(Vector3D.Distance(offsetCoords, entity.GetPosition()) < Settings.BossEncounters.MinSignalDistFromOtherEntities){
-							
+
+							Logger.AddMsg("Boss Spawn Coords Too Close To Other Entities", true);
 							badCoords = true;
 							break;
 							
@@ -412,7 +413,8 @@ namespace ModularEncountersSpawner.Spawners{
 					if(badCoords == false){
 						
 						if(SpawnResources.IsPositionInSafeZone(offsetCoords) == true){
-							
+
+							Logger.AddMsg("Boss Spawn Coords are Inside Safezone", true);
 							badCoords = true;
 							break;
 							
@@ -423,7 +425,8 @@ namespace ModularEncountersSpawner.Spawners{
 					if(SpawnResources.IsPositionInGravity(offsetCoords, planet) == true){
 						
 						if(SpawnResources.GetDistanceFromSurface(offsetCoords, planet) < Settings.BossEncounters.MinPlanetAltitude / 4){
-							
+
+							Logger.AddMsg("Planetary Boss Spawn Coords Too Close To Surface", true);
 							badCoords = true;
 							break;
 							
