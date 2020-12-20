@@ -53,6 +53,7 @@ namespace ModularEncountersSpawner.Api {
 			dict.Add("RegisterDespawnWatcher", new Func<IMyCubeGrid, Action<IMyCubeGrid, string>, bool>(RegisterDespawnWatcher));
 			dict.Add("RegisterRemoteControlCode", new Action<IMyRemoteControl, string>(RegisterRemoteControlCode));
 			dict.Add("RemoveKnownPlayerLocation", new Action<Vector3D, string, bool>(KnownPlayerLocationManager.RemoveLocation));
+			dict.Add("SetCargoShipOverride", new Action<IMyCubeGrid, bool>(SetCargoShipOverride));
 			dict.Add("SetSpawnerIgnoreForDespawn", new Func<IMyCubeGrid, bool, bool>(SetSpawnerIgnoreForDespawn));
 			dict.Add("SpawnBossEncounter", new Func<Vector3D, List<string>, bool>(SpawnBossEncounter));
 			dict.Add("SpawnPlanetaryCargoShip", new Func<Vector3D, List<string>, bool>(SpawnPlanetaryCargoShip));
@@ -146,7 +147,21 @@ namespace ModularEncountersSpawner.Api {
 
 		public static bool RegisterDespawnWatcher(IMyCubeGrid cubeGrid, Action<IMyCubeGrid, string> action) {
 
+			lock (NPCWatcher.ActiveNPCs) {
 
+				ActiveNPC activeNPC = null;
+
+				if (NPCWatcher.ActiveNPCs.TryGetValue(cubeGrid, out activeNPC)) {
+
+					if (activeNPC.DespawnActions == null)
+						activeNPC.DespawnActions = new List<Action<IMyCubeGrid, string>>();
+
+					activeNPC.DespawnActions.Add(action);
+					return true;
+
+				}
+			
+			}
 
 			return false;
 		
@@ -160,6 +175,22 @@ namespace ModularEncountersSpawner.Api {
 					return;
 
 				NPCWatcher.RemoteControlCodes.Add(remoteControl, code);
+
+			}
+
+		}
+
+		public static void SetCargoShipOverride(IMyCubeGrid cubeGrid, bool enabled) {
+
+			lock (NPCWatcher.ActiveNPCs) {
+
+				ActiveNPC activeNPC = null;
+
+				if (NPCWatcher.ActiveNPCs.TryGetValue(cubeGrid, out activeNPC)) {
+
+					activeNPC.CargoShipOverride = enabled;
+
+				}
 
 			}
 

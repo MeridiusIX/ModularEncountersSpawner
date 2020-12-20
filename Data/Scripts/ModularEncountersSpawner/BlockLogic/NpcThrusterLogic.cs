@@ -43,15 +43,15 @@ namespace ModularEncountersSpawner.BlockLogic{
 		"MES-NPC-Thrust-Atmo-LargeGrid-Large", 
 		"MES-NPC-Thrust-Atmo-LargeGrid-Small", 
 		"MES-NPC-Thrust-Atmo-SmallGrid-Large", 
-		"MES-NPC-Thrust-Atmo-SmallGrid-Small", 
-		"MES-NPC-Thrust-SciFiIon-LargeGrid-Large", 
-		"MES-NPC-Thrust-SciFiIon-LargeGrid-Small", 
-		"MES-NPC-Thrust-SciFiIon-SmallGrid-Large", 
-		"MES-NPC-Thrust-SciFiIon-SmallGrid-Small", 
-		"MES-NPC-Thrust-SciFiAtmo-LargeGrid-Large", 
-		"MES-NPC-Thrust-SciFiAtmo-LargeGrid-Small", 
-		"MES-NPC-Thrust-SciFiAtmo-SmallGrid-Large", 
-		"MES-NPC-Thrust-SciFiAtmo-SmallGrid-Small")
+		"MES-NPC-Thrust-Atmo-SmallGrid-Small",
+		"MES-NPC-Thrust-IonSciFi-LargeGrid-Large",
+		"MES-NPC-Thrust-IonSciFi-LargeGrid-Small",
+		"MES-NPC-Thrust-IonSciFi-SmallGrid-Large",
+		"MES-NPC-Thrust-IonSciFi-SmallGrid-Small",
+		"MES-NPC-Thrust-AtmoSciFi-LargeGrid-Large",
+		"MES-NPC-Thrust-AtmoSciFi-LargeGrid-Small",
+		"MES-NPC-Thrust-AtmoSciFi-SmallGrid-Large",
+		"MES-NPC-Thrust-AtmoSciFi-SmallGrid-Small")
 		]
 	 
 	public class NpcThrusterLogic : MyGameLogicComponent{
@@ -212,12 +212,14 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 			if (NpcOwned) {
 
+				Logger.AddMsg(string.Format("[{0}] Using Custom Thrust Multipliers: Force: {1} // Power: {2}", Thruster.CustomName, ThrustForceMultiplier, ThrustPowerMultiplier), true);
 				Thruster.ThrustMultiplier = ThrustForceMultiplier;
 				Thruster.PowerConsumptionMultiplier = ThrustPowerMultiplier;
 
 
 			} else {
 
+				Logger.AddMsg(string.Format("[{0}] Using Default Thrust Multipliers", Thruster.CustomName), true);
 				Thruster.ThrustMultiplier = 1;
 				Thruster.PowerConsumptionMultiplier = 1;
 

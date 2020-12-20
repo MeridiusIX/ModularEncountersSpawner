@@ -917,7 +917,7 @@ namespace ModularEncountersSpawner{
 
 							} else {
 
-								if(activeNPC.RemoteControl.IsAutoPilotEnabled == false) {
+								if(activeNPC.RemoteControl.IsAutoPilotEnabled == false && !activeNPC.CargoShipOverride) {
 
 									Logger.AddMsg("Planetary Cargo Ship " + cubeGrid.CustomName + " Remote Control Autopilot Disabled. Ship Now Identified As \"Other\" NPC.");
 									activeNPC.SpawnType = "Other";
@@ -1428,8 +1428,8 @@ namespace ModularEncountersSpawner{
 								if(block.IsFunctional == true){
 									
 									remoteControl = block;
-									
-									if(block.IsMainCockpit == true){
+
+									if(block.IsMainCockpit == true || RivalAIHelper.RivalAiControlModules.Contains(block.SlimBlock.BlockDefinition.Id.SubtypeName)) {
 										
 										remoteControl = block;
 										break;

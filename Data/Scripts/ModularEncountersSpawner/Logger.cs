@@ -634,7 +634,20 @@ namespace ModularEncountersSpawner{
 				}
 				
 			}
-			
+
+			sb.AppendLine();
+			//KPLs
+			sb.Append("::: Known Player Locations :::").AppendLine().AppendLine();
+
+			foreach (var kpl in KnownPlayerLocationManager.Locations) {
+
+				if (!KnownPlayerLocationManager.IsPositionInKnownPlayerLocation(kpl, coords))
+					continue;
+
+				sb.Append(kpl.GetInfo(coords)).AppendLine();
+
+			}
+
 			return sb.ToString();
 			
 			

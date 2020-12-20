@@ -24,6 +24,7 @@ namespace ModularEncountersSpawner.Api {
 		private static Func<IMyCubeGrid, Action<IMyCubeGrid, string>, bool> _registerDespawnWatcher;
 		private static Action<IMyRemoteControl, string> _registerRemoteControlCode;
 		private static Action<Vector3D, string, bool> _removeKnownPlayerLocation;
+		private static Action<IMyCubeGrid, bool> _setCargoShipOverride;
 		private static Func<IMyCubeGrid, bool, bool> _setSpawnerIgnoreForDespawn;
 		private static Func<Vector3D, List<string>, bool> _spawnBossEncounter;
 		private static Func<Vector3D, List<string>, bool> _spawnPlanetaryCargoShip;
@@ -137,6 +138,8 @@ namespace ModularEncountersSpawner.Api {
 		/// <param name="removeAll">If true, removes all KPLs at the coords</param>
 		public static void RemoveKnownPlayerLocation(Vector3D coords, string faction = "", bool removeAll = false) => _removeKnownPlayerLocation?.Invoke(coords, faction, removeAll);
 
+		public static void SetCargoShipOverride(IMyCubeGrid cubeGrid, bool enabled) => _setCargoShipOverride(cubeGrid, enabled);
+
 		/// <summary>
 		/// Allows you to set a grid to be ignored or considered by the MES Cleanup Processes
 		/// </summary>
@@ -217,6 +220,7 @@ namespace ModularEncountersSpawner.Api {
 				_registerDespawnWatcher = (Func<IMyCubeGrid, Action<IMyCubeGrid, string>, bool>)dict["RegisterDespawnWatcher"];
 				_registerRemoteControlCode = (Action<IMyRemoteControl, string>)dict["RegisterRemoteControlCode"];
 				_removeKnownPlayerLocation = (Action<Vector3D, string, bool>)dict["RemoveKnownPlayerLocation"];
+				_setCargoShipOverride = (Action<IMyCubeGrid, bool>)dict["SetCargoShipOverride"];
 				_setSpawnerIgnoreForDespawn = (Func<IMyCubeGrid, bool, bool>)dict["SetSpawnerIgnoreForDespawn"];
 				_spawnBossEncounter = (Func<Vector3D, List<string>, bool>)dict["SpawnBossEncounter"];
 				_spawnPlanetaryCargoShip = (Func<Vector3D, List<string>, bool>)dict["SpawnPlanetaryCargoShip"];

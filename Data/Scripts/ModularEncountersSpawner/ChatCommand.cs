@@ -370,6 +370,43 @@ namespace ModularEncountersSpawner{
 
 				}
 
+				//Prefab Spawn
+				if (receivedData.ChatMessage.StartsWith("/MES.PrefabSpawn.")) {
+
+					var msgSplit = receivedData.ChatMessage.Split('.');
+
+					if (msgSplit.Length != 3) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Invalid Command Received", 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					var prefab = MyDefinitionManager.Static.GetPrefabDefinition(msgSplit[2]);
+
+					if (prefab == null) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Could Not Find Prefab With Name: " + msgSplit[2], 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					var matrix = MatrixD.Identity;
+					matrix.Translation = receivedData.PlayerPosition;
+					var player = SpawnResources.GetPlayerById(receivedData.PlayerId);
+
+					if (player?.Character != null)
+						matrix = player.Character.WorldMatrix;
+
+					Vector3D coords = (prefab.BoundingSphere.Radius * 1.2) * matrix.Forward + matrix.Translation;
+
+					var dummyList = new List<IMyCubeGrid>();
+					MyAPIGateway.PrefabManager.SpawnPrefab(dummyList, msgSplit[2], coords, matrix.Backward, matrix.Up, Vector3.Zero, Vector3.Zero, null, SpawningOptions.RotateFirstCockpitTowardsDirection, receivedData.PlayerId);
+
+					return;
+
+				}
+
 				//Enable Debug Mode
 				if (receivedData.ChatMessage.StartsWith("/MES.EnableDebugMode.") == true){
 					

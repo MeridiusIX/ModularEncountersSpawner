@@ -66,6 +66,9 @@ namespace ModularEncountersSpawner.Templates{
 		[ProtoMember(12)]
 		public string SpawnType;
 
+		[ProtoMember(13)]
+		public bool CargoShipOverride;
+
 		[ProtoIgnore]
 		public string KeenAiName;
 		
@@ -165,6 +168,7 @@ namespace ModularEncountersSpawner.Templates{
 			AutoPilotSpeed = 0;
 			
 			SpawnType = "Other";
+			CargoShipOverride = false;
 			CleanupIgnore = false;
 			CleanupTime = 0;
 			KeenBehaviorCheck = false;

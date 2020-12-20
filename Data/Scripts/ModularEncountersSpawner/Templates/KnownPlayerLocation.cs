@@ -93,6 +93,9 @@ namespace ModularEncountersSpawner.Templates {
 
         public void IncludeCustomVariables(KnownPlayerLocation oldLocation) {
 
+            if (oldLocation.CustomCounters == null || this.CustomCounters == null || oldLocation.CustomBooleans == null || this.CustomBooleans == null)
+                return;
+
             foreach (var counter in oldLocation.CustomCounters.Keys) {
 
                 int counterValue = 0;
@@ -126,6 +129,32 @@ namespace ModularEncountersSpawner.Templates {
             
             }
         
+        }
+
+        public string GetInfo(Vector3D coords) {
+
+            var sb = new StringBuilder();
+            sb.Append(" - [Known Player Location Info] ").AppendLine();
+            sb.Append(" - Faction Owner:         ").Append(this.NpcFaction).AppendLine();
+            sb.Append(" - Radius:                ").Append(this.Radius).AppendLine();
+            sb.Append(" - Distance From Center:  ").Append(Vector3D.Distance(this.Coords, coords)).AppendLine();
+
+            if (this.ExpirationTimeMinutes > -1) {
+
+                var timeSpan = MyAPIGateway.Session.GameDateTime - this.LastSighting;
+                var minutes = this.ExpirationTimeMinutes - timeSpan.TotalMinutes;
+                sb.Append(" - Time Remaining:        ").Append(minutes).Append(" / ").Append(this.ExpirationTimeMinutes).AppendLine();
+
+            }
+
+            if (this.MaxSpawnedEncounters > -1) {
+
+                sb.Append(" - Encounters Spawned:    ").Append(this.SpawnedEncounters).Append(" / ").Append(this.MaxSpawnedEncounters).AppendLine();
+
+            }
+
+            return sb.ToString();
+
         }
 
     }
