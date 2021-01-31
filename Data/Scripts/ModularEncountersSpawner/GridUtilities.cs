@@ -26,14 +26,14 @@ using VRage.Game.ObjectBuilders;
 using VRage.Game.ObjectBuilders.ComponentSystem;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
 using VRage.Collections;
+using ModularEncountersSpawner.Manipulation;
 
-namespace ModularEncountersSpawner{
-	
+namespace ModularEncountersSpawner {
+
 	public static class GridUtilities{
 
 		public static void NonPhysicalAmmoProcessing(IMyCubeGrid cubeGrid) {
@@ -58,7 +58,7 @@ namespace ModularEncountersSpawner{
 
 					}
 
-					if (GridBuilderManipulation.AllWeaponCoreIDs.Contains(block.SlimBlock.BlockDefinition.Id))
+					if (WeaponRandomizer.AllWeaponCoreIDs.Contains(block.SlimBlock.BlockDefinition.Id))
 						continue;
 
 					var firstItem = block.GetInventory().GetItems()[0];
@@ -163,7 +163,7 @@ namespace ModularEncountersSpawner{
 				foreach(var block in blockList){
 
 					//WeaponCore Replenishing
-					if (MES_SessionCore.Instance.WeaponCoreLoaded && GridBuilderManipulation.AllWeaponCoreIDs.Contains(block.SlimBlock.BlockDefinition.Id)) {
+					if (MES_SessionCore.Instance.WeaponCoreLoaded && WeaponRandomizer.AllWeaponCoreIDs.Contains(block.SlimBlock.BlockDefinition.Id)) {
 
 						WeaponCoreReplenishment(block);
 						continue;

@@ -22,12 +22,12 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.Manipulation;
 
-namespace ModularEncountersSpawner.Spawners{
-	
+namespace ModularEncountersSpawner.Spawners {
+
 	public static class BossEncounterSpawner{
 		
 		public static Dictionary<string, List<ImprovedSpawnGroup>> SpawnGroupSublists = new Dictionary<string, List<ImprovedSpawnGroup>>();
@@ -489,7 +489,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 
 					//Grid Manipulation
-					GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, encounter.SpawnGroup, "BossEncounter", prefab.Behaviour);
+					ManipulationCore.ProcessPrefabForManipulation(prefab.SubtypeId, encounter.SpawnGroup, "BossEncounter", prefab.Behaviour);
 					
 					try{
 						
@@ -510,7 +510,7 @@ namespace ModularEncountersSpawner.Spawners{
 					pendingNPC.GridName = MyDefinitionManager.Static.GetPrefabDefinition(prefab.SubtypeId).CubeGrids[0].DisplayName;
 					pendingNPC.StartCoords = spawnPosition;
 					pendingNPC.CurrentCoords = spawnPosition;
-					pendingNPC.EndCoords = spawnPosition;
+					pendingNPC.EndCoords = Vector3D.Zero;
 					pendingNPC.SpawnType = "BossEncounter";
 					pendingNPC.CleanupIgnore = encounter.SpawnGroup.IgnoreCleanupRules;
 					pendingNPC.ForceStaticGrid = encounter.SpawnGroup.ForceStaticGrid;

@@ -63,6 +63,14 @@ namespace ModularEncountersSpawner.Templates{
 		public bool RivalAiAtmosphericSpawn;
 		public bool RivalAiAnySpawn;
 
+		public bool CreatureSpawn;
+		public List<string> CreatureIds;
+		public int MinCreatureCount;
+		public int MaxCreatureCount;
+		public int MinCreatureDistance;
+		public int MaxCreatureDistance;
+		public bool RegisterCreatureToPlanetGenerators;
+
 		public bool CanSpawnUnderwater;
 		public bool MustSpawnUnderwater;
 		public double MinWaterDepth;
@@ -150,6 +158,9 @@ namespace ModularEncountersSpawner.Templates{
 		public bool AddDefenseShieldBlocks = false;
 		public bool IgnoreShieldProviderMod = false;
 		public int ShieldProviderChance;
+
+		public bool ReplaceArmorBlocksWithModules;
+		public List<MyDefinitionId> ModulesForArmorReplacement;
 
 		public bool UseBlockReplacer;
 		public Dictionary<MyDefinitionId, MyDefinitionId> ReplaceBlockReference;
@@ -409,6 +420,14 @@ namespace ModularEncountersSpawner.Templates{
 			RivalAiAtmosphericSpawn = false;
 			RivalAiAnySpawn = false;
 
+			CreatureSpawn = false;
+			CreatureIds = new List<string>();
+			MinCreatureCount = 1;
+			MaxCreatureCount = 1;
+			MinCreatureDistance = 100;
+			MaxCreatureDistance = 150;
+			RegisterCreatureToPlanetGenerators = false;
+
 			CanSpawnUnderwater = false;
 			MustSpawnUnderwater = false;
 			MinWaterDepth = 0;
@@ -466,6 +485,9 @@ namespace ModularEncountersSpawner.Templates{
 			AddDefenseShieldBlocks = false;
 			IgnoreShieldProviderMod = false;
 			ShieldProviderChance = 100;
+
+			ReplaceArmorBlocksWithModules = false;
+			ModulesForArmorReplacement = new List<MyDefinitionId>();
 
 			UseBlockReplacer = false;
 			ReplaceBlockReference = new Dictionary<MyDefinitionId, MyDefinitionId>();

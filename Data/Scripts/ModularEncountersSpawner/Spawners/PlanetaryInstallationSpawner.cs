@@ -22,13 +22,13 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Api;
+using ModularEncountersSpawner.Manipulation;
 
-namespace ModularEncountersSpawner.Spawners{
-	
+namespace ModularEncountersSpawner.Spawners {
+
 	public static class PlanetaryInstallationSpawner{
 		
 		public static Dictionary<string, List<ImprovedSpawnGroup>> SpawnGroupSublists = new Dictionary<string, List<ImprovedSpawnGroup>>();
@@ -350,7 +350,7 @@ namespace ModularEncountersSpawner.Spawners{
 				var gridList = new List<IMyCubeGrid>();
 				
 				//Grid Manipulation
-				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "PlanetaryInstallation", prefab.Behaviour);
+				ManipulationCore.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "PlanetaryInstallation", prefab.Behaviour);
 				
 				try{
 					
@@ -372,7 +372,7 @@ namespace ModularEncountersSpawner.Spawners{
 				pendingNPC.GridName = MyDefinitionManager.Static.GetPrefabDefinition(prefab.SubtypeId).CubeGrids[0].DisplayName;
 				pendingNPC.StartCoords = finalCoords;
 				pendingNPC.CurrentCoords = finalCoords;
-				pendingNPC.EndCoords = finalCoords;
+				pendingNPC.EndCoords = Vector3D.Zero;
 				pendingNPC.SpawnType = "PlanetaryInstallation";
 				pendingNPC.CleanupIgnore = spawnGroup.IgnoreCleanupRules;
 				pendingNPC.ForceStaticGrid = spawnGroup.ForceStaticGrid;

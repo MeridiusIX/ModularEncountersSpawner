@@ -86,6 +86,7 @@ namespace ModularEncountersSpawner.Templates {
             this.Coords = coords;
             this.Radius = radius;
             this.ExpirationTimeMinutes = expiration;
+            this.LastSighting = MyAPIGateway.Session.GameDateTime;
             this.MaxSpawnedEncounters = maxSpawns;
             this.MinThreatForAvoidingAbandonment = minThreat;
 
@@ -142,7 +143,7 @@ namespace ModularEncountersSpawner.Templates {
             if (this.ExpirationTimeMinutes > -1) {
 
                 var timeSpan = MyAPIGateway.Session.GameDateTime - this.LastSighting;
-                var minutes = this.ExpirationTimeMinutes - timeSpan.TotalMinutes;
+                var minutes = this.ExpirationTimeMinutes - (timeSpan.TotalSeconds / 60);
                 sb.Append(" - Time Remaining:        ").Append(minutes).Append(" / ").Append(this.ExpirationTimeMinutes).AppendLine();
 
             }

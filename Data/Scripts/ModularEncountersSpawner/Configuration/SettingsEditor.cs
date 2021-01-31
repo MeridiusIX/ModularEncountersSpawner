@@ -169,7 +169,25 @@ namespace ModularEncountersSpawner.Configuration{
 					return saveSetting;
 					
 				}
-				
+
+				//EnableCreatureSpawns
+				if (receivedCommand.StartsWith("/MES.Settings.General.EnableCreatureSpawns.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.General.EnableCreatureSpawns.", "");
+					bool result = false;
+
+					if (bool.TryParse(receivedValue, out result) == false) {
+
+						return "Failed To Parse Value: " + receivedValue;
+
+					}
+
+					Settings.General.EnableCreatureSpawns = result;
+					var saveSetting = Settings.General.SaveSettings(Settings.General);
+					return saveSetting;
+
+				}
+
 				//EnableLegacySpaceCargoShipDetection
 				if (receivedCommand.StartsWith("/MES.Settings.General.EnableLegacySpaceCargoShipDetection.") == true){
 					
@@ -3351,13 +3369,179 @@ namespace ModularEncountersSpawner.Configuration{
 				}
 								
 			}
-			
+
+			////////////////////////////////////////////////////////
+			//                   Creatures
+			////////////////////////////////////////////////////////
+
+			if (receivedCommand.StartsWith("/MES.Settings.Creatures.") == true) {
+
+				//MinCreatureSpawnTime
+				if (receivedCommand.StartsWith("/MES.Settings.Creatures.MinCreatureSpawnTime.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.Creatures.MinCreatureSpawnTime.", "");
+					int result = 0;
+
+					if (int.TryParse(receivedValue, out result) == false) {
+
+						return "Failed To Parse Value: " + receivedValue;
+
+					}
+
+					Settings.Creatures.MinCreatureSpawnTime = result;
+					var saveSetting = Settings.Creatures.SaveSettings(Settings.Creatures);
+					return saveSetting;
+
+				}
+
+				//MaxCreatureSpawnTime
+				if (receivedCommand.StartsWith("/MES.Settings.Creatures.MaxCreatureSpawnTime.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.Creatures.MaxCreatureSpawnTime.", "");
+					int result = 0;
+
+					if (int.TryParse(receivedValue, out result) == false) {
+
+						return "Failed To Parse Value: " + receivedValue;
+
+					}
+
+					Settings.Creatures.MaxCreatureSpawnTime = result;
+					var saveSetting = Settings.Creatures.SaveSettings(Settings.Creatures);
+					return saveSetting;
+
+				}
+
+				//MaxPlayerAltitudeForSpawn
+				if (receivedCommand.StartsWith("/MES.Settings.Creatures.MaxPlayerAltitudeForSpawn.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.Creatures.MaxPlayerAltitudeForSpawn.", "");
+					int result = 0;
+
+					if (int.TryParse(receivedValue, out result) == false) {
+
+						return "Failed To Parse Value: " + receivedValue;
+
+					}
+
+					Settings.Creatures.MaxPlayerAltitudeForSpawn = result;
+					var saveSetting = Settings.Creatures.SaveSettings(Settings.Creatures);
+					return saveSetting;
+
+				}
+
+				//CreatureBlacklist.Add
+				if (receivedCommand.StartsWith("/MES.Settings.Creatures.CreatureBlacklist.Add.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.Creatures.CreatureBlacklist.Add.", "");
+
+					if (string.IsNullOrEmpty(receivedValue) == true) {
+
+						return "No Value Provided.";
+
+					}
+
+					var blacklist = new List<string>(Settings.Creatures.CreatureBlacklist.ToList());
+
+					if (blacklist.Contains(receivedValue) == true) {
+
+						return "Creature Name Blacklist Already Contains Value: " + receivedValue;
+
+					}
+
+					blacklist.Add(receivedValue);
+					Settings.Creatures.CreatureBlacklist = blacklist.ToArray();
+					var saveSetting = Settings.Creatures.SaveSettings(Settings.Creatures);
+					return saveSetting;
+
+				}
+
+				//NpcGridNameBlacklist.Remove
+				if (receivedCommand.StartsWith("/MES.Settings.Creatures.CreatureBlacklist.Remove.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.Creatures.CreatureBlacklist.Remove.", "");
+
+					if (string.IsNullOrEmpty(receivedValue) == true) {
+
+						return "No Value Provided.";
+
+					}
+
+					var blacklist = new List<string>(Settings.Creatures.CreatureBlacklist.ToList());
+
+					if (blacklist.Contains(receivedValue) == false) {
+
+						return "Creature Name Blacklist Does Not Contain Value: " + receivedValue;
+
+					}
+
+					blacklist.Remove(receivedValue);
+					Settings.Creatures.CreatureBlacklist = blacklist.ToArray();
+					var saveSetting = Settings.Creatures.SaveSettings(Settings.Creatures);
+					return saveSetting;
+
+				}
+
+				//CreaturePlanetBlacklist.Add
+				if (receivedCommand.StartsWith("/MES.Settings.Creatures.CreaturePlanetBlacklist.Add.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.Creatures.CreaturePlanetBlacklist.Add.", "");
+
+					if (string.IsNullOrEmpty(receivedValue) == true) {
+
+						return "No Value Provided.";
+
+					}
+
+					var blacklist = new List<string>(Settings.Creatures.CreaturePlanetBlacklist.ToList());
+
+					if (blacklist.Contains(receivedValue) == true) {
+
+						return "Creature Planet Blacklist Already Contains Value: " + receivedValue;
+
+					}
+
+					blacklist.Add(receivedValue);
+					Settings.Creatures.CreaturePlanetBlacklist = blacklist.ToArray();
+					var saveSetting = Settings.Creatures.SaveSettings(Settings.Creatures);
+					return saveSetting;
+
+				}
+
+				//CreaturePlanetBlacklist.Remove
+				if (receivedCommand.StartsWith("/MES.Settings.Creatures.CreaturePlanetBlacklist.Remove.") == true) {
+
+					var receivedValue = receivedCommand.Replace("/MES.Settings.Creatures.CreaturePlanetBlacklist.Remove.", "");
+
+					if (string.IsNullOrEmpty(receivedValue) == true) {
+
+						return "No Value Provided.";
+
+					}
+
+					var blacklist = new List<string>(Settings.Creatures.CreaturePlanetBlacklist.ToList());
+
+					if (blacklist.Contains(receivedValue) == false) {
+
+						return "Creature Planet Blacklist Does Not Contain Value: " + receivedValue;
+
+					}
+
+					blacklist.Remove(receivedValue);
+					Settings.Creatures.CreaturePlanetBlacklist = blacklist.ToArray();
+					var saveSetting = Settings.Creatures.SaveSettings(Settings.Creatures);
+					return saveSetting;
+
+				}
+
+			}
+
 			////////////////////////////////////////////////////////
 			//                   OtherNPCs
 			////////////////////////////////////////////////////////
-			
+
 			//DespawnDistanceFromPlayer
-			if(receivedCommand.StartsWith("/MES.Settings.OtherNPCs.DespawnDistanceFromPlayer.") == true){
+			if (receivedCommand.StartsWith("/MES.Settings.OtherNPCs.DespawnDistanceFromPlayer.") == true){
 				
 				var receivedValue = receivedCommand.Replace("/MES.Settings.OtherNPCs.DespawnDistanceFromPlayer.", "");
 				double result = 0;

@@ -22,12 +22,12 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.Manipulation;
 
-namespace ModularEncountersSpawner.Spawners{
-	
+namespace ModularEncountersSpawner.Spawners {
+
 	public static class OtherNPCSpawner{
 		
 		public static void AttemptSpawn(SpawnRequestMES spawnData){
@@ -97,7 +97,7 @@ namespace ModularEncountersSpawner.Spawners{
 				var gridList = new List<IMyCubeGrid>();
 				
 				//Grid Manipulation
-				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "OtherNPC", prefab.Behaviour);
+				ManipulationCore.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "OtherNPC", prefab.Behaviour);
 
 				try{
 					

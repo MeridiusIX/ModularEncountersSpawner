@@ -133,8 +133,9 @@ namespace ModularEncountersSpawner {
                 var location = Locations[i];
                 var duration = MyAPIGateway.Session.GameDateTime - location.LastSighting;
 
-                if(location.ExpirationTimeMinutes >= 0 && duration.TotalMinutes >= location.ExpirationTimeMinutes) {
+                if(location.ExpirationTimeMinutes >= 0 && (duration.TotalSeconds / 60) >= location.ExpirationTimeMinutes) {
 
+                    Logger.AddMsg(string.Format("Player Known Location At [{0}] Has Been Removed Because its Timer Expired", location.Coords), true);
                     Locations.RemoveAt(i);
                     needsUpdate = true;
                     continue;
@@ -143,6 +144,7 @@ namespace ModularEncountersSpawner {
 
                 if(location.MaxSpawnedEncounters >= 0 && location.SpawnedEncounters >= location.MaxSpawnedEncounters) {
 
+                    Logger.AddMsg(string.Format("Player Known Location At [{0}] Has Been Removed Because it has Exceeded Spawn Count", location.Coords), true);
                     Locations.RemoveAt(i);
                     needsUpdate = true;
                     continue;
@@ -199,6 +201,7 @@ namespace ModularEncountersSpawner {
 
                 if (IsPositionInKnownPlayerLocation(location, coords, false)) {
 
+                    location.LastSighting = MyAPIGateway.Session.GameDateTime;
                     location.SpawnedEncounters++;
 
                 }
@@ -242,6 +245,7 @@ namespace ModularEncountersSpawner {
 
                     if (removeAllZones || faction == Locations[i].NpcFaction || string.IsNullOrWhiteSpace(faction) == string.IsNullOrWhiteSpace(Locations[i].NpcFaction)) {
 
+                        Logger.AddMsg(string.Format("Player Known Location At [{0}] Has Been Removed", Locations[i].Coords), true);
                         Locations.RemoveAt(i);
                         removedLocation = true;
 

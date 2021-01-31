@@ -22,19 +22,18 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
 
-namespace ModularEncountersSpawner{
-	
+namespace ModularEncountersSpawner {
+
 	public static class ChatCommand{
 
 		public static List<MyCubeBlockDefinition> BlockDefinitionList = new List<MyCubeBlockDefinition>();
 
-		public static void MESChatCommand(string messageText, ref bool sendToOthers){
-			
+		public static void MESChatCommand(string messageTextRaw, ref bool sendToOthers){
+
 			var thisPlayer = MyAPIGateway.Session.LocalHumanPlayer;
 			bool isAdmin = false;
 			
@@ -56,8 +55,10 @@ namespace ModularEncountersSpawner{
 				return;
 				
 			}
-			
-			if(messageText.StartsWith("/MES.") == true){
+
+			var messageText = messageTextRaw.Trim();
+
+			if (messageText.StartsWith("/MES.") == true){
 				
 				sendToOthers = false;
 				var syncData = new SyncData();
@@ -279,8 +280,14 @@ namespace ModularEncountersSpawner{
 
 			}
 
+			if (receivedData.ChatMessage.StartsWith("/MES.SC") == true) {
+
+				receivedData.ChatMessage = receivedData.ChatMessage.Replace("/MES.SC", "/MES.Spawn.Creature");
+
+			}
+
 			//Debug Commands
-			if(receivedData.ChatMessage.StartsWith("/MES.") == true){
+			if (receivedData.ChatMessage.StartsWith("/MES.") == true){
 
 				//ChangeCounter
 				if (receivedData.ChatMessage.StartsWith("/MES.ChangeCounter.")) {
@@ -332,6 +339,24 @@ namespace ModularEncountersSpawner{
 					var result = RelationManager.ResetFactionReputation(msgSplit[2]);
 					MyVisualScriptLogicProvider.ShowNotification("Faction [" + msgSplit[2] + "] Reputation Reset Result: " + result, 5000, "White", receivedData.PlayerId);
 					return; 
+
+				}
+
+				//SetDebugGroup
+				if (receivedData.ChatMessage.StartsWith("/MES.SetDebugGroup.")) {
+
+					var msgSplit = receivedData.ChatMessage.Split('.');
+
+					if (msgSplit.Length != 3) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Invalid Command Received", 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					Logger.DebugSpawnGroup = msgSplit[2];
+					MyVisualScriptLogicProvider.ShowNotification("Debug SpawnGroup Set To " + msgSplit[2], 5000, "White", receivedData.PlayerId);
+					return;
 
 				}
 
@@ -401,7 +426,75 @@ namespace ModularEncountersSpawner{
 					Vector3D coords = (prefab.BoundingSphere.Radius * 1.2) * matrix.Forward + matrix.Translation;
 
 					var dummyList = new List<IMyCubeGrid>();
+					MyVisualScriptLogicProvider.ShowNotification("Spawning Prefab [" + msgSplit[2] + "]", 5000, "White", receivedData.PlayerId);
 					MyAPIGateway.PrefabManager.SpawnPrefab(dummyList, msgSplit[2], coords, matrix.Backward, matrix.Up, Vector3.Zero, Vector3.Zero, null, SpawningOptions.RotateFirstCockpitTowardsDirection, receivedData.PlayerId);
+
+					return;
+
+				}
+
+				//Prefab Station Spawn
+				if (receivedData.ChatMessage.StartsWith("/MES.PrefabStationSpawn.")) {
+
+					var msgSplit = receivedData.ChatMessage.Split('.');
+
+					if (msgSplit.Length != 4) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Invalid Command Received", 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					double depth = 0;
+					var prefab = MyDefinitionManager.Static.GetPrefabDefinition(msgSplit[3]);
+
+					if (!double.TryParse(msgSplit[2], out depth)) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Could Not Parse Number Value: " + msgSplit[2], 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					if (prefab == null) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Could Not Find Prefab With Name: " + msgSplit[3], 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					var planet = MyGamePruningStructure.GetClosestPlanet(receivedData.PlayerPosition);
+
+					if (planet == null) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Could Not Find Nearby Planet", 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					var matrix = MatrixD.Identity;
+					matrix.Translation = receivedData.PlayerPosition;
+					var player = SpawnResources.GetPlayerById(receivedData.PlayerId);
+
+					if (player?.Character != null)
+						matrix = player.Character.WorldMatrix;
+
+					Vector3D roughcoords = (prefab.BoundingSphere.Radius * 1.2) * matrix.Forward + matrix.Translation;
+					Vector3D surfacecoords = planet.GetClosestSurfacePointGlobal(roughcoords);
+					Vector3D up = Vector3D.Normalize(surfacecoords - planet.PositionComp.WorldAABB.Center);
+					Vector3D coords = up * depth + surfacecoords;
+
+					if (Vector3D.Distance(coords, receivedData.PlayerPosition) < prefab.BoundingSphere.Radius) {
+
+						MyVisualScriptLogicProvider.ShowNotification("Player Too Close To Spawn Location", 5000, "White", receivedData.PlayerId);
+						return;
+
+					}
+
+					matrix = MatrixD.CreateWorld(coords, Vector3D.CalculatePerpendicularVector(up), up);
+
+					var dummyList = new List<IMyCubeGrid>();
+					MyAPIGateway.PrefabManager.SpawnPrefab(dummyList, msgSplit[3], coords, matrix.Backward, matrix.Up, Vector3.Zero, Vector3.Zero, null, SpawningOptions.RotateFirstCockpitTowardsDirection, receivedData.PlayerId);
+					MyVisualScriptLogicProvider.ShowNotification("Spawning Prefab [" + msgSplit[3] + "] As Planetary Installation", 5000, "White", receivedData.PlayerId);
 
 					return;
 
@@ -733,8 +826,22 @@ namespace ModularEncountersSpawner{
 						}
 						
 					}
-					
-					if(success == false){
+
+					if (receivedData.ChatMessage.Contains("Creature") == true) {
+
+						if (MES_SessionCore.playerWatchList.ContainsKey(thisPlayer) == true) {
+
+							SpawnGroupManager.AdminSpawnGroup = SpecificSpawnGroupRequest(receivedData.ChatMessage, "Creature");
+							MES_SessionCore.playerWatchList[thisPlayer].CreatureCheckTimer = 0;
+							MES_SessionCore.PlayerWatcherTimer = 0;
+							MyVisualScriptLogicProvider.ShowNotification("Attempting Random Spawn: Creature", 5000, "White", receivedData.PlayerId);
+							success = true;
+
+						}
+
+					}
+
+					if (success == false){
 						
 						MyVisualScriptLogicProvider.ShowNotification("Could Not Spawn Encounter: Player Not In Watch List", 5000, "White", receivedData.PlayerId);
 						

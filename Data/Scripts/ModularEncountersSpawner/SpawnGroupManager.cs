@@ -18,12 +18,6 @@ namespace ModularEncountersSpawner {
 		public static List<ImprovedSpawnGroup> SpawnGroups = new List<ImprovedSpawnGroup>();
 		public static List<string> PlanetNames = new List<string>();
 		
-		public static Dictionary<string, Vector2> SpaceCargoShipFrequencyRange = new Dictionary<string, Vector2>();
-		public static Dictionary<string, Vector2> RandomEncounterFrequencyRange = new Dictionary<string, Vector2>();
-		public static Dictionary<string, Vector2> PlanetaryCargoShipFrequencyRange = new Dictionary<string, Vector2>();
-		public static Dictionary<string, Vector2> PlanetaryInstallationFrequencyRange = new Dictionary<string, Vector2>();
-		public static Dictionary<string, Vector2> BossEncounterFrequencyRange = new Dictionary<string, Vector2>();
-		
 		public static List<string> UniqueGroupsSpawned = new List<string>();
 		
 		public static Dictionary<string, List<MyObjectBuilder_CubeGrid>> prefabBackupList = new Dictionary<string, List<MyObjectBuilder_CubeGrid>>(); //Temporary Until Thraxus Spawner Is Added
@@ -358,7 +352,9 @@ namespace ModularEncountersSpawner {
 			bool setAtmoRequired = false;
 			bool setForceStatic = false;
 						
-			foreach(var tag in descSplit){
+			foreach(var tagRaw in descSplit){
+
+				var tag = tagRaw.Trim();
 
 				//SpawnGroupEnabled
 				if(tag.Contains("[SpawnGroupEnabled:") == true){
@@ -531,6 +527,48 @@ namespace ModularEncountersSpawner {
 				if(tag.Contains("[RivalAiAnySpawn:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiAnySpawn);
+
+				}
+
+				//CreatureSpawn
+				if (tag.Contains("[CreatureSpawn:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.CreatureSpawn);
+
+				}
+
+				//CreatureIds
+				if (tag.Contains("[CreatureIds:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.CreatureIds);
+
+				}
+
+				//MinCreatureCount
+				if (tag.Contains("[MinCreatureCount:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.MinCreatureCount);
+
+				}
+
+				//MaxCreatureCount
+				if (tag.Contains("[MaxCreatureCount:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.MaxCreatureCount);
+
+				}
+
+				//MinCreatureDistance
+				if (tag.Contains("[MinCreatureDistance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.MinCreatureDistance);
+
+				}
+
+				//MaxCreatureDistance
+				if (tag.Contains("[MaxCreatureDistance:") == true) {
+
+					TagIntCheck(tag, ref improveSpawnGroup.MaxCreatureDistance);
 
 				}
 
@@ -877,6 +915,20 @@ namespace ModularEncountersSpawner {
 				if (tag.Contains("[ShieldProviderChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.ShieldProviderChance);
+
+				}
+
+				//ReplaceArmorBlocksWithModules
+				if (tag.Contains("[ReplaceArmorBlocksWithModules:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.ReplaceArmorBlocksWithModules);
+
+				}
+
+				//ModulesForArmorReplacement
+				if (tag.Contains("[ModulesForArmorReplacement:") == true) {
+
+					TagMyDefIdCheck(tag, ref improveSpawnGroup.ModulesForArmorReplacement);
 
 				}
 

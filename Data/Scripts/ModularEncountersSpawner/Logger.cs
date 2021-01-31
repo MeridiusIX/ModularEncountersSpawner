@@ -1,35 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Threading;
-using Sandbox.Common;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.Definitions;
-using Sandbox.Definitions;
-using Sandbox.Game;
-using Sandbox.Game.Entities;
-using Sandbox.Game.EntityComponents;
-using Sandbox.Game.GameSystems;
-using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using SpaceEngineers.Game.ModAPI;
-using VRage.Game;
-using VRage.Game.Components;
-using VRage.Game.Entity;
-using VRage.Game.ModAPI;
-using VRage.ModAPI;
-using VRage.ObjectBuilders;
-using VRage.Utils;
-using VRageMath;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Spawners;
 using ModularEncountersSpawner.Templates;
+using Sandbox.Game;
+using Sandbox.ModAPI;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using VRage.Game.ModAPI;
+using VRage.Utils;
+using VRageMath;
 
-namespace ModularEncountersSpawner{
-	
+namespace ModularEncountersSpawner {
+
 	public static class Logger{
 
 		public static bool LoggerDebugMode { get { return Settings.General.DebugMode; } set { Settings.General.DebugMode = value; } }
@@ -360,7 +344,7 @@ namespace ModularEncountersSpawner{
 			
 			foreach(var spawnGroup in SpawnGroupManager.SpawnGroups){
 				
-				sb.Append("Spawn Group Name: ").Append(spawnGroup.SpawnGroup.Id.SubtypeName).AppendLine();
+				sb.Append("Spawn Group Name: ").Append(spawnGroup.SpawnGroupName).AppendLine();
 				sb.Append("SpaceCargoShip: ").Append(spawnGroup.SpaceCargoShip.ToString()).AppendLine();
 				sb.Append("LunarCargoShip: ").Append(spawnGroup.LunarCargoShip.ToString()).AppendLine();
 				sb.Append("AtmosphericCargoShip: ").Append(spawnGroup.AtmosphericCargoShip.ToString()).AppendLine();
@@ -636,6 +620,20 @@ namespace ModularEncountersSpawner{
 			}
 
 			sb.AppendLine();
+
+			//Creatures
+			sb.Append("::: Creature Eligible Spawns :::").AppendLine().AppendLine();
+
+			var creatureList = CreatureSpawner.GetCreatureSpawnGroups(coords, null, false, out validFactions);
+
+			foreach (var sgroup in creatureList.Distinct().ToList()) {
+
+				sb.Append(" - ").Append(sgroup.SpawnGroupName).AppendLine();
+
+			}
+
+			sb.AppendLine();
+
 			//KPLs
 			sb.Append("::: Known Player Locations :::").AppendLine().AppendLine();
 

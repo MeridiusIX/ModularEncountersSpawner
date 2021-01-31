@@ -22,12 +22,12 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.Manipulation;
 
-namespace ModularEncountersSpawner.Spawners{
-	
+namespace ModularEncountersSpawner.Spawners {
+
 	public static class SpaceCargoShipSpawner{
 		
 		public static Dictionary<string, List<ImprovedSpawnGroup>> SpawnGroupSublists = new Dictionary<string, List<ImprovedSpawnGroup>>();
@@ -101,6 +101,7 @@ namespace ModularEncountersSpawner.Spawners{
 			var spawnForwardDir = Vector3D.Normalize(endPathCoords - startPathCoords);
 			var spawnUpDir = Vector3D.CalculatePerpendicularVector(spawnForwardDir);
 			var spawnMatrix = MatrixD.CreateWorld(startPathCoords, spawnForwardDir, spawnUpDir);
+			var despawnMatrix = MatrixD.CreateWorld(endPathCoords, spawnForwardDir, spawnUpDir);
 			long gridOwner = 0;
 			var randFactionTag = spawnGroup.FactionOwner;
 
@@ -132,6 +133,7 @@ namespace ModularEncountersSpawner.Spawners{
 
 				var options = SpawnGroupManager.CreateSpawningOptions(spawnGroup, prefab);
 				var spawnPosition = Vector3D.Transform((Vector3D)prefab.Position, spawnMatrix);
+				var despawnPosition = Vector3D.Transform((Vector3D)prefab.Position, despawnMatrix);
 				var speedL = prefab.Speed * (Vector3)spawnForwardDir;
 				var speedA = Vector3.Zero;
 				var gridList = new List<IMyCubeGrid>();
@@ -153,7 +155,7 @@ namespace ModularEncountersSpawner.Spawners{
 				
 				
 				//Grid Manipulation
-				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "SpaceCargoShip", prefab.Behaviour);
+				ManipulationCore.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "SpaceCargoShip", prefab.Behaviour);
 
 				try{
 					
@@ -172,9 +174,9 @@ namespace ModularEncountersSpawner.Spawners{
 				pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
 				pendingNPC.Name = prefab.SubtypeId;
 				pendingNPC.GridName = MyDefinitionManager.Static.GetPrefabDefinition(prefab.SubtypeId).CubeGrids[0].DisplayName;
-				pendingNPC.StartCoords = startPathCoords;
-				pendingNPC.CurrentCoords = startPathCoords;
-				pendingNPC.EndCoords = endPathCoords;
+				pendingNPC.StartCoords = spawnPosition;
+				pendingNPC.CurrentCoords = spawnPosition;
+				pendingNPC.EndCoords = despawnPosition;
 				pendingNPC.SpawnType = "SpaceCargoShip";
 				pendingNPC.AutoPilotSpeed = speedL.Length();
 				pendingNPC.CleanupIgnore = spawnGroup.IgnoreCleanupRules;

@@ -22,13 +22,12 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using VRage.Game.ObjectBuilders;
 using ModularEncountersSpawner.Api;
 
-namespace ModularEncountersSpawner.Spawners{
+namespace ModularEncountersSpawner.Spawners {
 
 	public static class SpawnResources{
 		

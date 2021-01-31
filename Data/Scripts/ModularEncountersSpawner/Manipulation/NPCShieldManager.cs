@@ -9,7 +9,7 @@ using VRage.Game.ModAPI;
 using VRage.ObjectBuilders;
 using VRageMath;
 
-namespace ModularEncountersSpawner {
+namespace ModularEncountersSpawner.Manipulation {
 
 	//This class is dedicated to adding modified blocks from the Defense Shields mod
 	//to NPC Grids when spawned through MES.
@@ -34,8 +34,8 @@ namespace ModularEncountersSpawner {
 
 		public static bool IsGlobalShieldProviderEnabled() {
 
-			return (NPCShieldProviderModLoaded || Settings.Grids.EnableGlobalNPCShieldProvider);
-		
+			return NPCShieldProviderModLoaded || Settings.Grids.EnableGlobalNPCShieldProvider;
+
 		}
 
 		public static bool AddDefenseShieldsToGrid(MyObjectBuilder_CubeGrid cubeGrid, bool spawnGroupAdd) {
@@ -126,7 +126,7 @@ namespace ModularEncountersSpawner {
 			cubeGrid.CubeBlocks.Add(controller);
 
 			return true;
-		
+
 		}
 
 		public static void ActivateShieldsForNPC(IMyCubeGrid cubeGrid) {
@@ -137,16 +137,16 @@ namespace ModularEncountersSpawner {
 			if (cubeGrid.BigOwners.Count == 0) {
 
 				return;
-			
+
 			} else {
 
 				foreach (var owner in cubeGrid.BigOwners) {
 
 					if (!IsNPC(owner))
 						return;
-				
+
 				}
-			
+
 			}
 
 			//Get Blocks, filter shields
@@ -169,7 +169,7 @@ namespace ModularEncountersSpawner {
 					block.SlimBlock.CubeGrid.OnGridSplit += ShieldGridSplit;
 
 				}
-			
+
 			}
 
 		}
@@ -202,7 +202,7 @@ namespace ModularEncountersSpawner {
 				//TODO: Set LoS Requirement to True
 
 			}
-		
+
 		}
 
 		private static void ShieldBlockGridOwnershipChanged(IMyCubeGrid cubeGrid) {
@@ -253,7 +253,7 @@ namespace ModularEncountersSpawner {
 			if (!_activeNpcShields.TryGetValue(gridA, out shield) && !_activeNpcShields.TryGetValue(gridA, out shield)) {
 
 				return;
-				
+
 			}
 
 			if (shield?.SlimBlock?.CubeGrid == null || !MyAPIGateway.Entities.Exist(shield?.SlimBlock?.CubeGrid)) {

@@ -36,6 +36,7 @@ namespace ModularEncountersSpawner{
 		
 		public static void ApplySuppression(bool cargo, bool encounter){
 			
+			/*
 			SuppressCargoShips.Add("Military1");
 			SuppressCargoShips.Add("Military2");
 			SuppressCargoShips.Add("Mining1");
@@ -79,23 +80,32 @@ namespace ModularEncountersSpawner{
 			SuppressEncounters.Add("Encounter RoidStation");
 			SuppressEncounters.Add("Encounter Safehouse station");
 			SuppressEncounters.Add("Encounter Shuttle");
-			
+			*/
+
 			foreach(var spawn in SpawnGroupManager.SpawnGroups){
-				
-				if(cargo == true && SuppressCargoShips.Contains(spawn.SpawnGroupName) == true){
-					
-					Logger.AddMsg("Suppress Vanilla Cargo Ships Mod Detected");
-					spawn.SpaceCargoShip = false;
-					
+
+				if (cargo && spawn.SpaceCargoShip) {
+
+					if (spawn.SpawnGroup?.Context != null) {
+
+						if (spawn.SpawnGroup.Context.IsBaseGame)
+							spawn.SpaceCargoShip = false;
+
+					}
+
 				}
-				
-				if(encounter == true && SuppressEncounters.Contains(spawn.SpawnGroupName) == true){
-					
-					Logger.AddMsg("Suppress Vanilla Random Encounters Mod Detected");
-					spawn.SpaceRandomEncounter = false;
-					
+
+				if (encounter && spawn.SpaceRandomEncounter) {
+
+					if (spawn.SpawnGroup?.Context != null) {
+
+						if (spawn.SpawnGroup.Context.IsBaseGame)
+							spawn.SpaceRandomEncounter = false;
+
+					}
+
 				}
-				
+
 			}
 			
 		}

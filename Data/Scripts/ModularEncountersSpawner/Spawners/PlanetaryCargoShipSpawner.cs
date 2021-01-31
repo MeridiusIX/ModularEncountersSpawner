@@ -9,6 +9,7 @@ using VRage.ModAPI;
 using VRageMath;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.Manipulation;
 
 namespace ModularEncountersSpawner.Spawners {
 
@@ -82,6 +83,7 @@ namespace ModularEncountersSpawner.Spawners {
 			var spawnForwardDir = startMatrix.Forward;
 			var spawnUpDir = startMatrix.Up;
 			var spawnMatrix = startMatrix;
+			var despawnMatrix = MatrixD.CreateWorld(endPathCoords, startMatrix.Forward, startMatrix.Up);
 			long gridOwner = 0;
 			var randFactionTag = spawnGroup.FactionOwner;
 
@@ -115,6 +117,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 				var options = SpawnGroupManager.CreateSpawningOptions(spawnGroup, prefab);
 				var spawnPosition = Vector3D.Transform((Vector3D)prefab.Position, spawnMatrix);
+				var despawnPosition = Vector3D.Transform((Vector3D)prefab.Position, despawnMatrix);
 				var speedL = prefab.Speed;
 				var speedA = Vector3.Zero;
 				var gridList = new List<IMyCubeGrid>();
@@ -188,7 +191,7 @@ namespace ModularEncountersSpawner.Spawners {
 				//Character Injection - End*/
 				
 				//Grid Manipulation
-				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "PlanetaryCargoShip", prefab.Behaviour);
+				ManipulationCore.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "PlanetaryCargoShip", prefab.Behaviour);
 				
 				try{
 					
@@ -207,9 +210,9 @@ namespace ModularEncountersSpawner.Spawners {
 				pendingNPC.faction = MyAPIGateway.Session.Factions.TryGetFactionByTag(pendingNPC.InitialFaction);
 				pendingNPC.Name = prefab.SubtypeId;
 				pendingNPC.GridName = MyDefinitionManager.Static.GetPrefabDefinition(prefab.SubtypeId).CubeGrids[0].DisplayName;
-				pendingNPC.StartCoords = startPathCoords;
+				pendingNPC.StartCoords = spawnPosition;
 				pendingNPC.CurrentCoords = startPathCoords;
-				pendingNPC.EndCoords = endPathCoords;
+				pendingNPC.EndCoords = despawnPosition;
 				pendingNPC.AutoPilotSpeed = speedL;
 				pendingNPC.Planet = planet;
 				pendingNPC.SpawnType = "PlanetaryCargoShip";
@@ -410,6 +413,42 @@ namespace ModularEncountersSpawner.Spawners {
 
 						totalSteps += Settings.PlanetaryCargoShips.PathStepCheckDistance;
 						
+					}
+
+					if (!badPath) {
+
+						var doublePathDist = pathDist * 2;
+						var box = new BoundingBoxD(new Vector3D(-1,-1,-1) + tempStartPath, new Vector3D(1, 1, 1) + tempEndPath);
+
+						foreach (var entity in SpawnResources.EntityList) {
+
+							if (Vector3D.Distance(entity.GetPosition(), tempStartPath) > doublePathDist) {
+
+								continue;
+							
+							}
+
+							if (entity.WorldAABB.Contains(box) != ContainmentType.Disjoint) {
+
+								var planet = entity as MyPlanet;
+
+								if (planet != null)
+									continue;
+
+								var grid = entity as IMyCubeGrid;
+								var voxel = entity as IMyVoxelBase;
+
+								if (grid != null || voxel != null) {
+
+									badPath = true;
+									break;
+								
+								}
+							
+							}
+						
+						}
+					
 					}
 					
 					if(badPath == true){

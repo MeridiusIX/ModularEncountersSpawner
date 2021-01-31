@@ -106,12 +106,12 @@ namespace ModularEncountersSpawner.Configuration{
 		
 		public ConfigGrids LoadSettings(){
 			
-			if(MyAPIGateway.Utilities.FileExistsInWorldStorage("Config-Grids.xml", typeof(ConfigGeneral)) == true){
+			if(MyAPIGateway.Utilities.FileExistsInWorldStorage("Config-Grids.xml", typeof(ConfigGrids)) == true){
 				
 				try{
 					
 					ConfigGrids config = null;
-					var reader = MyAPIGateway.Utilities.ReadFileInWorldStorage("Config-Grids.xml", typeof(ConfigGeneral));
+					var reader = MyAPIGateway.Utilities.ReadFileInWorldStorage("Config-Grids.xml", typeof(ConfigGrids));
 					string configcontents = reader.ReadToEnd();
 					config = MyAPIGateway.Utilities.SerializeFromXML<ConfigGrids>(configcontents);
 					Logger.AddMsg("Loaded Existing Settings From Config-Grids.xml");
@@ -131,7 +131,7 @@ namespace ModularEncountersSpawner.Configuration{
 			
 			try{
 				
-				using (var writer = MyAPIGateway.Utilities.WriteFileInWorldStorage("Config-Grids.xml", typeof(ConfigGeneral))){
+				using (var writer = MyAPIGateway.Utilities.WriteFileInWorldStorage("Config-Grids.xml", typeof(ConfigGrids))){
 				
 					writer.Write(MyAPIGateway.Utilities.SerializeToXML<ConfigGrids>(settings));
 				
@@ -151,7 +151,7 @@ namespace ModularEncountersSpawner.Configuration{
 			
 			try{
 				
-				using (var writer = MyAPIGateway.Utilities.WriteFileInWorldStorage("Config-Grids.xml", typeof(ConfigGeneral))){
+				using (var writer = MyAPIGateway.Utilities.WriteFileInWorldStorage("Config-Grids.xml", typeof(ConfigGrids))){
 					
 					writer.Write(MyAPIGateway.Utilities.SerializeToXML<ConfigGrids>(settings));
 				

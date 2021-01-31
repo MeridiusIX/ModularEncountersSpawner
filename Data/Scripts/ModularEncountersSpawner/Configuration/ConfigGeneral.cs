@@ -69,6 +69,7 @@ namespace ModularEncountersSpawner.Configuration{
 		public bool EnableRandomEncounters;
 		public bool EnablePlanetaryInstallations;
 		public bool EnableBossEncounters;
+		public bool EnableCreatureSpawns;
 
 		public bool EnableLegacySpaceCargoShipDetection;
 		
@@ -114,6 +115,7 @@ namespace ModularEncountersSpawner.Configuration{
 			EnableRandomEncounters = true;
 			EnablePlanetaryInstallations = true;
 			EnableBossEncounters = true;
+			EnableCreatureSpawns = true;
 			EnableLegacySpaceCargoShipDetection = true;
 			UseModIdSelectionForSpawning = true;
 			UseWeightedModIdSelection = true;

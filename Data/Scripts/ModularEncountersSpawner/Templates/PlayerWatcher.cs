@@ -25,28 +25,30 @@ using VRageMath;
 using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.Spawners;
 
 namespace ModularEncountersSpawner.Templates{
 	
 	public class PlayerWatcher{
 		
-		public IMyPlayer Player {get; set;}
+		public IMyPlayer Player;
 		
-		public int SpaceCargoShipTimer {get; set;}
-		public int AtmoCargoShipTimer {get; set;}
-		public int LunarCargoShipTimer {get; set;}
-		public int RandomEncounterCheckTimer {get; set;}
-		public int PlanetaryInstallationCheckTimer {get; set;}
-		public int BossEncounterCheckTimer {get; set;}
+		public int SpaceCargoShipTimer;
+		public int AtmoCargoShipTimer;
+		public int LunarCargoShipTimer;
+		public int RandomEncounterCheckTimer;
+		public int PlanetaryInstallationCheckTimer;
+		public int BossEncounterCheckTimer;
+		public int CreatureCheckTimer;
+
+		public int RandomEncounterCoolDownTimer;
+		public int PlanetaryInstallationCooldownTimer;
+		public int BossEncounterCooldownTimer;
 		
-		public int RandomEncounterCoolDownTimer {get; set;}
-		public int PlanetaryInstallationCooldownTimer {get; set;}
-		public int BossEncounterCooldownTimer {get; set;}
+		public bool BossEncounterActive;
 		
-		public bool BossEncounterActive {get; set;}
-		
-		public Vector3D RandomEncounterDistanceCoordCheck {get; set;}
-		public Vector3D InstallationDistanceCoordCheck {get; set;}
+		public Vector3D RandomEncounterDistanceCoordCheck;
+		public Vector3D InstallationDistanceCoordCheck;
 				
 		public PlayerWatcher(){
 			
@@ -58,7 +60,8 @@ namespace ModularEncountersSpawner.Templates{
 			RandomEncounterCheckTimer = Settings.RandomEncounters.SpawnTimerTrigger;
 			PlanetaryInstallationCheckTimer = Settings.PlanetaryInstallations.SpawnTimerTrigger;
 			BossEncounterCheckTimer = Settings.BossEncounters.SpawnTimerTrigger;
-			
+			CreatureCheckTimer = SpawnResources.rnd.Next(Settings.Creatures.MinCreatureSpawnTime, Settings.Creatures.MaxCreatureSpawnTime);
+
 			RandomEncounterCoolDownTimer = 0;
 			PlanetaryInstallationCooldownTimer = 0;
 			BossEncounterCooldownTimer = 0;

@@ -1,41 +1,29 @@
+using DefenseShields;
+using ModularEncountersSpawner.Api;
+using ModularEncountersSpawner.Configuration;
+using ModularEncountersSpawner.Manipulation;
+using ModularEncountersSpawner.Spawners;
+using ModularEncountersSpawner.Templates;
+using Sandbox.Common.ObjectBuilders;
+using Sandbox.Definitions;
+using Sandbox.ModAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Sandbox.Common;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.Definitions;
-using Sandbox.Definitions;
-using Sandbox.Game;
-using Sandbox.Game.Entities;
-using Sandbox.Game.EntityComponents;
-using Sandbox.Game.GameSystems;
-using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using SpaceEngineers.Game.ModAPI;
 using VRage.Game;
 using VRage.Game.Components;
-using VRage.Game.Entity;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
-using VRage.ObjectBuilders;
-using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
-using ModularEncountersSpawner.Configuration;
-using ModularEncountersSpawner.Templates;
-using ModularEncountersSpawner.Spawners;
-using ModularEncountersSpawner.Api;
-using DefenseShields;
 
-namespace ModularEncountersSpawner{
-	
+namespace ModularEncountersSpawner {
+
 	[MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
 	
 	public class MES_SessionCore : MySessionComponentBase{
 		
-		public static float ModVersion = 1.106f;
+		public static float ModVersion = 1.110f;
 		public static string SaveName = "";
 		public static int PlayerWatcherTimer = 0;
 		public static Dictionary<IMyPlayer, PlayerWatcher> playerWatchList = new Dictionary<IMyPlayer, PlayerWatcher>();
@@ -64,6 +52,8 @@ namespace ModularEncountersSpawner{
 		
 		public static bool NPCWeaponUpgradesModDetected = false;
 		public static bool SpaceWaveSpawnerModDetected = false;
+		public static bool CreatureOverrideModDetected = false;
+		public static ulong CreatureOverrideModId = 2371761016;
 		public static bool spawningInProgress = false;
 
 		//WeaponCore and DefenseSheld API Requirements
@@ -119,6 +109,9 @@ namespace ModularEncountersSpawner{
 
 			Instance = this;
 
+			SpawnGroupManager.CreateSpawnLists();
+			Settings.InitSettings();
+
 			foreach (var mod in MyAPIGateway.Session.Mods) {
 
 				if (mod.PublishedFileId == ShieldModId) {
@@ -136,6 +129,20 @@ namespace ModularEncountersSpawner{
 
 				}
 
+				if (mod.PublishedFileId == CreatureOverrideModId) {
+
+					Logger.AddMsg("Creature Spawn Override Mod Detected");
+					CreatureOverrideModDetected = true;
+
+				}
+
+			}
+
+			//Creature Init
+			if (CreatureOverrideModDetected || Settings.Creatures.OverrideVanillaCreatureSpawns) {
+
+				CreatureSpawner.BotOverrideConfig();
+
 			}
 
 			var allDefs = MyDefinitionManager.Static.GetAllDefinitions();
@@ -150,8 +157,8 @@ namespace ModularEncountersSpawner{
 				if (!block.Public)
 					continue;
 
-				if (!GridBuilderManipulation.DefaultPublicBlocks.Contains(block.Id))
-					GridBuilderManipulation.DefaultPublicBlocks.Add(block.Id);
+				if (!WeaponRandomizer.DefaultPublicBlocks.Contains(block.Id))
+					WeaponRandomizer.DefaultPublicBlocks.Add(block.Id);
 
 			}
 
@@ -248,21 +255,21 @@ namespace ModularEncountersSpawner{
 
 				Logger.AddMsg("WeaponCore Successfully Loaded");
 				MES_SessionCore.Instance.WeaponCoreLoaded = true;
-				MES_SessionCore.Instance.WeaponCore.GetAllCoreWeapons(GridBuilderManipulation.AllWeaponCoreIDs);
-				MES_SessionCore.Instance.WeaponCore.GetAllCoreStaticLaunchers(GridBuilderManipulation.AllWeaponCoreStaticIDs);
-				MES_SessionCore.Instance.WeaponCore.GetAllCoreTurrets(GridBuilderManipulation.AllWeaponCoreTurretIDs);
+				MES_SessionCore.Instance.WeaponCore.GetAllCoreWeapons(WeaponRandomizer.AllWeaponCoreIDs);
+				MES_SessionCore.Instance.WeaponCore.GetAllCoreStaticLaunchers(WeaponRandomizer.AllWeaponCoreStaticIDs);
+				MES_SessionCore.Instance.WeaponCore.GetAllCoreTurrets(WeaponRandomizer.AllWeaponCoreTurretIDs);
 
 				if (Logger.LoggerDebugMode) {
 
 					Logger.AddMsg("Static Weapons", true);
-					foreach (var statics in GridBuilderManipulation.AllWeaponCoreStaticIDs) {
+					foreach (var statics in WeaponRandomizer.AllWeaponCoreStaticIDs) {
 
 						Logger.AddMsg(" - " + statics.ToString(), true);
 
 					}
 
 					Logger.AddMsg("Turret Weapons", true);
-					foreach (var turret in GridBuilderManipulation.AllWeaponCoreTurretIDs) {
+					foreach (var turret in WeaponRandomizer.AllWeaponCoreTurretIDs) {
 
 						Logger.AddMsg(" - " + turret.ToString(), true);
 
@@ -462,7 +469,15 @@ namespace ModularEncountersSpawner{
 				MyAPIGateway.Session.SessionSettings.EnableEncounters = false;
 				
 			}
-			
+
+			if (CreatureOverrideModDetected || Settings.Creatures.OverrideVanillaCreatureSpawns) {
+
+				Logger.AddMsg("Disabling Spider/Wolves In World Setting. Current Settings Dicate MES Will Control These Spawns.");
+				MyAPIGateway.Session.SessionSettings.EnableSpiders = false;
+				MyAPIGateway.Session.SessionSettings.EnableWolfs = false;
+
+			}
+
 			/*
 			if(MyAPIGateway.Multiplayer.IsServer == false){
 
@@ -482,9 +497,9 @@ namespace ModularEncountersSpawner{
 				
 			}
 			*/
-			
+
 			//All Block SubtypeIds
-			try{
+			try {
 				
 				var allDefs = MyDefinitionManager.Static.GetAllDefinitions();
 				
@@ -610,11 +625,9 @@ namespace ModularEncountersSpawner{
 			MyAPIGateway.Utilities.RegisterMessageHandler(1521905890002, ModMessages.ModMessageReceiverSpawnRequest);
 			MyAPIGateway.Utilities.RegisterMessageHandler(1521905890003, ModMessages.ModMessageReceiverRivalAISpawnRequest);
 			Logger.AddMsg("Initiating Main Settings.");
-			Settings.InitSettings();
 			NPCWatcher.InitFactionData();
 			SpawnResources.PopulateNpcFactionLists();
 			TerritoryManager.TerritoryRefresh();
-			SpawnGroupManager.CreateSpawnLists();
 			
 			string[] uniqueSpawnedArray = new string[0];
 			if(MyAPIGateway.Utilities.GetVariable<string[]>("MES-UniqueGroupsSpawned", out uniqueSpawnedArray) == true){
@@ -843,8 +856,14 @@ namespace ModularEncountersSpawner{
 						playerWatchList[player].AtmoCargoShipTimer -= Settings.General.PlayerWatcherTimerTrigger;
 						
 					}
-					
-					if(Settings.General.EnableRandomEncounters == true){
+
+					if (Settings.General.EnableCreatureSpawns == true) {
+
+						playerWatchList[player].CreatureCheckTimer -= Settings.General.PlayerWatcherTimerTrigger;
+
+					}
+
+					if (Settings.General.EnableRandomEncounters == true){
 						
 						//CoolDown Timers
 						if(playerWatchList[player].RandomEncounterCoolDownTimer > 0){
@@ -976,8 +995,18 @@ namespace ModularEncountersSpawner{
 						}
 								
 					}
-					
-				}else{
+
+					if (playerWatchList[player].CreatureCheckTimer <= 0) {
+
+						playerWatchList[player].CreatureCheckTimer = SpawnResources.rnd.Next(Settings.Creatures.MinCreatureSpawnTime, Settings.Creatures.MaxCreatureSpawnTime);
+						Logger.SkipNextMessage = true;
+						Logger.AddMsg("Attempting Creature Spawn Near Player: " + player.DisplayName, true);
+						Logger.SkipNextMessage = true;
+						var spawnResult = CreatureSpawner.AttemptSpawn(player.GetPosition());
+
+					}
+
+				} else{
 					
 					var newPlayerWatcher = new PlayerWatcher();
 					playerWatchList.Add(player, newPlayerWatcher);

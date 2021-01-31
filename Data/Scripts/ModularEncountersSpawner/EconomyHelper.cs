@@ -34,7 +34,7 @@ using ModularEncountersSpawner.Spawners;
 using ModularEncountersSpawner.Configuration;
 
 namespace ModularEncountersSpawner {
-	
+
 	public static class EconomyHelper {
 
 		public static Dictionary<MyDefinitionId, int> OreMinimumValues = new Dictionary<MyDefinitionId, int>();

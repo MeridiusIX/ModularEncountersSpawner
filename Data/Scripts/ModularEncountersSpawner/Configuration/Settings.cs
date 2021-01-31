@@ -38,6 +38,7 @@ namespace ModularEncountersSpawner.Configuration{
 		public static ConfigBossEncounters BossEncounters = new ConfigBossEncounters();
 		public static ConfigOtherNPCs OtherNPCs = new ConfigOtherNPCs();
 		public static ConfigCustomBlocks CustomBlocks = new ConfigCustomBlocks();
+		public static ConfigCreatures Creatures = new ConfigCreatures();
 
 
 		public static void InitSettings(){
@@ -51,6 +52,7 @@ namespace ModularEncountersSpawner.Configuration{
 			BossEncounters = BossEncounters.LoadSettings();
 			OtherNPCs = OtherNPCs.LoadSettings();
 			CustomBlocks = CustomBlocks.LoadSettings();
+			Creatures = Creatures.LoadSettings();
 			CheckGlobalEvents();
 			
 		}

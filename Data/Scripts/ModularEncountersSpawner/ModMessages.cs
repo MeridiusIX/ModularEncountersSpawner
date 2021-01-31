@@ -22,13 +22,13 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
+using ModularEncountersSpawner.Manipulation;
 
-namespace ModularEncountersSpawner{
-	
+namespace ModularEncountersSpawner {
+
 	public static class ModMessages{
 		
 		public static void ModMessageHandler(object obj){
@@ -179,9 +179,9 @@ namespace ModularEncountersSpawner{
 				
 				Logger.AddMsg("Block Replacer Reference Received. " + payloadData.ReplacementReferenceName);
 				
-				if(GridBuilderManipulation.BlockReplacementProfiles.ContainsKey(payloadData.ReplacementReferenceName) == false){
-					
-					GridBuilderManipulation.BlockReplacementProfiles.Add(payloadData.ReplacementReferenceName, payloadData);
+				if(BlockReplacement.BlockReplacementProfiles.ContainsKey(payloadData.ReplacementReferenceName) == false){
+
+					BlockReplacement.BlockReplacementProfiles.Add(payloadData.ReplacementReferenceName, payloadData);
 					Logger.AddMsg("Block Replacer Reference Added To MES For This Session. ");
 					
 				}else{

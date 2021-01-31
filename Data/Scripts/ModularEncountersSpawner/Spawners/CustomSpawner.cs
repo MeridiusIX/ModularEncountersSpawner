@@ -22,12 +22,12 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.Manipulation;
 
-namespace ModularEncountersSpawner.Spawners{
-	
+namespace ModularEncountersSpawner.Spawners {
+
 	public static class CustomSpawner {
 		
 		public static bool CustomSpawnRequest(List<string> spawnGroups, MatrixD spawningMatrix, Vector3 velocity, bool ignoreSafetyCheck, string factionOverride, string spawnProfileId) {
@@ -123,7 +123,7 @@ namespace ModularEncountersSpawner.Spawners{
 				var gridList = new List<IMyCubeGrid>();
 				
 				//Grid Manipulation
-				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "SpaceCargoShip", prefab.Behaviour);
+				ManipulationCore.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "SpaceCargoShip", prefab.Behaviour);
 
 				try{
 					

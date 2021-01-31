@@ -22,12 +22,12 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.Manipulation;
 
-namespace ModularEncountersSpawner.Spawners{
-	
+namespace ModularEncountersSpawner.Spawners {
+
 	public static class RandomEncounterSpawner{
 		
 		public static Dictionary<string, List<ImprovedSpawnGroup>> SpawnGroupSublists = new Dictionary<string, List<ImprovedSpawnGroup>>();
@@ -192,7 +192,7 @@ namespace ModularEncountersSpawner.Spawners{
 				var gridList = new List<IMyCubeGrid>();
 				
 				//Grid Manipulation
-				GridBuilderManipulation.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "RandomEncounter", prefab.Behaviour);
+				ManipulationCore.ProcessPrefabForManipulation(prefab.SubtypeId, spawnGroup, "RandomEncounter", prefab.Behaviour);
 				
 				try{
 					
@@ -213,7 +213,7 @@ namespace ModularEncountersSpawner.Spawners{
 				pendingNPC.GridName = MyDefinitionManager.Static.GetPrefabDefinition(prefab.SubtypeId).CubeGrids[0].DisplayName;
 				pendingNPC.StartCoords = spawnCoords;
 				pendingNPC.CurrentCoords = spawnCoords;
-				pendingNPC.EndCoords = spawnCoords;
+				pendingNPC.EndCoords = Vector3D.Zero;
 				pendingNPC.SpawnType = "RandomEncounter";
 				pendingNPC.CleanupIgnore = spawnGroup.IgnoreCleanupRules;
 				pendingNPC.ForceStaticGrid = spawnGroup.ForceStaticGrid;

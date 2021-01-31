@@ -22,14 +22,13 @@ using VRage.ModAPI;
 using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
 
 namespace ModularEncountersSpawner {
 
-    public static class CargoShipWatcher {
+	public static class CargoShipWatcher {
 
         public static Dictionary<IMyCubeGrid, Vector3> LastGridSpeed = new Dictionary<IMyCubeGrid, Vector3>();
         public static List<IMyCubeGrid> NoLongerMonitorGrids = new List<IMyCubeGrid>();

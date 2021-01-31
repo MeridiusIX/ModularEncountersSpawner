@@ -1,47 +1,31 @@
+using Sandbox.Common.ObjectBuilders;
+using Sandbox.Game;
+using Sandbox.Game.EntityComponents;
+using Sandbox.ModAPI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sandbox.Common;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.Definitions;
-using Sandbox.Definitions;
-using Sandbox.Game;
-using Sandbox.Game.Entities;
-using Sandbox.Game.EntityComponents;
-using Sandbox.Game.GameSystems;
-using Sandbox.Game.Lights;
-using Sandbox.Game.Weapons;
-using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using Sandbox.ModAPI.Interfaces.Terminal;
-using SpaceEngineers.Game.ModAPI;
-using ProtoBuf;
 using VRage.Game;
 using VRage.Game.Components;
-using VRage.Game.Entity;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
 using VRage.ObjectBuilders;
-using VRage.Game.ObjectBuilders.Definitions;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
-using ModularEncountersSpawner.Configuration;
 
 
-namespace ModularEncountersSpawner.BlockLogic{
-	
+namespace ModularEncountersSpawner.BlockLogic {
+
 	//Change MyObjectBuilder_LargeGatlingTurret to the matching ObjectBuilder for your block
-	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "SuppressorLargeId", "SuppressorSmallId")]
+	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "MES-Suppressor-Nanobots-Large")]
 	 
-	public class SuppressorBlockLogic : MyGameLogicComponent{
+	public class NanobotSuppressorLogic : MyGameLogicComponent{
 
 		bool AffectBlocksAttachedToOwnGrid = false;
 
 		IMyRadioAntenna Antenna;
 		bool IsWorking = false;
+		bool IsNpcOwned = false;
+		bool InRange = false;
 
 		List<MyDefinitionId> SuppressedBlockIds = new List<MyDefinitionId>();
 		List<IMyFunctionalBlock> SuppressedBlocksInWorld = new List<IMyFunctionalBlock>();
@@ -50,14 +34,17 @@ namespace ModularEncountersSpawner.BlockLogic{
 		List<IMyFunctionalBlock> BlocksToSuppress = new List<IMyFunctionalBlock>();
 
 		bool SetupDone = false;
-		bool IsServer = false;
+
+		DateTime OverheatTimer = MyAPIGateway.Session.GameDateTime;
+		int OverheatInstanceCounter = 0;
 		
 		public override void Init(MyObjectBuilder_EntityBase objectBuilder){
 			
 			base.Init(objectBuilder);
 			
 			try{
-				
+
+				//MyVisualScriptLogicProvider.ShowNotificationToAll("Suppressor Init", 3000);
 				Antenna = Entity as IMyRadioAntenna;
 				NeedsUpdate |= MyEntityUpdateEnum.EACH_100TH_FRAME;
 				
@@ -71,17 +58,38 @@ namespace ModularEncountersSpawner.BlockLogic{
 		
 		public override void UpdateBeforeSimulation100(){
 
-			if (!SetupDone && !MyAPIGateway.Multiplayer.IsServer) {
+			if (!SetupDone)
+				Setup();
+
+			if (!SetupDone) {
 
 				NeedsUpdate = MyEntityUpdateEnum.NONE;
 				return;
 
 			}
 
-			if (!SetupDone)
-				Setup();
+			if (!MyAPIGateway.Utilities.IsDedicated && MyAPIGateway.Session.LocalHumanPlayer != null) {
 
-			MyAPIGateway.Parallel.Start(() => {
+				if (IsWorking && IsNpcOwned) {
+
+					var distance = Vector3D.Distance(Antenna.GetPosition(), MyAPIGateway.Session.LocalHumanPlayer.GetPosition());
+					var inRange = distance <= Antenna.Radius;
+
+					if (inRange && !InRange) {
+
+						MyVisualScriptLogicProvider.ShowNotificationLocal("WARNING: Inhibitor Field Has Disable Jump Drive Functionality!", 4000, "Red");
+						//MyVisualScriptLogicProvider.PlayHudSoundLocal(VRage.Audio.MyGuiSounds.HudUnable, MyAPIGateway.Session.LocalHumanPlayer.IdentityId);
+
+					}
+
+					InRange = inRange;
+
+				}
+
+			}
+
+			if (MyAPIGateway.Multiplayer.IsServer) {
+
 
 				for (int i = SuppressedBlocksInWorld.Count - 1; i >= 0; i--) {
 
@@ -94,36 +102,71 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 					}
 
-					if (CheckBlockForSuppression(block))
-						BlocksToSuppress.Add(block);
+					if (!IsNpcOwned && CheckBlockForSuppression(block)) {
 
-				}
+						block.Enabled = false;
 
-			}, () => {
+						var timespan = MyAPIGateway.Session.GameDateTime - OverheatTimer;
 
-				for (int i = BlocksToSuppress.Count - 1; i >= 0; i--) {
+						if (timespan.TotalMilliseconds <= 250) {
 
-					var block = BlocksToSuppress[i];
+							OverheatInstanceCounter++;
 
-					if (block?.SlimBlock == null) {
+							if (OverheatInstanceCounter >= 100) {
 
-						continue;
+								OverheatInstanceCounter += 10;
+								block.SlimBlock.DoDamage(OverheatInstanceCounter * 10, MyStringHash.GetOrCompute("Overheat"), true, null, Antenna.OwnerId);
+
+							}
+
+						} else {
+
+							OverheatInstanceCounter = 0;
+
+						}
+
+						OverheatTimer = MyAPIGateway.Session.GameDateTime;
 
 					}
 
-					block.Enabled = false;
-
 				}
 
-				BlocksToSuppress.Clear();
-
-			});
+			}
 
 		}
 
 		void Setup() {
 
+			Antenna = Entity as IMyRadioAntenna;
+
+			if (Antenna == null) {
+
+				//MyVisualScriptLogicProvider.ShowNotificationToAll("Suppressor Null Or Not Server", 3000);
+				NeedsUpdate = MyEntityUpdateEnum.NONE;
+				return;
+
+			}
+
 			SetupDone = true;
+
+			if (!MyAPIGateway.Multiplayer.IsServer)
+				return;
+
+			if (Antenna.Storage == null) {
+
+				Antenna.Storage = new MyModStorageComponent();
+				Antenna.CustomName = "[Nanobot Inhibitor Field]";
+				Antenna.Radius = 1000;
+
+			}
+
+			SuppressedBlockIds.Add(new MyDefinitionId(typeof(MyObjectBuilder_ShipWelder), "SELtdLargeNanobotBuildAndRepairSystem"));
+			SuppressedBlockIds.Add(new MyDefinitionId(typeof(MyObjectBuilder_ShipWelder), "SELtdSmallNanobotBuildAndRepairSystem"));
+			Antenna.IsWorkingChanged += OnWorkingChange;
+			Antenna.OwnershipChanged += OnOwnerChange;
+			OnOwnerChange(Antenna);
+			OnWorkingChange(Antenna);
+
 			var entities = new HashSet<IMyEntity>();
 			MyAPIGateway.Entities.GetEntities(entities, x => x as IMyCubeGrid != null);
 
@@ -169,6 +212,7 @@ namespace ModularEncountersSpawner.BlockLogic{
 				if (SuppressedBlocksInWorld.Contains(terminalBlock))
 					return;
 
+				//MyVisualScriptLogicProvider.ShowNotificationToAll("Added Suppressable Block", 3000);
 				terminalBlock.IsWorkingChanged += SuppressedBlockChanged;
 				SuppressedBlocksInWorld.Add(terminalBlock);
 
@@ -181,7 +225,15 @@ namespace ModularEncountersSpawner.BlockLogic{
 			if (!block.IsWorking || !block.IsFunctional)
 				return;
 
-			if (CheckBlockForSuppression(block as IMyFunctionalBlock))
+			if (Antenna == null || Antenna.MarkedForClose) {
+
+				//MyVisualScriptLogicProvider.ShowNotificationToAll("Suppressor Null or Closed", 3000);
+				block.IsWorkingChanged -= SuppressedBlockChanged;
+				return;
+
+			}
+
+			if (!IsNpcOwned && CheckBlockForSuppression(block as IMyFunctionalBlock))
 				(block as IMyFunctionalBlock).Enabled = false;
 
 		}
@@ -215,11 +267,24 @@ namespace ModularEncountersSpawner.BlockLogic{
 			
 		}
 
+		void OnOwnerChange(IMyTerminalBlock block) {
+
+			if (block.OwnerId == 0 || MyAPIGateway.Players.TryGetSteamId(block.OwnerId) > 0) {
+
+				IsNpcOwned = false;
+				return;
+			
+			}
+
+			IsNpcOwned = true;
+
+		}
+
 		public override void OnRemovedFromScene(){
 			
 			base.OnRemovedFromScene();
 			
-			var Block = Entity as IMyBeacon;
+			var Block = Entity as IMyRadioAntenna;
 			
 			if(Block == null){
 				
@@ -227,7 +292,8 @@ namespace ModularEncountersSpawner.BlockLogic{
 				
 			}
 
-			Block.IsWorkingChanged += OnWorkingChange;
+			Block.OwnershipChanged -= OnOwnerChange;
+			Block.IsWorkingChanged -= OnWorkingChange;
 
 		}
 		
