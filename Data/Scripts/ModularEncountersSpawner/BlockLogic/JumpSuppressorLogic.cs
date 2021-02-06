@@ -36,7 +36,11 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 		DateTime OverheatTimer = MyAPIGateway.Session.GameDateTime;
 		int OverheatInstanceCounter = 0;
-		
+
+		float defaultRange = 5000;
+		string lastCustomData = "";
+		int tickCount = 0;
+
 		public override void Init(MyObjectBuilder_EntityBase objectBuilder){
 			
 			base.Init(objectBuilder);
@@ -87,6 +91,15 @@ namespace ModularEncountersSpawner.BlockLogic {
 			
 			}
 
+			tickCount += 100;
+
+			if (tickCount >= 100) {
+
+				tickCount = 0;
+				SetRange();
+
+			}
+
 			if (MyAPIGateway.Multiplayer.IsServer) {
 
 				for (int i = SuppressedBlocksInWorld.Count - 1; i >= 0; i--) {
@@ -100,7 +113,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 					}
 
-					if (!IsNpcOwned && CheckBlockForSuppression(block)) {
+					if (IsNpcOwned && CheckBlockForSuppression(block)) {
 
 						block.Enabled = false;
 
@@ -148,14 +161,17 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 			SetupDone = true;
 
+			SetRange();
+
 			if (!MyAPIGateway.Multiplayer.IsServer)
 				return;
+
+
 
 			if (Antenna.Storage == null) {
 
 				Antenna.Storage = new MyModStorageComponent();
 				Antenna.CustomName = "[Jump Drive Inhibitor Field]";
-				Antenna.Radius = 6000;
 
 			}
 
@@ -230,7 +246,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 			}
 
-			if (!IsNpcOwned && CheckBlockForSuppression(block as IMyFunctionalBlock))
+			if (IsNpcOwned && CheckBlockForSuppression(block as IMyFunctionalBlock))
 				(block as IMyFunctionalBlock).Enabled = false;
 
 		}
@@ -247,7 +263,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 			}
 
-			return (Vector3D.Distance(Antenna.GetPosition(), block.GetPosition()) < Antenna.Radius);
+			return (Vector3D.Distance(Antenna.GetPosition(), block.GetPosition()) < defaultRange);
 
 		}
 
@@ -266,7 +282,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 		void OnOwnerChange(IMyTerminalBlock block) {
 
-			if (block.OwnerId == 0 || MyAPIGateway.Players.TryGetSteamId(block.OwnerId) > 0) {
+			if (block.OwnerId == 0 || MyAPIGateway.Players.TryGetSteamId(block.OwnerId) > 1) {
 
 				IsNpcOwned = false;
 				return;
@@ -274,6 +290,31 @@ namespace ModularEncountersSpawner.BlockLogic {
 			}
 
 			IsNpcOwned = true;
+
+		}
+
+		void SetRange() {
+
+			if (string.IsNullOrWhiteSpace(Antenna.CustomData)) {
+
+				Antenna.CustomData = defaultRange.ToString();
+				lastCustomData = defaultRange.ToString();
+				Antenna.Radius = defaultRange;
+				return;
+
+			}
+
+			if (Antenna.CustomData == lastCustomData)
+				return;
+
+			lastCustomData = Antenna.CustomData;
+			float result = 0;
+
+			if (!float.TryParse(Antenna.CustomData, out result))
+				return;
+
+			Antenna.Radius = result;
+			defaultRange = result;
 
 		}
 

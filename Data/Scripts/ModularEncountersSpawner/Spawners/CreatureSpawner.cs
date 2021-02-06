@@ -340,7 +340,7 @@ namespace ModularEncountersSpawner.Spawners {
 						
 					}
 
-					SpawnGroupManager.SpawnGroups.Add(spawnGroup);
+					SpawnGroupManager.AddSpawnGroup(spawnGroup);
 
 				}
 
@@ -365,7 +365,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 					}
 
-					SpawnGroupManager.SpawnGroups.Add(spawnGroup);
+					SpawnGroupManager.AddSpawnGroup(spawnGroup);
 
 				}
 

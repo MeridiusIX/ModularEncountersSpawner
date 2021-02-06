@@ -9,7 +9,6 @@
         <SubtypeId>MES-Suppressor-Nanobots-Large</SubtypeId>
       </Id>
       <DisplayName>Nanobot Suppression Field</DisplayName>
-      <Public>true</Public>
       <Icon>Textures\GUI\Icons\Cubes\ArtificialMass.dds</Icon>
       <Description>This block generates a field that suppresses the operation of various nanite and nanobot technologies while they are within range of the field generator.</Description>
       <CubeSize>Large</CubeSize>
@@ -68,7 +67,6 @@
         <SubtypeId>MES-Suppressor-JumpDrive-Large</SubtypeId>
       </Id>
       <DisplayName>Jump Drive Suppression Field</DisplayName>
-      <Public>true</Public>
       <Icon>Textures\GUI\Icons\Cubes\ArtificialMass.dds</Icon>
       <Description>This block generates a field that suppresses the operation of Jump Drives while they are within range of the field generator.</Description>
       <CubeSize>Large</CubeSize>
@@ -127,7 +125,6 @@
         <SubtypeId>MES-Suppressor-Jetpack-Large</SubtypeId>
       </Id>
       <DisplayName>Jetpack Suppression Field</DisplayName>
-      <Public>true</Public>
       <Icon>Textures\GUI\Icons\Cubes\ArtificialMass.dds</Icon>
       <Description>This block generates a field that suppresses the operation of Jetpacks while they are within range of the field generator.</Description>
       <CubeSize>Large</CubeSize>
@@ -186,7 +183,6 @@
         <SubtypeId>MES-Suppressor-Drill-Large</SubtypeId>
       </Id>
       <DisplayName>Drill Suppression Field</DisplayName>
-      <Public>true</Public>
       <Icon>Textures\GUI\Icons\Cubes\ArtificialMass.dds</Icon>
       <Description>This block generates a field that suppresses the operation of Hand Drills while they are within range of the field generator.</Description>
       <CubeSize>Large</CubeSize>

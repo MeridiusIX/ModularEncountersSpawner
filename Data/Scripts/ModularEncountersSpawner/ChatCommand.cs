@@ -1138,6 +1138,7 @@ namespace ModularEncountersSpawner {
 				
 			}
 
+			Logger.DebugSpawnGroup = result;
 			return result;
 			
 		}

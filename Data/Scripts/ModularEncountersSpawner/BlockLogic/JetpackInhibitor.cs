@@ -1,38 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sandbox.Common;
 using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.Definitions;
-using Sandbox.Definitions;
 using Sandbox.Game;
-using Sandbox.Game.Entities;
-using Sandbox.Game.EntityComponents;
-using Sandbox.Game.GameSystems;
-using Sandbox.Game.Lights;
-using Sandbox.Game.Weapons;
 using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using Sandbox.ModAPI.Interfaces.Terminal;
-using SpaceEngineers.Game.ModAPI;
-using ProtoBuf;
-using VRage.Game;
+using System;
 using VRage.Game.Components;
-using VRage.Game.Entity;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
 using VRage.ObjectBuilders;
-using VRage.Game.ObjectBuilders.Definitions;
-using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
-using ModularEncountersSpawner.Configuration;
 
 
-namespace ModularEncountersSpawner.BlockLogic{
-	
+namespace ModularEncountersSpawner.BlockLogic {
+
 	//Change MyObjectBuilder_LargeGatlingTurret to the matching ObjectBuilder for your block
 	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "MES-Suppressor-Jetpack-Large")]
 	 
@@ -40,11 +18,17 @@ namespace ModularEncountersSpawner.BlockLogic{
 		
 		IMyRadioAntenna Antenna;
 		bool IsWorking = false;
+		bool IsNpcOwned = false;
 		bool IsValid = false;
+		bool IsDedicated = false;
 
 		bool SetupDone = false;
 		bool InDampenerRange = false;
 		bool InDisableRange = false;
+
+		float defaultRange = 1200;
+		string lastCustomData = "";
+		int tickCount = 0;
 
 		public override void Init(MyObjectBuilder_EntityBase objectBuilder){
 			
@@ -70,13 +54,6 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 				SetupDone = true;
 
-				if(MyAPIGateway.Utilities.IsDedicated && MyAPIGateway.Multiplayer.IsServer) {
-
-					NeedsUpdate = MyEntityUpdateEnum.NONE;
-					return;
-
-				}
-
 				Antenna = Entity as IMyRadioAntenna;
 
 				if (Antenna == null) {
@@ -86,10 +63,15 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 				}
 
+				IsDedicated = MyAPIGateway.Multiplayer.IsServer && MyAPIGateway.Utilities.IsDedicated;
 				Antenna.IsWorkingChanged += OnWorkingChange;
+				Antenna.OwnershipChanged += OnOwnerChange;
 				Antenna.CustomName = "[Jetpack Inhibitor Field]";
-				Antenna.Radius = 1200;
+				SetRange();
 				IsWorking = Antenna?.Enabled ?? false;
+
+				OnWorkingChange(Antenna);
+				OnOwnerChange(Antenna);
 
 			}
 
@@ -100,16 +82,24 @@ namespace ModularEncountersSpawner.BlockLogic{
 				
 			}
 
-			if (!IsWorking)
+			if (IsDedicated)
+				return;
+
+			if (!IsWorking || !IsNpcOwned)
 				return;
 
 			if (!InDisableRange && !InDampenerRange)
 				return;
 
-			var character = MyAPIGateway.Session?.LocalHumanPlayer?.Character;
 
-			if (character == null || character.IsDead || !character.EnabledThrusts)
+
+			var character = MyAPIGateway.Session?.LocalHumanPlayer?.Character as IMyCharacter;
+			var controlledEntity = MyAPIGateway.Session?.LocalHumanPlayer?.Controller?.ControlledEntity?.Entity;
+
+			if (character == null || character.IsDead || character != controlledEntity || !character.EnabledThrusts)
 				return;
+
+
 
 			if (InDisableRange) {
 
@@ -129,6 +119,19 @@ namespace ModularEncountersSpawner.BlockLogic{
 			if (!IsWorking)
 				return;
 
+
+			tickCount += 100;
+
+			if (tickCount >= 100) {
+
+				tickCount = 0;
+				SetRange();
+
+			}
+
+			if (IsDedicated)
+				return;
+
 			if (MyAPIGateway.Session?.LocalHumanPlayer?.Character == null)
 				return;
 
@@ -137,8 +140,8 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 			var distance = Vector3D.Distance(MyAPIGateway.Session.LocalHumanPlayer.Character.GetPosition(), Antenna.GetPosition());
 
-			var dampeners = distance <= Antenna.Radius;
-			var disable = distance <= Antenna.Radius / 3;
+			var dampeners = distance <= defaultRange && IsNpcOwned;
+			var disable = distance <= defaultRange / 3 && IsNpcOwned;
 
 			if (dampeners && !InDampenerRange) {
 
@@ -159,6 +162,31 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 		}
 
+		void SetRange() {
+
+			if (string.IsNullOrWhiteSpace(Antenna.CustomData)) {
+
+				Antenna.CustomData = defaultRange.ToString();
+				lastCustomData = defaultRange.ToString();
+				Antenna.Radius = defaultRange;
+				return;
+
+			}
+
+			if (Antenna.CustomData == lastCustomData)
+				return;
+
+			lastCustomData = Antenna.CustomData;
+			float result = 0;
+
+			if (!float.TryParse(Antenna.CustomData, out result))
+				return;
+
+			Antenna.Radius = result;
+			defaultRange = result;
+
+		}
+
 		void OnWorkingChange(IMyCubeBlock block) {
 
 			if(block.IsWorking == false || block.IsFunctional == false) {
@@ -170,6 +198,19 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 			IsWorking = true;
 			
+		}
+
+		void OnOwnerChange(IMyTerminalBlock block) {
+
+			if (block.OwnerId == 0 || MyAPIGateway.Players.TryGetSteamId(block.OwnerId) > 0) {
+
+				IsNpcOwned = false;
+				return;
+
+			}
+
+			IsNpcOwned = true;
+
 		}
 
 		public override void OnRemovedFromScene(){
@@ -185,6 +226,7 @@ namespace ModularEncountersSpawner.BlockLogic{
 			}
 
 			Block.IsWorkingChanged -= OnWorkingChange;
+			Block.OwnershipChanged -= OnOwnerChange;
 
 		}
 		

@@ -143,6 +143,22 @@ namespace ModularEncountersSpawner {
 
 		}
 
+		public static void AddSpawnGroup(ImprovedSpawnGroup spawnGroup) {
+
+			foreach (var group in SpawnGroups) {
+
+				if (group.SpawnGroupName == spawnGroup.SpawnGroupName) {
+
+					return;
+				
+				}
+
+			}
+
+			SpawnGroups.Add(spawnGroup);
+
+		}
+
 		public static bool CheckSpawnGroupPlanetLists(ImprovedSpawnGroup spawnGroup, EnvironmentEvaluation environment){
 
 			if (!environment.IsOnPlanet)

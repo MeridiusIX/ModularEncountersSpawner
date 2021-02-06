@@ -1,38 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sandbox.Common;
 using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.Definitions;
-using Sandbox.Definitions;
 using Sandbox.Game;
-using Sandbox.Game.Entities;
-using Sandbox.Game.EntityComponents;
-using Sandbox.Game.GameSystems;
-using Sandbox.Game.Lights;
-using Sandbox.Game.Weapons;
 using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using Sandbox.ModAPI.Interfaces.Terminal;
-using SpaceEngineers.Game.ModAPI;
-using ProtoBuf;
-using VRage.Game;
+using Sandbox.ModAPI.Weapons;
+using System;
 using VRage.Game.Components;
-using VRage.Game.Entity;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
 using VRage.ObjectBuilders;
-using VRage.Game.ObjectBuilders.Definitions;
-using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner;
-using ModularEncountersSpawner.Configuration;
-using Sandbox.ModAPI.Weapons;
 
-namespace ModularEncountersSpawner.BlockLogic{
-	
+namespace ModularEncountersSpawner.BlockLogic {
+
 	//Change MyObjectBuilder_LargeGatlingTurret to the matching ObjectBuilder for your block
 	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "MES-Suppressor-Drill-Large")]
 	 
@@ -40,12 +18,20 @@ namespace ModularEncountersSpawner.BlockLogic{
 		
 		IMyRadioAntenna Antenna;
 		bool IsWorking = false;
+		bool IsNpcOwned = false;
 		bool IsValid = false;
+		bool IsDedicated = false;
 
 		bool SetupDone = false;
 		bool InDisableRange = false;
 
 		int toolbarIndex = 0;
+
+		float defaultRange = 500;
+		string lastCustomData = "";
+		int tickCount = 0;
+
+		DateTime LastToolbarChange = MyAPIGateway.Session.GameDateTime;
 
 		public override void Init(MyObjectBuilder_EntityBase objectBuilder){
 			
@@ -64,67 +50,11 @@ namespace ModularEncountersSpawner.BlockLogic{
 			
 		}
 		
-		public void ToolEquipped(long playerId, string typeId = "", string subtypeId = "") {
-
-			if (MyAPIGateway.Session.LocalHumanPlayer == null) {
-
-				//MyVisualScriptLogicProvider.ShowNotificationLocal("Player Null", 4000, "White");
-				return;
-
-			}
-
-			if (playerId != MyAPIGateway.Session.LocalHumanPlayer.IdentityId) {
-
-				//MyVisualScriptLogicProvider.ShowNotificationLocal("Identity Not Matched", 4000, "White");
-				return;
-
-			}
-
-			if (!InDisableRange) {
-
-				//MyVisualScriptLogicProvider.ShowNotificationLocal("Outside Disable Range", 4000, "White");
-				return;
-
-			}
-
-			if (MyAPIGateway.Session.LocalHumanPlayer.Character?.EquippedTool == null) {
-
-				//MyVisualScriptLogicProvider.ShowNotificationLocal("Tool Null", 4000, "White");
-				return;
-
-			}
-				
-
-			var drill = MyAPIGateway.Session.LocalHumanPlayer.Character.EquippedTool as IMyHandDrill;
-
-			if (drill == null) {
-
-				//MyVisualScriptLogicProvider.ShowNotificationLocal("Drill Null", 4000, "White");
-				return;
-
-			}
-			
-			toolbarIndex++;
-
-			if (toolbarIndex > 8)
-				toolbarIndex = 0;
-
-			MyVisualScriptLogicProvider.SwitchToolbarToSlot(toolbarIndex, MyAPIGateway.Session.LocalHumanPlayer.IdentityId);
-
-		}
-
 		public override void UpdateBeforeSimulation10() {
 
 			if (SetupDone == false) {
 
 				SetupDone = true;
-
-				if (MyAPIGateway.Utilities.IsDedicated && MyAPIGateway.Multiplayer.IsServer) {
-
-					NeedsUpdate = MyEntityUpdateEnum.NONE;
-					return;
-
-				}
 
 				Antenna = Entity as IMyRadioAntenna;
 
@@ -135,11 +65,15 @@ namespace ModularEncountersSpawner.BlockLogic{
 
 				}
 
+				IsDedicated = MyAPIGateway.Multiplayer.IsServer && MyAPIGateway.Utilities.IsDedicated;
 				Antenna.IsWorkingChanged += OnWorkingChange;
 				Antenna.CustomName = "[Drill Inhibitor Field]";
-				Antenna.Radius = 500;
+				SetRange();
 				IsWorking = Antenna?.Enabled ?? false;
-				MyVisualScriptLogicProvider.ToolEquipped += ToolEquipped;
+				MyVisualScriptLogicProvider.ToolbarItemChanged += ToolbarItemChanged;
+				Antenna.OwnershipChanged += OnOwnerChange;
+				OnWorkingChange(Antenna);
+				OnOwnerChange(Antenna);
 
 			}
 
@@ -153,28 +87,127 @@ namespace ModularEncountersSpawner.BlockLogic{
 			if (!IsWorking)
 				return;
 
-			var character = MyAPIGateway.Session?.LocalHumanPlayer?.Character;
+			tickCount += 10;
 
-			if (character == null)
+			if (tickCount >= 100) {
+
+				tickCount = 0;
+				SetRange();
+			
+			}
+
+			if (IsDedicated)
 				return;
+
+			var character = MyAPIGateway.Session?.LocalHumanPlayer?.Character as IMyCharacter;
+			var controlledEntity = MyAPIGateway.Session?.LocalHumanPlayer?.Controller?.ControlledEntity?.Entity;
+
+			if (character == null || controlledEntity == null || character.EntityId != controlledEntity.EntityId) {
+
+				//MyVisualScriptLogicProvider.ShowNotificationLocal("Controller Character Mismatch", 4000);
+				return;
+
+			}
+				
 
 			if (character.IsDead)
 				return;
 
 			var distance = Vector3D.Distance(character.GetPosition(), Antenna.GetPosition());
+			//MyVisualScriptLogicProvider.ShowNotificationLocal(distance.ToString(), 4000, "White");
+			//MyVisualScriptLogicProvider.ShowNotificationLocal("Chara" + character.GetPosition().ToString(), 4000, "White");
+			//MyVisualScriptLogicProvider.ShowNotificationLocal("Block" + Antenna.GetPosition().ToString(), 4000, "White");
 
-			var disable = distance <= Antenna.Radius;
+			var disable = distance <= defaultRange && IsNpcOwned;
 
 			if (disable && !InDisableRange && character.EquippedTool != null) {
 
-				InDisableRange = disable;
-				ToolEquipped(MyAPIGateway.Session.LocalHumanPlayer.IdentityId);
 				MyVisualScriptLogicProvider.ShowNotificationLocal("WARNING: Inhibitor Field Has Disabled Hand Drill Use!", 4000, "Red");
 				//MyVisualScriptLogicProvider.PlayHudSoundLocal(VRage.Audio.MyGuiSounds.HudUnable, MyAPIGateway.Session.LocalHumanPlayer.IdentityId);
 
 			}
 
 			InDisableRange = disable;
+			ToolEquipped(MyAPIGateway.Session.LocalHumanPlayer.IdentityId);
+
+		}
+
+		public void ToolEquipped(long playerId, string typeId = "", string subtypeId = "") {
+
+			if (IsDedicated || MyAPIGateway.Session?.LocalHumanPlayer == null) {
+
+				//MyVisualScriptLogicProvider.ShowNotificationLocal("Player Null", 4000, "White");
+				return;
+
+			}
+
+			if (playerId != MyAPIGateway.Session.LocalHumanPlayer.IdentityId) {
+
+				//MyVisualScriptLogicProvider.ShowNotificationLocal("Identity Not Matched", 4000, "White");
+				return;
+
+			}
+
+			if (!InDisableRange || !IsNpcOwned) {
+
+				//MyVisualScriptLogicProvider.ShowNotificationLocal("Outside Disable Range", 4000, "White");
+				return;
+
+			}
+
+			if (MyAPIGateway.Session.LocalHumanPlayer.Character?.EquippedTool == null) {
+
+				//MyVisualScriptLogicProvider.ShowNotificationLocal("Tool Null", 4000, "White");
+				return;
+
+			}
+
+			var timeSpan = MyAPIGateway.Session.GameDateTime - LastToolbarChange;
+
+			if (timeSpan.TotalMilliseconds < 250) {
+
+				//MyVisualScriptLogicProvider.ShowNotificationLocal("Toolbar Change Timer", 4000, "White");
+				return;
+
+			}
+
+			var drill = MyAPIGateway.Session.LocalHumanPlayer.Character.EquippedTool as IMyHandDrill;
+
+			if (drill == null) {
+
+				//MyVisualScriptLogicProvider.ShowNotificationLocal("Drill Null", 4000, "White");
+				return;
+
+			}
+
+			toolbarIndex++;
+
+			if (toolbarIndex > 8)
+				toolbarIndex = 0;
+
+			MyVisualScriptLogicProvider.SwitchToolbarToSlot(toolbarIndex, MyAPIGateway.Session.LocalHumanPlayer.IdentityId);
+
+		}
+
+		void ToolbarItemChanged(long entityId, string typeId, string subtypeId, int page, int slot) {
+
+			if (MyAPIGateway.Session?.LocalHumanPlayer?.Character == null || MyAPIGateway.Session.LocalHumanPlayer.Character.EntityId != entityId)
+				return;
+
+			LastToolbarChange = MyAPIGateway.Session.GameDateTime;
+
+		}
+
+		void OnOwnerChange(IMyTerminalBlock block) {
+
+			if (block.OwnerId == 0 || MyAPIGateway.Players.TryGetSteamId(block.OwnerId) > 0) {
+
+				IsNpcOwned = false;
+				return;
+
+			}
+
+			IsNpcOwned = true;
 
 		}
 
@@ -191,6 +224,31 @@ namespace ModularEncountersSpawner.BlockLogic{
 			
 		}
 
+		void SetRange() {
+
+			if (string.IsNullOrWhiteSpace(Antenna.CustomData)) {
+
+				Antenna.CustomData = defaultRange.ToString();
+				lastCustomData = defaultRange.ToString();
+				Antenna.Radius = defaultRange;
+				return;
+
+			}
+
+			if (Antenna.CustomData == lastCustomData)
+				return;
+
+			lastCustomData = Antenna.CustomData;
+			float result = 0;
+
+			if (!float.TryParse(Antenna.CustomData, out result))
+				return;
+
+			Antenna.Radius = result;
+			defaultRange = result;
+
+		}
+
 		public override void OnRemovedFromScene(){
 			
 			base.OnRemovedFromScene();
@@ -204,7 +262,9 @@ namespace ModularEncountersSpawner.BlockLogic{
 			}
 
 			Block.IsWorkingChanged -= OnWorkingChange;
-			MyVisualScriptLogicProvider.ToolEquipped -= ToolEquipped;
+			//MyVisualScriptLogicProvider.ToolEquipped -= ToolEquipped;
+			Block.OwnershipChanged -= OnOwnerChange;
+			MyVisualScriptLogicProvider.ToolbarItemChanged -= ToolbarItemChanged;
 
 		}
 		

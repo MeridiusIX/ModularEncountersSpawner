@@ -58,15 +58,16 @@ namespace ModularEncountersSpawner.Spawners {
 				return "Too Many Boss Encounter Grids in Player Area";
 				
 			}
-			
-			var spawnCoords = Vector3D.Zero;
-			
-			if(GetInitialSpawnCoords(startCoords, out spawnCoords) == false){
-				
+
+			Vector3D spawnCoords = Vector3D.Zero;
+			float airDensity = 0;
+
+			if (GetInitialSpawnCoords(startCoords, ref spawnCoords, ref airDensity) == false) {
+
 				return "Could Not Find Valid Coords For Boss Encounter Signal Generation.";
-				
+
 			}
-			
+
 			var spawnGroupList = GetBossEncounters(startCoords, spawnCoords, eligibleNames);
 			
 			if(Settings.General.UseModIdSelectionForSpawning == true){
@@ -80,7 +81,7 @@ namespace ModularEncountersSpawner.Spawners {
 				return "No Eligible Spawn Groups Could Be Found To Spawn Near Player.";
 				
 			}
-			
+
 			var spawnGroup = spawnGroupList[SpawnResources.rnd.Next(0, spawnGroupList.Count)];
 			
 			var bossEncounter = new BossEncounter();
@@ -186,14 +187,10 @@ namespace ModularEncountersSpawner.Spawners {
 			}
 			
 			if(environment.IsOnPlanet) {
-				
-				if(environment.AtmosphereAtPosition > Settings.BossEncounters.MinAirDensity){
-					
-					planetSpawn = true;
-					
-				}
 
-			}else{
+				planetSpawn = true;
+
+			} else{
 				
 				spaceSpawn = true;
 				
@@ -238,9 +235,13 @@ namespace ModularEncountersSpawner.Spawners {
 				}
 				
 				if(spawnGroup.BossEncounterAtmo == true && planetSpawn == true){
-					
-					eligibleGroup = true;
-					
+
+					if (environment.AtmosphereAtPosition >= Settings.BossEncounters.MinAirDensity || spawnGroup.MinAirDensity > -1) {
+
+						eligibleGroup = true;
+
+					}
+
 				}
 				
 				if(spawnGroup.BossEncounterAny == true){
@@ -573,7 +574,7 @@ namespace ModularEncountersSpawner.Spawners {
 			
 		}
 		
-		public static bool GetInitialSpawnCoords(Vector3D startCoords, out Vector3D spawnCoords){
+		public static bool GetInitialSpawnCoords(Vector3D startCoords, ref Vector3D spawnCoords, ref float airDensity){
 			
 			spawnCoords = Vector3D.Zero;
 			MyPlanet planet = SpawnResources.GetNearestPlanet(startCoords);
@@ -611,13 +612,16 @@ namespace ModularEncountersSpawner.Spawners {
 					var roughCoords = randDir * randDist + startCoords;
 					var surfaceCoords = SpawnResources.GetNearestSurfacePoint(roughCoords, planet);
 					spawnCoords = upDir * Settings.BossEncounters.MinPlanetAltitude + surfaceCoords;
-					
-					if(planet.GetAirDensity(spawnCoords) < Settings.BossEncounters.MinAirDensity){
+					airDensity = planet.GetAirDensity(spawnCoords);
+
+					/*
+					if (airDensity < Settings.BossEncounters.MinAirDensity){
 						
 						spawnCoords = Vector3D.Zero;
 						continue;
 						
 					}
+					*/
 					
 				}
 				

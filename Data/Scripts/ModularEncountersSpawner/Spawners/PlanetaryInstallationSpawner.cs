@@ -71,7 +71,7 @@ namespace ModularEncountersSpawner.Spawners {
 			
 			if(planet == null){
 				
-				return "No Planets In Game World Found.";
+				return "Player Not On Planet Or No Planets In Game World Found.";
 				
 			}else{
 				

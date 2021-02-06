@@ -417,11 +417,7 @@ namespace ModularEncountersSpawner.Manipulation {
 			//Armor Modules
 			if (spawnGroup.ReplaceArmorBlocksWithModules) {
 
-				foreach (var grid in prefabDef.CubeGrids) {
-
-					ArmorModuleReplacement.ProcessGridForModules(grid, spawnGroup);
-
-				}
+				ArmorModuleReplacement.ProcessGridForModules(prefabDef.CubeGrids, spawnGroup);
 
 			}
 

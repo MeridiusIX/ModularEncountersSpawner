@@ -31,95 +31,34 @@ using ModularEncountersSpawner.Spawners;
 
 namespace ModularEncountersSpawner.Zones {
 
-	public enum ZoneEnum {
-	
-		None,
-		Static,
-		Planetary,
-		Dynamic
-	
-	}
-
 	public class Zone {
 
-		//Configurable
+
 		public string Name;
-		public ZoneEnum Type;
+
+
+		public List<string> Factions;
+
 
 		public Vector3D Coordinates;
-		public Vector3D CoreDirection;
+
+
+		public Vector3D Direction;
+
+
 		public double Radius;
-		public List<string> PlanetList;
 
-		public bool UseFactionOwnership;
-		public string FactionOwner;
-		public List<string> FriendlyFactions;
 
-		public bool UseTimer;
-		public bool PlayerInZoneResetsTime;
-		public int MaxTimeMinutes;
+		public bool IsShell;
 
-		public bool AllowFactionContest;
-		public string ContestingFaction;
-		public List<string> ContestingFactionFriends;
-		public int ContestVictoryPointsRequired;
 
-		public bool UseZoneAnnouncing;
-		public string ZoneEnterAnnounceMessage;
-		public string ZoneEnterAnnounceSoundId;
-		public string ZoneExitAnnounceMessage;
-		public string ZoneExitAnnounceSoundId;
+		public double MinShellRadius;
 
-		//Non-Configurable
-		public int ZoneMorale;
-		public int ZoneSpawnResources;
 
-		public int MyContestPoints;
-		public int EnemyContestPoints;
-		public string EnemyFaction;
-		public string EnemyNewTerritory;
+		public double MaxShellRadius;
 
-		public Zone() {
 
-			//Configurable
-			Name = "";
-			Type = ZoneEnum.None;
 
-			Coordinates = Vector3D.Zero;
-			CoreDirection = Vector3D.Zero;
-			Radius = 0;
-			PlanetList = new List<string>();
-
-			UseFactionOwnership = false;
-			FactionOwner = "";
-			FriendlyFactions = new List<string>();
-
-			UseTimer = false;
-			PlayerInZoneResetsTime = false;
-			MaxTimeMinutes = 0;
-
-			AllowFactionContest = false;
-			ContestingFaction = "";
-			ContestingFactionFriends = new List<string>();
-			ContestVictoryPointsRequired = 10;
-
-			UseZoneAnnouncing = false;
-			ZoneEnterAnnounceMessage = "";
-			ZoneEnterAnnounceSoundId = "";
-			ZoneExitAnnounceMessage = "";
-			ZoneExitAnnounceSoundId = "";
-
-			//Non-Configurable
-			ZoneMorale = 0;
-			ZoneSpawnResources = 0;
-
-		}
-
-		public void InitTags(string tagData = "") {
-		
-			
-		
-		}
 
 	}
 

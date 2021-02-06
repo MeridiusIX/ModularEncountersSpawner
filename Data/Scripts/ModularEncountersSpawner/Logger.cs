@@ -605,9 +605,10 @@ namespace ModularEncountersSpawner {
 			//Boss Encounter
 			sb.Append("::: Boss Encounter Eligible Spawns :::").AppendLine().AppendLine();
 			
-			var spawnCoords = Vector3D.Zero;
-			
-			if(BossEncounterSpawner.GetInitialSpawnCoords(coords, out spawnCoords) == true){
+			Vector3D spawnCoords = Vector3D.Zero;
+			float airDensity = 0;
+
+			if (BossEncounterSpawner.GetInitialSpawnCoords(coords, ref spawnCoords, ref airDensity) == true){
 				
 				var bossList = BossEncounterSpawner.GetBossEncounters(coords, spawnCoords, null);
 			
