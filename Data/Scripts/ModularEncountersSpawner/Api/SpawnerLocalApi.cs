@@ -25,6 +25,9 @@ using VRageMath;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
+using ModularEncountersSpawner.Manipulation;
+using ModularEncountersSpawner.World;
+using ModularEncountersSpawner.Zones;
 
 namespace ModularEncountersSpawner.Api {
 	public static class SpawnerLocalApi {

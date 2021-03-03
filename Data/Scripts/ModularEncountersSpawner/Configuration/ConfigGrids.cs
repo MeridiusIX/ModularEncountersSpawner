@@ -81,6 +81,9 @@ namespace ModularEncountersSpawner.Configuration{
 		public bool UseNonPhysicalAmmoForNPCs;
 		public bool RemoveContainerInventoryFromNPCs;
 
+		public int ReplenishedAmmoMaxAmount;
+		public int ReplenishedFuelMaxAmount;
+
 		public ConfigGrids(){
 			
 			ModVersion = MES_SessionCore.ModVersion;
@@ -101,6 +104,9 @@ namespace ModularEncountersSpawner.Configuration{
 
 			UseNonPhysicalAmmoForNPCs = false;
 			RemoveContainerInventoryFromNPCs = false;
+
+			ReplenishedAmmoMaxAmount = 30;
+			ReplenishedFuelMaxAmount = 100;
 
 		}
 		

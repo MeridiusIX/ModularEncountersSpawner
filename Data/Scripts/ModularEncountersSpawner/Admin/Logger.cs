@@ -1,6 +1,10 @@
+using ModularEncountersSpawner.Admin;
+using ModularEncountersSpawner.Api;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Spawners;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.World;
+using ModularEncountersSpawner.Zones;
 using Sandbox.Game;
 using Sandbox.ModAPI;
 using System;
@@ -543,6 +547,7 @@ namespace ModularEncountersSpawner {
 			sb.Append(" - Is Night At Position:        ").Append(environment.IsOnPlanet ? environment.IsNight.ToString() : "N/A").AppendLine();
 			sb.Append(" - Weather At Position:         ").Append(environment.IsOnPlanet && !string.IsNullOrWhiteSpace(environment.WeatherAtPosition) ? environment.WeatherAtPosition.ToString() : "N/A").AppendLine();
 			sb.Append(" - Common Terrain At Position:  ").Append(environment.IsOnPlanet ? environment.CommonTerrainAtPosition.ToString() : "N/A").AppendLine();
+			sb.Append(" - Water Mod Enabled:           ").Append(WaterHelper.Enabled).AppendLine();
 			sb.Append(" - Planet Has Water:            ").Append(environment.IsOnPlanet ? environment.PlanetHasWater.ToString() : "N/A").AppendLine();
 			sb.Append(" - Position Underwater:         ").Append(environment.IsOnPlanet ? environment.PositionIsUnderWater.ToString() : "N/A").AppendLine();
 			sb.Append(" - Surface Underwater:          ").Append(environment.IsOnPlanet ? environment.SurfaceIsUnderWater.ToString() : "N/A").AppendLine();

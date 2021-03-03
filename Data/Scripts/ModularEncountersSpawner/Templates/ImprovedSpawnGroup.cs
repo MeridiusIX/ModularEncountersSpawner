@@ -39,7 +39,10 @@ namespace ModularEncountersSpawner.Templates{
 		public bool GravityCargoShip;
 
 		public bool SkipAirDensityCheck;
-		
+		public bool CargoShipTerrainPath;
+		public double CustomPathStartAltitude;
+		public double CustomPathEndAltitude;
+
 		public bool SpaceRandomEncounter;
 		
 		public bool PlanetaryInstallation;
@@ -241,13 +244,15 @@ namespace ModularEncountersSpawner.Templates{
 		public int MinimumBuildPercent;
 		public int MaximumBuildPercent;
 
-		public List<string> ReduceBlockStateByType;
+		public bool UseGridDereliction;
+		public List<string> DerelictionProfiles;
 
 		public bool UseRivalAi;
 		public bool RivalAiReplaceRemoteControl;
 		public string ApplyBehaviorToNamedBlock;
 		public bool ConvertAllRemoteControlBlocks;
-		
+
+		public bool ClearGridInventories;
 		public bool EraseIngameScripts;
 		public bool DisableTimerBlocks;
 		public bool DisableSensorBlocks;
@@ -374,6 +379,7 @@ namespace ModularEncountersSpawner.Templates{
 		public string BossCustomAnnounceAuthor;
 		public string BossCustomAnnounceMessage;
 		public string BossCustomGPSLabel;
+		public Vector3D BossCustomGPSColor;
 		public string BossMusicId;
 		
 		public bool RotateFirstCockpitToForward;
@@ -396,6 +402,9 @@ namespace ModularEncountersSpawner.Templates{
 			GravityCargoShip = false;
 
 			SkipAirDensityCheck = false;
+			CargoShipTerrainPath = false;
+			CustomPathStartAltitude = -1;
+			CustomPathEndAltitude = -1;
 
 			SpaceRandomEncounter = false;
 			
@@ -567,12 +576,16 @@ namespace ModularEncountersSpawner.Templates{
 			MaximumBlocksPercent = 40;
 			MinimumBuildPercent = 10;
 			MaximumBuildPercent = 75;
-			
+
+			UseGridDereliction = false;
+			DerelictionProfiles = new List<string>();
+
 			UseRivalAi = false;
 			RivalAiReplaceRemoteControl = false;
 			ApplyBehaviorToNamedBlock = "";
 			ConvertAllRemoteControlBlocks = false;
 
+			ClearGridInventories = false;
 			EraseIngameScripts = false;
 			DisableTimerBlocks = false;
 			DisableSensorBlocks = false;
@@ -699,6 +712,7 @@ namespace ModularEncountersSpawner.Templates{
 			BossCustomAnnounceAuthor = "";
 			BossCustomAnnounceMessage = "";
 			BossCustomGPSLabel = "Dangerous Encounter";
+			BossCustomGPSColor = new Vector3D(255,0,255);
 			BossMusicId = "";
 
 			RotateFirstCockpitToForward = true;

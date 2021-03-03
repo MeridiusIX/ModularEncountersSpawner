@@ -1,9 +1,12 @@
 using DefenseShields;
+using ModularEncountersSpawner.Admin;
 using ModularEncountersSpawner.Api;
 using ModularEncountersSpawner.Configuration;
+using ModularEncountersSpawner.Helpers;
 using ModularEncountersSpawner.Manipulation;
 using ModularEncountersSpawner.Spawners;
 using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.World;
 using Sandbox.Common.ObjectBuilders;
 using Sandbox.Definitions;
 using Sandbox.ModAPI;
@@ -23,7 +26,7 @@ namespace ModularEncountersSpawner {
 	
 	public class MES_SessionCore : MySessionComponentBase{
 		
-		public static float ModVersion = 1.114f;
+		public static float ModVersion = 1.119f;
 		public static string SaveName = "";
 		public static int PlayerWatcherTimer = 0;
 		public static Dictionary<IMyPlayer, PlayerWatcher> playerWatchList = new Dictionary<IMyPlayer, PlayerWatcher>();
@@ -94,7 +97,9 @@ namespace ModularEncountersSpawner {
 			if (MyAPIGateway.Multiplayer.IsServer) {
 
 				WaterMod.Register("Modular Encounters Spawner");
+				Logger.AddMsg("Registering Water ModAPI");
 				WaterMod.OnRegisteredEvent += WaterLogged;
+				WaterHelper.Init();
 
 			}
 	
@@ -189,6 +194,30 @@ namespace ModularEncountersSpawner {
 				return;
 
 			SpawnerLocalApi.SendApiToMods();
+
+			//Load Profiles
+			var entityComps = MyDefinitionManager.Static.GetEntityComponentDefinitions();
+
+			foreach (var comp in entityComps) {
+
+				//Dereliction Profiles
+				if (string.IsNullOrWhiteSpace(comp.DescriptionString))
+					continue;
+
+				if (comp.DescriptionString.Contains("[MES Dereliction]")) {
+
+					var profile = new DerelictionProfile(comp.DescriptionString);
+
+					if (!BlockStates.DerelictionProfiles.ContainsKey(comp.Id.SubtypeName)) {
+
+						BlockStates.DerelictionProfiles.Add(comp.Id.SubtypeName, profile);
+						continue;
+
+					}
+				
+				}
+
+			}
 
 			try {
 
@@ -1096,6 +1125,7 @@ namespace ModularEncountersSpawner {
 
 				WaterMod.Unregister();
 				WaterMod.OnRegisteredEvent -= WaterLogged;
+				WaterHelper.Unload();
 
 			}
 	

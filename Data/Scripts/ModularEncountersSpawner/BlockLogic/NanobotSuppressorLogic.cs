@@ -26,6 +26,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 		bool IsWorking = false;
 		bool IsNpcOwned = false;
 		bool InRange = false;
+		bool IsValid = false;
 
 		List<MyDefinitionId> SuppressedBlockIds = new List<MyDefinitionId>();
 		List<IMyFunctionalBlock> SuppressedBlocksInWorld = new List<IMyFunctionalBlock>();
@@ -178,6 +179,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 			SuppressedBlockIds.Add(new MyDefinitionId(typeof(MyObjectBuilder_ShipWelder), "SELtdSmallNanobotBuildAndRepairSystem"));
 			Antenna.IsWorkingChanged += OnWorkingChange;
 			Antenna.OwnershipChanged += OnOwnerChange;
+			IsValid = Antenna?.SlimBlock?.CubeGrid?.Physics != null;
 			OnOwnerChange(Antenna);
 			OnWorkingChange(Antenna);
 
@@ -236,7 +238,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 		void SuppressedBlockChanged(IMyCubeBlock block) {
 
-			if (!block.IsWorking || !block.IsFunctional)
+			if (!block.IsWorking || !block.IsFunctional || !IsValid)
 				return;
 
 			if (Antenna == null || Antenna.MarkedForClose) {

@@ -26,6 +26,8 @@ using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using VRage.Game.ObjectBuilders;
 using ModularEncountersSpawner.Api;
+using ModularEncountersSpawner.World;
+using ModularEncountersSpawner.Zones;
 
 namespace ModularEncountersSpawner.Spawners {
 
@@ -1078,6 +1080,7 @@ namespace ModularEncountersSpawner.Spawners {
 			
 		}
 
+		/*
 		public static Water GetWaterAtPlanet(MyPlanet planet) {
 
 			if (!MES_SessionCore.Instance.WaterMod.Registered)
@@ -1100,6 +1103,7 @@ namespace ModularEncountersSpawner.Spawners {
 			return null;
 
 		}
+		*/
 
 		public static bool IsIdentityNPC(long id) {
 

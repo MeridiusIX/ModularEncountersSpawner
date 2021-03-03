@@ -25,6 +25,7 @@ using VRageMath;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
+using ModularEncountersSpawner.World;
 
 namespace ModularEncountersSpawner {
 

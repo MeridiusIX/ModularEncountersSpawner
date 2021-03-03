@@ -10,6 +10,8 @@ using VRageMath;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Manipulation;
+using ModularEncountersSpawner.World;
+using ModularEncountersSpawner.Zones;
 
 namespace ModularEncountersSpawner.Spawners {
 
@@ -307,6 +309,7 @@ namespace ModularEncountersSpawner.Spawners {
 					altitudeFromMid = SpawnResources.GetRandomPathDist(altitudeFromMid * -1, altitudeFromMid);
 
 				var tempStartPath = upDir * altitudeFromMid + midPointSurface;
+				var customAltitudeStart = spawnGroup.CustomPathStartAltitude > -1 ? spawnGroup.CustomPathStartAltitude * upDir + midPointSurface : Vector3D.Zero;
 
 				if (!spawnGroup.SkipAirDensityCheck) {
 
@@ -340,7 +343,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 				}
 				
-				if(SpawnResources.IsPositionNearEntities(tempStartPath, Settings.PlanetaryCargoShips.MinSpawnFromGrids) == true){
+				if(SpawnResources.IsPositionNearEntities(customAltitudeStart != Vector3D.Zero ? customAltitudeStart : tempStartPath, Settings.PlanetaryCargoShips.MinSpawnFromGrids) == true){
 					
 					continue;
 					
@@ -350,6 +353,14 @@ namespace ModularEncountersSpawner.Spawners {
 				
 				//Get Ending Point
 				var randPathDir = SpawnResources.GetRandomCompassDirection(tempStartPath, environment.NearestPlanet);
+
+				if (spawnGroup.CargoShipTerrainPath) {
+
+					var customPathMatrix = MatrixD.CreateWorld(startCoords, randDirFromPlayer, Vector3D.Normalize(startCoords - environment.NearestPlanet.PositionComp.WorldAABB.Center));
+					randPathDir = customPathMatrix.Right;
+
+				}
+				
 				var randPathDist = SpawnResources.GetRandomPathDist(Settings.PlanetaryCargoShips.MinPathDistance, Settings.PlanetaryCargoShips.MaxPathDistance);
 				var endPathA = randPathDir * randPathDist + tempStartPath;
 				var endPathB = -randPathDir * randPathDist + tempStartPath;
@@ -372,85 +383,169 @@ namespace ModularEncountersSpawner.Spawners {
 				
 				//Check Path
 				var tempMatrix = MatrixD.CreateWorld(tempStartPath, randPathDir, upDir);
+				var tempCustomPathMatrix = MatrixD.CreateWorld(customAltitudeStart, randPathDir, upDir);
 				var truePathDir = Vector3D.Normalize(tempEndPath - tempStartPath);
 				bool badPath = false;
 				
 				foreach(var prefab in spawnGroup.SpawnGroup.Prefabs){
-					
+
 					var modifiedStart = Vector3D.Transform((Vector3D)prefab.Position, tempMatrix);
 					double totalSteps = 0;
-					
-					while(totalSteps < randPathDist){
-						
-						var testPath = totalSteps * truePathDir + modifiedStart;
-						
-						if(SpawnResources.IsPositionInSafeZone(testPath) == true){
-							
-							badPath = true;
-							break;
-							
-						}
-						
-						if(SpawnResources.GetDistanceFromSurface(testPath, environment.NearestPlanet) < Settings.PlanetaryCargoShips.MinPathAltitude){
-							
-							badPath = true;
-							break;
-							
-						}
 
-						if (environment.PlanetWater != null) {
+					if (!spawnGroup.CargoShipTerrainPath || customAltitudeStart == Vector3D.Zero) {
 
-							var pathToWaterDist = Vector3D.Distance(testPath, environment.PlanetWater.GetClosestSurfacePoint(testPath));
+						//Regular Aerial Path
+						while (totalSteps < randPathDist) {
 
-							if (environment.PlanetWater.IsUnderwater(testPath) || pathToWaterDist < Settings.PlanetaryCargoShips.MinPathAltitude) {
+							var testPath = totalSteps * truePathDir + modifiedStart;
+
+							if (SpawnResources.IsPositionInSafeZone(testPath) == true) {
 
 								badPath = true;
 								break;
 
 							}
 
-						}
+							if (SpawnResources.GetDistanceFromSurface(testPath, environment.NearestPlanet) < Settings.PlanetaryCargoShips.MinPathAltitude) {
 
-						totalSteps += Settings.PlanetaryCargoShips.PathStepCheckDistance;
-						
-					}
+								badPath = true;
+								break;
 
-					if (!badPath) {
-
-						var doublePathDist = pathDist * 2;
-						var box = new BoundingBoxD(new Vector3D(-1,-1,-1) + tempStartPath, new Vector3D(1, 1, 1) + tempEndPath);
-
-						foreach (var entity in SpawnResources.EntityList) {
-
-							if (Vector3D.Distance(entity.GetPosition(), tempStartPath) > doublePathDist) {
-
-								continue;
-							
 							}
 
-							if (entity.WorldAABB.Contains(box) != ContainmentType.Disjoint) {
+							if (environment.PlanetWater != null) {
 
-								var planet = entity as MyPlanet;
+								var pathToWaterDist = Vector3D.Distance(testPath, environment.PlanetWater.GetClosestSurfacePoint(testPath));
 
-								if (planet != null)
-									continue;
-
-								var grid = entity as IMyCubeGrid;
-								var voxel = entity as IMyVoxelBase;
-
-								if (grid != null || voxel != null) {
+								if (environment.PlanetWater.IsUnderwater(testPath) || pathToWaterDist < Settings.PlanetaryCargoShips.MinPathAltitude) {
 
 									badPath = true;
 									break;
-								
+
 								}
-							
+
 							}
-						
+
+							totalSteps += Settings.PlanetaryCargoShips.PathStepCheckDistance;
+
 						}
-					
+
+						if (!badPath) {
+
+							var doublePathDist = pathDist * 2;
+							var box = new BoundingBoxD(new Vector3D(-1, -1, -1) + tempStartPath, new Vector3D(1, 1, 1) + tempEndPath);
+
+							foreach (var entity in SpawnResources.EntityList) {
+
+								if (Vector3D.Distance(entity.GetPosition(), tempStartPath) > doublePathDist) {
+
+									continue;
+
+								}
+
+								if (entity.WorldAABB.Contains(box) != ContainmentType.Disjoint) {
+
+									var planet = entity as MyPlanet;
+
+									if (planet != null)
+										continue;
+
+									var grid = entity as IMyCubeGrid;
+									var voxel = entity as IMyVoxelBase;
+
+									if (grid != null || voxel != null) {
+
+										badPath = true;
+										break;
+
+									}
+
+								}
+
+							}
+
+						}
+
+
+					} else {
+
+						//Terrain Path
+						var modifiedStartSurface = environment.NearestPlanet.GetClosestSurfacePointGlobal(modifiedStart);
+						modifiedStart = upDir * spawnGroup.CustomPathStartAltitude + modifiedStartSurface;
+
+						while (totalSteps < randPathDist) {
+
+							var testPath = totalSteps * truePathDir + modifiedStart;
+							var testPathSurface = environment.NearestPlanet.GetClosestSurfacePointGlobal(testPath);
+							var actualPathSurface = Vector3D.Normalize(testPathSurface - environment.NearestPlanet.PositionComp.WorldAABB.Center) * spawnGroup.CustomPathStartAltitude + testPathSurface;
+
+							if (SpawnResources.IsPositionInSafeZone(testPath) == true) {
+
+								badPath = true;
+								break;
+
+							}
+
+							if (!spawnGroup.SkipAirDensityCheck) {
+
+								var air = environment.NearestPlanet.GetAirDensity(actualPathSurface);
+
+								if (air < Settings.PlanetaryCargoShips.MinAirDensity) {
+
+									badPath = true;
+									break;
+
+								}
+
+							}
+
+							totalSteps += Settings.PlanetaryCargoShips.PathStepCheckDistance;
+
+						}
+
+						if (!badPath) {
+
+							var points = new List<Vector3D>();
+							points.Add(tempStartPath);
+							points.Add(modifiedStart);
+							points.Add(truePathDir * randPathDist + modifiedStart);
+							points.Add(truePathDir * randPathDist + tempStartPath);
+
+							var box = BoundingBoxD.CreateFromPoints(points);
+							var doublePathDist = pathDist * 2;
+
+							foreach (var entity in SpawnResources.EntityList) {
+
+								if (Vector3D.Distance(entity.GetPosition(), tempStartPath) > doublePathDist) {
+
+									continue;
+
+								}
+
+								if (entity.WorldAABB.Contains(box) != ContainmentType.Disjoint) {
+
+									var planet = entity as MyPlanet;
+
+									if (planet != null)
+										continue;
+
+									var grid = entity as IMyCubeGrid;
+
+									if (grid != null) {
+
+										badPath = true;
+										break;
+
+									}
+
+								}
+
+							}
+
+						}
+
 					}
-					
+
 					if(badPath == true){
 						
 						break;
@@ -466,7 +561,24 @@ namespace ModularEncountersSpawner.Spawners {
 				}
 				
 				startPathCoords = tempStartPath;
+
+				if (spawnGroup.CustomPathStartAltitude > -1) {
+
+					var surface = environment.NearestPlanet.GetClosestSurfacePointGlobal(startPathCoords);
+					startPathCoords = Vector3D.Normalize(surface - environment.NearestPlanet.PositionComp.WorldAABB.Center) * spawnGroup.CustomPathStartAltitude + surface;
+					tempMatrix.Translation = startPathCoords;
+
+				}
+
 				endPathCoords = tempEndPath;
+
+				if (spawnGroup.CustomPathEndAltitude > -1) {
+
+					var surface = environment.NearestPlanet.GetClosestSurfacePointGlobal(endPathCoords);
+					startPathCoords = Vector3D.Normalize(surface - environment.NearestPlanet.PositionComp.WorldAABB.Center) * spawnGroup.CustomPathEndAltitude + surface;
+
+				}
+
 				startMatrix = tempMatrix;
 				return true;
 				

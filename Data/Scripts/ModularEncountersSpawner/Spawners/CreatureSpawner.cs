@@ -12,6 +12,7 @@ using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using Sandbox.Game;
 using VRage.Game;
+using ModularEncountersSpawner.Zones;
 
 namespace ModularEncountersSpawner.Spawners {
 

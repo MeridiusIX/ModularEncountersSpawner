@@ -1,4 +1,5 @@
 ﻿using ModularEncountersSpawner.Configuration;
+using ModularEncountersSpawner.World;
 using Sandbox.Common.ObjectBuilders;
 using Sandbox.ModAPI;
 using System;

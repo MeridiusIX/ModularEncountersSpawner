@@ -26,6 +26,8 @@ using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Api;
 using ModularEncountersSpawner.Manipulation;
+using ModularEncountersSpawner.World;
+using ModularEncountersSpawner.Zones;
 
 namespace ModularEncountersSpawner.Spawners {
 
@@ -312,25 +314,13 @@ namespace ModularEncountersSpawner.Spawners {
 				//Realign to Terrain
 				var offsetSurfaceCoords = SpawnResources.GetNearestSurfacePoint(spawnPosition, planet);
 
-				if (MES_SessionCore.Instance.WaterMod.Registered && spawnGroup.InstallationSpawnsOnWaterSurface) {
+				if (WaterHelper.Enabled && spawnGroup.InstallationSpawnsOnWaterSurface) {
 
-					for (int j = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; j >= 0; j++) {
+					var water = WaterHelper.GetWater(planet);
 
-						if (j >= MES_SessionCore.Instance.WaterMod.Waters.Count)
-							continue;
+					if (water != null && WaterHelper.IsPositionUnderwater(offsetSurfaceCoords, water)) {
 
-						var water = MES_SessionCore.Instance.WaterMod.Waters[j];
-
-						if (water.planetID != planet.EntityId)
-							continue;
-
-						if (water.IsUnderwater(offsetSurfaceCoords)) {
-
-							offsetSurfaceCoords = water.GetClosestSurfacePoint(offsetSurfaceCoords);
-
-						}
-
-						break;
+						offsetSurfaceCoords = WaterHelper.GetClosestSurface(offsetSurfaceCoords, planet, water);
 
 					}
 
@@ -839,23 +829,12 @@ namespace ModularEncountersSpawner.Spawners {
 			bool doWaterChecks = false;
 			Water localWater = null;
 
-			if (MES_SessionCore.Instance.WaterMod.Registered) {
+			if (WaterHelper.Enabled) {
 
-				for (int i = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; i >= 0; i--) {
+				localWater = WaterHelper.GetWater(planet);
 
-					if (i >= MES_SessionCore.Instance.WaterMod.Waters.Count)
-						continue;
-
-					var water = MES_SessionCore.Instance.WaterMod.Waters[i];
-
-					if (water.planetID != planet.EntityId)
-						continue;
-
+				if(localWater != null)
 					doWaterChecks = true;
-					localWater = water;
-					break;
-
-				}
 
 			}
 			
@@ -905,7 +884,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 					if (doWaterChecks) {
 
-						var surfaceUnderwater = localWater.IsUnderwater(surfaceCoords);
+						var surfaceUnderwater = WaterHelper.IsPositionUnderwater(surfaceCoords, localWater);
 
 						if (surfaceUnderwater && !spawnGroup.InstallationSpawnsOnWaterSurface && !spawnGroup.InstallationSpawnsUnderwater) {
 
@@ -923,7 +902,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 						if (surfaceUnderwater && spawnGroup.InstallationSpawnsUnderwater && spawnGroup.MinWaterDepth > 0) {
 
-							var waterSurfaceCoords = localWater.GetClosestSurfacePoint(surfaceCoords);
+							var waterSurfaceCoords = WaterHelper.GetClosestSurface(surfaceCoords, planet, localWater);
 							var surfaceToWaterDist = Vector3D.Distance(surfaceCoords, waterSurfaceCoords);
 
 							if (surfaceToWaterDist < spawnGroup.MinWaterDepth) {
@@ -998,7 +977,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 								} else {
 
-									var pointUnderwater = localWater.IsUnderwater(checkTerrainSurfaceCoords);
+									var pointUnderwater = WaterHelper.IsPositionUnderwater(checkTerrainSurfaceCoords, localWater);
 
 									if (!pointUnderwater) {
 
@@ -1007,7 +986,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 									}
 
-									var pointSurfaceWater = localWater.GetClosestSurfacePoint(checkTerrainSurfaceCoords);
+									var pointSurfaceWater = WaterHelper.GetClosestSurface(checkTerrainSurfaceCoords, planet, localWater);
 
 									if (Vector3D.Distance(pointSurfaceWater, checkTerrainSurfaceCoords) < spawnGroup.MinWaterDepth) {
 

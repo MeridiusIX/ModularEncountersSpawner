@@ -24,29 +24,29 @@ using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
 
-namespace ModularEncountersSpawner {
-	
-	public static class RandomNameGenerator{
-		
+namespace ModularEncountersSpawner.Manipulation {
+
+	public static class RandomNameGenerator {
+
 		public static Random Rnd = new Random();
-		
+
 		public static string CharStringAll = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		public static string CharStringNumbers = "0123456789";
 		public static string CharStringLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		
+
 		public static string[] GoodAdjectives = {
 
-			"Gilded", 
-			"Privilaged", 
-			"Honorable", 
-			"Heroic", 
-			"Brave", 
-			"Giddy", 
-			"Happy",	
-			"Kind",	
-			"Determined", 
-			"Excited", 
-			"Satisfied", 
+			"Gilded",
+			"Privilaged",
+			"Honorable",
+			"Heroic",
+			"Brave",
+			"Giddy",
+			"Happy",
+			"Kind",
+			"Determined",
+			"Excited",
+			"Satisfied",
 			"Patriotic",
 			"Wishful"
 		};
@@ -86,7 +86,7 @@ namespace ModularEncountersSpawner {
 			"Unwelcome",
 			"Wicked"
 		};
-		
+
 		public static string[] FunnyAdjectives = {
 
 			"Goofy",
@@ -102,7 +102,7 @@ namespace ModularEncountersSpawner {
 			"Horny",
 			"Whiny"
 		};
-		
+
 		public static string[] ColorAdjectives = {
 
 			"Red",
@@ -121,7 +121,7 @@ namespace ModularEncountersSpawner {
 			"White"
 
 		};
-		
+
 		public static string[] GoodNouns = {
 
 			"Victory",
@@ -148,9 +148,9 @@ namespace ModularEncountersSpawner {
 			"Discipline",
 			"Redemption",
 			"Advantage"
-			
+
 		};
-		
+
 		public static string[] NeutralNouns = {
 
 			"Caution",
@@ -171,9 +171,9 @@ namespace ModularEncountersSpawner {
 			"Eon",
 			"Epoch",
 			"Climate"
-			
+
 		};
-		
+
 		public static string[] BadNouns = {
 
 			"Malice",
@@ -199,11 +199,11 @@ namespace ModularEncountersSpawner {
 			"Darkness",
 			"Plague",
 			"Vice"
-			
+
 		};
-		
-		
-		
+
+
+
 		public static string[] FunnyNouns = {
 
 			"Trickery",
@@ -212,9 +212,9 @@ namespace ModularEncountersSpawner {
 			"Left-Overs",
 			"Dirty-Laundry",
 			"Private-Stash"
-			
+
 		};
-		
+
 		public static string[] AuthorityNouns = {
 
 			"Ambassador",
@@ -233,7 +233,7 @@ namespace ModularEncountersSpawner {
 			"Bishop",
 			"Administrator"
 		};
-		
+
 		public static string[] MilitaryNouns = {
 
 			"Officer",
@@ -249,9 +249,9 @@ namespace ModularEncountersSpawner {
 			"Sergeant",
 			"Major",
 			"Corporal"
-			
+
 		};
-		
+
 		public static string[] BaddieNouns = {
 
 			"Scoundrel",
@@ -275,7 +275,7 @@ namespace ModularEncountersSpawner {
 			"Malcontent",
 			"Interloper"
 		};
-		
+
 		public static string[] ExplorerNouns = {
 
 			"Explorer",
@@ -286,9 +286,9 @@ namespace ModularEncountersSpawner {
 			"Nomad",
 			"Scavenger",
 			"Prospector",
-			"Navigator"			
+			"Navigator"
 		};
-		
+
 		public static string[] JobNouns = {
 
 			"Courier",
@@ -304,7 +304,7 @@ namespace ModularEncountersSpawner {
 			"Nurse",
 			"Janitor"
 		};
-		
+
 		public static string[] BirdNouns = {
 
 			"Pigeon",
@@ -322,7 +322,7 @@ namespace ModularEncountersSpawner {
 			"Heron",
 			"Vulture",
 			"Woodpecker"
-			
+
 		};
 		public static string[] AnimalNouns = {
 
@@ -345,7 +345,7 @@ namespace ModularEncountersSpawner {
 			"Mouse",
 			"Badger",
 			"Hound"
-			
+
 		};
 		public static string[] FishNouns = {
 
@@ -374,7 +374,7 @@ namespace ModularEncountersSpawner {
 			"Megalodon"
 
 		};
-		
+
 		public static string[] InsectNouns = {
 
 			"Bee",
@@ -395,11 +395,11 @@ namespace ModularEncountersSpawner {
 			"Cricket",
 			"Tarantula",
 			"Mosquito"
-			
+
 		};
-		
+
 		public static string[] Surnames = {
-			
+
 			"Smith",
 			"Johnson",
 			"Williams",
@@ -453,9 +453,9 @@ namespace ModularEncountersSpawner {
 			"Harding",
 			"Langille",
 			"Lancaster"
-			
+
 		};
-		
+
 		public static string[] NatoLetter = {
 
 			"Alpha",
@@ -486,7 +486,7 @@ namespace ModularEncountersSpawner {
 			"Zulu"
 
 		};
-		
+
 		public static string[] GreekLetter = {
 
 			"Alpha",
@@ -515,8 +515,8 @@ namespace ModularEncountersSpawner {
 			"Omega"
 
 		};
-		
-		
+
+
 
 		public static string CreateRandomNameFromPattern(string pattern) {
 
@@ -582,11 +582,11 @@ namespace ModularEncountersSpawner {
 					result = ReplaceFirstOccurence(keyword, randString, result);
 
 				}
-			
+
 			}
 
 			return result;
-		
+
 		}
 
 		public static string ProcessCharString(string existingString, string keyword, string wordArray, bool handleOwnership = false) {

@@ -1,39 +1,19 @@
+using ModularEncountersSpawner.Configuration;
+using ModularEncountersSpawner.Spawners;
+using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.World;
+using Sandbox.Common.ObjectBuilders;
+using Sandbox.Common.ObjectBuilders.Definitions;
+using Sandbox.Definitions;
+using Sandbox.ModAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Sandbox.Common;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.Definitions;
-using Sandbox.Definitions;
-using Sandbox.Game;
-using Sandbox.Game.Entities;
-using Sandbox.Game.EntityComponents;
-using Sandbox.Game.GameSystems;
-using Sandbox.Game.Lights;
-using Sandbox.Game.Weapons;
-using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using Sandbox.ModAPI.Interfaces.Terminal;
-using SpaceEngineers.Game.ModAPI;
-using ProtoBuf;
-using VRage;
 using VRage.Game;
-using VRage.Game.Components;
-using VRage.Game.Entity;
 using VRage.Game.ModAPI;
-using VRage.Game.ModAPI.Interfaces;
-using VRage.ModAPI;
-using VRage.ObjectBuilders;
-using VRage.Game.ObjectBuilders.Definitions;
-using VRage.Utils;
-using VRageMath;
-using ModularEncountersSpawner.Templates;
-using ModularEncountersSpawner.Spawners;
-using ModularEncountersSpawner.Configuration;
 
-namespace ModularEncountersSpawner {
+namespace ModularEncountersSpawner.Helpers {
 
 	public static class EconomyHelper {
 
@@ -42,9 +22,9 @@ namespace ModularEncountersSpawner {
 		public static Dictionary<MyDefinitionId, int> ComponentMinimumValues = new Dictionary<MyDefinitionId, int>();
 		public static Dictionary<MyDefinitionId, int> OtherItemMinimumValues = new Dictionary<MyDefinitionId, int>();
 		public static Dictionary<MyDefinitionId, int> BlockMinimumValues = new Dictionary<MyDefinitionId, int>();
-		
+
 		public static Dictionary<MyDefinitionId, int> MinimumValuesMaster = new Dictionary<MyDefinitionId, int>();
-		
+
 		public static List<MyDefinitionId> ItemsWithBadValue = new List<MyDefinitionId>();
 		public static List<MyDefinitionId> ForbiddenItems = new List<MyDefinitionId>();
 		public static List<MyBlueprintDefinitionBase> UsedBlueprints = new List<MyBlueprintDefinitionBase>();
@@ -58,10 +38,10 @@ namespace ModularEncountersSpawner {
 
 			//Build Lists of Ore, Ingot, Component Values
 			var allItems = MyDefinitionManager.Static.GetPhysicalItemDefinitions();
-			
-			foreach(var item in allItems){
 
-				if(ForbiddenItems.Contains(item.Id) == true) {
+			foreach (var item in allItems) {
+
+				if (ForbiddenItems.Contains(item.Id) == true) {
 
 					continue;
 
@@ -71,54 +51,54 @@ namespace ModularEncountersSpawner {
 
 				UsedBlueprints.Clear();
 
-				if(item.Id.TypeId == typeof(MyObjectBuilder_Ore)){
-					
+				if (item.Id.TypeId == typeof(MyObjectBuilder_Ore)) {
+
 					int itemPrice = 0;
-					
-					if(OreMinimumValues.ContainsKey(item.Id) == false){
-						
+
+					if (OreMinimumValues.ContainsKey(item.Id) == false) {
+
 						itemPrice = CalculateItemMinimalPrice(item.Id, 1f);
 						OreMinimumValues.Add(item.Id, itemPrice);
 						AddToMasterReference(item.Id, itemPrice);
-						
+
 					}
-					
+
 				}
-				
-				if(item.Id.TypeId == typeof(MyObjectBuilder_Ingot)){
-					
+
+				if (item.Id.TypeId == typeof(MyObjectBuilder_Ingot)) {
+
 					int itemPrice = 0;
-					
-					if(IngotMinimumValues.ContainsKey(item.Id) == false){
-						
+
+					if (IngotMinimumValues.ContainsKey(item.Id) == false) {
+
 						itemPrice = CalculateItemMinimalPrice(item.Id, 1f);
 						IngotMinimumValues.Add(item.Id, itemPrice);
 						AddToMasterReference(item.Id, itemPrice);
-						
+
 					}
-					
+
 				}
-				
-				if(item.Id.TypeId == typeof(MyObjectBuilder_Component)){
-					
+
+				if (item.Id.TypeId == typeof(MyObjectBuilder_Component)) {
+
 					int itemPrice = 0;
-					
-					if(ComponentMinimumValues.ContainsKey(item.Id) == false){
-						
+
+					if (ComponentMinimumValues.ContainsKey(item.Id) == false) {
+
 						itemPrice = CalculateItemMinimalPrice(item.Id, 1f);
 						ComponentMinimumValues.Add(item.Id, itemPrice);
 						AddToMasterReference(item.Id, itemPrice);
-						
+
 					}
 
 				}
 
 				//TODO: Add Tools, Weapon, Bottles, Health/Energy, Zonechips?, Datapads?
-				if(item.Id.TypeId == typeof(MyObjectBuilder_PhysicalGunObject)) {
+				if (item.Id.TypeId == typeof(MyObjectBuilder_PhysicalGunObject)) {
 
 					int itemPrice = 0;
 
-					if(MinimumValuesMaster.ContainsKey(item.Id) == false) {
+					if (MinimumValuesMaster.ContainsKey(item.Id) == false) {
 
 						itemPrice = CalculateItemMinimalPrice(item.Id, 1f);
 						OtherItemMinimumValues.Add(item.Id, itemPrice);
@@ -128,11 +108,11 @@ namespace ModularEncountersSpawner {
 
 				}
 
-				if(item.Id.TypeId == typeof(MyObjectBuilder_GasContainerObject)) {
+				if (item.Id.TypeId == typeof(MyObjectBuilder_GasContainerObject)) {
 
 					int itemPrice = 0;
 
-					if(MinimumValuesMaster.ContainsKey(item.Id) == false) {
+					if (MinimumValuesMaster.ContainsKey(item.Id) == false) {
 
 						itemPrice = CalculateItemMinimalPrice(item.Id, 1f);
 						OtherItemMinimumValues.Add(item.Id, itemPrice);
@@ -142,11 +122,11 @@ namespace ModularEncountersSpawner {
 
 				}
 
-				if(item.Id.TypeId == typeof(MyObjectBuilder_OxygenContainerObject)) {
+				if (item.Id.TypeId == typeof(MyObjectBuilder_OxygenContainerObject)) {
 
 					int itemPrice = 0;
 
-					if(MinimumValuesMaster.ContainsKey(item.Id) == false) {
+					if (MinimumValuesMaster.ContainsKey(item.Id) == false) {
 
 						itemPrice = CalculateItemMinimalPrice(item.Id, 1f);
 						OtherItemMinimumValues.Add(item.Id, itemPrice);
@@ -156,11 +136,11 @@ namespace ModularEncountersSpawner {
 
 				}
 
-				if(item.Id.TypeId == typeof(MyObjectBuilder_ConsumableItem)) {
+				if (item.Id.TypeId == typeof(MyObjectBuilder_ConsumableItem)) {
 
 					int itemPrice = 0;
 
-					if(MinimumValuesMaster.ContainsKey(item.Id) == false) {
+					if (MinimumValuesMaster.ContainsKey(item.Id) == false) {
 
 						itemPrice = CalculateItemMinimalPrice(item.Id, 1f);
 						OtherItemMinimumValues.Add(item.Id, itemPrice);
@@ -170,11 +150,11 @@ namespace ModularEncountersSpawner {
 
 				}
 
-				if(item.Id.TypeId == typeof(MyObjectBuilder_Datapad)) {
+				if (item.Id.TypeId == typeof(MyObjectBuilder_Datapad)) {
 
 					int itemPrice = 0;
 
-					if(MinimumValuesMaster.ContainsKey(item.Id) == false) {
+					if (MinimumValuesMaster.ContainsKey(item.Id) == false) {
 
 						itemPrice = CalculateItemMinimalPrice(item.Id, 1f);
 						OtherItemMinimumValues.Add(item.Id, itemPrice);
@@ -185,60 +165,60 @@ namespace ModularEncountersSpawner {
 				}
 
 			}
-			
+
 			//Build List of Block Values
 			var allDefinitions = MyDefinitionManager.Static.GetAllDefinitions();
 			var definitions = new List<MyDefinitionBase>();
-			
-			foreach(var definition in allDefinitions.ToList().Where(x => x as MyCubeBlockDefinition != null)){
-				
-				if(BlockMinimumValues.ContainsKey(definition.Id)){
-					
+
+			foreach (var definition in allDefinitions.ToList().Where(x => x as MyCubeBlockDefinition != null)) {
+
+				if (BlockMinimumValues.ContainsKey(definition.Id)) {
+
 					continue;
-					
+
 				}
-				
+
 				var blockDefinition = definition as MyCubeBlockDefinition;
 				int totalCost = 0;
 				bool badItemValue = false;
-				
-				foreach(var component in blockDefinition.Components){
-					
+
+				foreach (var component in blockDefinition.Components) {
+
 					int componentValue = 0;
-					
-					if(ComponentMinimumValues.TryGetValue(component.Definition.Id, out componentValue) == true){
-						
+
+					if (ComponentMinimumValues.TryGetValue(component.Definition.Id, out componentValue) == true) {
+
 						totalCost += componentValue * component.Count;
-						
+
 					}
-					
-					if(componentValue == 0 || ItemsWithBadValue.Contains(component.Definition.Id)){
-						
+
+					if (componentValue == 0 || ItemsWithBadValue.Contains(component.Definition.Id)) {
+
 						badItemValue = true;
-						
+
 					}
-					
+
 				}
-				
+
 				BlockMinimumValues.Add(blockDefinition.Id, totalCost);
-				
-				if(badItemValue == true){
-					
+
+				if (badItemValue == true) {
+
 					ItemsWithBadValue.Add(blockDefinition.Id);
-					
+
 				}
-				
+
 			}
 
-			if(Logger.LoggerDebugMode == true) {
+			if (Logger.LoggerDebugMode == true) {
 
-				foreach(var itemId in MinimumValuesMaster.Keys) {
+				foreach (var itemId in MinimumValuesMaster.Keys) {
 
 					Logger.AddMsg("EV - " + itemId.ToString() + " = " + MinimumValuesMaster[itemId].ToString(), true);
 
 				}
 
-				foreach(var itemId in ItemsWithBadValue) {
+				foreach (var itemId in ItemsWithBadValue) {
 
 					Logger.AddMsg("BV - " + itemId.ToString(), true);
 
@@ -247,17 +227,17 @@ namespace ModularEncountersSpawner {
 			}
 
 		}
-		
-		public static void AddToMasterReference(MyDefinitionId id, int amount){
-			
-			if(MinimumValuesMaster.ContainsKey(id) == false){
-				
+
+		public static void AddToMasterReference(MyDefinitionId id, int amount) {
+
+			if (MinimumValuesMaster.ContainsKey(id) == false) {
+
 				MinimumValuesMaster.Add(id, amount);
-				
+
 			}
-			
+
 		}
-		
+
 		public static int CalculateItemMinimalPrice(MyDefinitionId itemId, float baseCostProductionSpeedMultiplier) {
 
 			try {
@@ -307,7 +287,7 @@ namespace ModularEncountersSpawner {
 
 					int minimalPrice2 = CalculateItemMinimalPrice(item.Id, baseCostProductionSpeedMultiplier);
 					float num3 = (float)item.Amount / num;
-					num2 += (int)((float)minimalPrice2 * num3);
+					num2 += (int)(minimalPrice2 * num3);
 
 					if (minimalPrice2 <= 0) {
 
@@ -360,7 +340,7 @@ namespace ModularEncountersSpawner {
 
 				float num6 = (float)item2.Amount;
 				float num7 = 1f + (float)Math.Log(definition2.BaseProductionTimeInSeconds + 1f) * baseCostProductionSpeedMultiplier / num4;
-				minimalPrice += (int)((float)num2 * (1f / num6) * num7);
+				minimalPrice += (int)(num2 * (1f / num6) * num7);
 				return minimalPrice;
 
 			} catch (Exception e) {
@@ -373,8 +353,8 @@ namespace ModularEncountersSpawner {
 			return -1;
 
 		}
-		
-		public static void InitNpcStoreBlock(IMyCubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup){
+
+		public static void InitNpcStoreBlock(IMyCubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup) {
 
 			var errorLog = new StringBuilder();
 			errorLog.Append("Starting Store Block Init For Grid").AppendLine();
@@ -382,14 +362,14 @@ namespace ModularEncountersSpawner {
 			try {
 
 				errorLog.Append(" - Check if Grid Exists").AppendLine();
-				if(cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
+				if (cubeGrid == null || MyAPIGateway.Entities.Exist(cubeGrid) == false) {
 
 					return;
 
 				}
 
 				errorLog.Append(" - Check if Grid Is Active NPC").AppendLine();
-				if(NPCWatcher.ActiveNPCs.ContainsKey(cubeGrid) == false) {
+				if (NPCWatcher.ActiveNPCs.ContainsKey(cubeGrid) == false) {
 
 					return;
 
@@ -402,20 +382,20 @@ namespace ModularEncountersSpawner {
 				var gastankList = new List<IMyGasTank>();
 				cubeGrid.GetBlocks(blockList);
 
-				foreach(var block in blockList.Where(x => x.FatBlock != null)) {
+				foreach (var block in blockList.Where(x => x.FatBlock != null)) {
 
 					var storeBlock = block.FatBlock as IMyStoreBlock;
 					var cargo = block.FatBlock as IMyCargoContainer;
 					var gasTank = block.FatBlock as IMyGasTank;
 
-					if(storeBlock != null) {
+					if (storeBlock != null) {
 
 						errorLog.Append("   - Found Store Block " + storeBlock.EntityId.ToString()).AppendLine();
 						storeBlockList.Add(storeBlock);
 
 					}
 
-					if(cargo != null) {
+					if (cargo != null) {
 
 						errorLog.Append("   - Found Container Block " + cargo.EntityId.ToString()).AppendLine();
 						containerList.Add(cargo);
@@ -438,7 +418,7 @@ namespace ModularEncountersSpawner {
 				errorLog.Append(" - Processing Store Blocks").AppendLine();
 
 				//Process Stores
-				foreach(var store in storeBlockList) {
+				foreach (var store in storeBlockList) {
 
 					errorLog.Append("   - Check If Store Inventory Exists").AppendLine();
 					var storeInv = store.GetInventory();
@@ -452,13 +432,13 @@ namespace ModularEncountersSpawner {
 						var ob = (MyObjectBuilder_StoreBlock)store.SlimBlock.GetObjectBuilder();
 
 						errorLog.Append("      - Check If ObjectBuilder Null" + store.EntityId.ToString()).AppendLine();
-						if(ob != null) {
+						if (ob != null) {
 
 							//var existingIdList = new List<long>();
 
-							if(ob.PlayerItems != null) {
+							if (ob.PlayerItems != null) {
 
-								foreach(var item in ob.PlayerItems.ToList()) {
+								foreach (var item in ob.PlayerItems.ToList()) {
 
 									store.CancelStoreItem(item.Id);
 
@@ -467,11 +447,11 @@ namespace ModularEncountersSpawner {
 							}
 
 						}
-						
-					}catch(Exception exc){
-						
+
+					} catch (Exception exc) {
+
 						errorLog.Append("      - Exception Encountered, Probably One Of Those Troublesome ATMs" + store.EntityId.ToString()).AppendLine();
-						
+
 					}
 
 					var itemsAvailable = new Dictionary<MyDefinitionId, int>();
@@ -480,12 +460,12 @@ namespace ModularEncountersSpawner {
 
 					errorLog.Append("   - Check Items In Store Inventory To Sell").AppendLine();
 
-					foreach(var item in storeitemList) {
+					foreach (var item in storeitemList) {
 
 						var itemDefId = new MyDefinitionId(item.Content.TypeId, item.Content.SubtypeId);
 						//Logger.AddMsg("Item: " + itemDefId.ToString(), true);
 
-						if(itemDefId.SubtypeName == "SpaceCredit") {
+						if (itemDefId.SubtypeName == "SpaceCredit") {
 
 							continue;
 
@@ -494,7 +474,7 @@ namespace ModularEncountersSpawner {
 						var amount = (float)item.Amount;
 						int amountRounded = (int)Math.Floor(amount);
 
-						if(itemsAvailable.ContainsKey(itemDefId) == false) {
+						if (itemsAvailable.ContainsKey(itemDefId) == false) {
 
 							itemsAvailable.Add(itemDefId, amountRounded);
 
@@ -557,11 +537,11 @@ namespace ModularEncountersSpawner {
 					errorLog.Append("   - Check Items in Attached Cargo Containers To Sell").AppendLine();
 
 					//Get Items For Offers
-					foreach(var cargo in containerList) {
+					foreach (var cargo in containerList) {
 
 						//Logger.AddMsg("Checking Cargo Container On: " + cargo.CubeGrid.CustomName);
 
-						if(usedCargoContainers.Contains(cargo)) {
+						if (usedCargoContainers.Contains(cargo)) {
 
 							continue;
 
@@ -569,7 +549,7 @@ namespace ModularEncountersSpawner {
 
 						var cargoInv = cargo.GetInventory();
 
-						if(cargoInv.IsConnectedTo(storeInv) == false || cargo.IsSameConstructAs(store) == false) {
+						if (cargoInv.IsConnectedTo(storeInv) == false || cargo.IsSameConstructAs(store) == false) {
 
 							continue;
 
@@ -579,12 +559,12 @@ namespace ModularEncountersSpawner {
 
 						var itemList = cargoInv.GetItems();
 
-						foreach(var item in itemList) {
+						foreach (var item in itemList) {
 
 							var itemDefId = new MyDefinitionId(item.Content.TypeId, item.Content.SubtypeId);
 							//Logger.AddMsg("Item: " + itemDefId.ToString(), true);
 
-							if(itemDefId.SubtypeName == "SpaceCredit") {
+							if (itemDefId.SubtypeName == "SpaceCredit") {
 
 								continue;
 
@@ -593,7 +573,7 @@ namespace ModularEncountersSpawner {
 							var amount = (float)item.Amount;
 							int amountRounded = (int)Math.Floor(amount);
 
-							if(itemsAvailable.ContainsKey(itemDefId) == false) {
+							if (itemsAvailable.ContainsKey(itemDefId) == false) {
 
 								itemsAvailable.Add(itemDefId, amountRounded);
 
@@ -607,9 +587,9 @@ namespace ModularEncountersSpawner {
 
 					}
 
-					if(Logger.LoggerDebugMode == true) {
+					if (Logger.LoggerDebugMode == true) {
 
-						foreach(var item in itemsAvailable.Keys) {
+						foreach (var item in itemsAvailable.Keys) {
 
 							Logger.AddMsg("Item For StoreBlock: " + item.ToString() + " - " + itemsAvailable[item], true);
 
@@ -661,10 +641,10 @@ namespace ModularEncountersSpawner {
 					*/
 
 					errorLog.Append("   - Add Each Item To The Store Block").AppendLine();
-					foreach(var item in itemsAvailable.Keys) {
+					foreach (var item in itemsAvailable.Keys) {
 
 						errorLog.Append("     - Checking Item: " + item.ToString()).AppendLine();
-						if(ItemsWithBadValue.Contains(item) || MinimumValuesMaster.ContainsKey(item) == false) {
+						if (ItemsWithBadValue.Contains(item) || MinimumValuesMaster.ContainsKey(item) == false) {
 
 							errorLog.Append("     - Item Has Bad Value According To Economy Helper").AppendLine();
 							Logger.AddMsg(item.ToString() + " has invalid economy value or was not in master reference", true);
@@ -674,7 +654,7 @@ namespace ModularEncountersSpawner {
 
 
 						double markup = 1.2; //TODO: Figure out how reputation affects this
-						int itemValue = (int)Math.Floor((double)MinimumValuesMaster[item] * markup);
+						int itemValue = (int)Math.Floor(MinimumValuesMaster[item] * markup);
 						MyStoreItemData orderData = new MyStoreItemData(item, itemsAvailable[item], itemValue, OnSaleComplete, null);
 						long orderResult = 0;
 						var storeAddResult = store.InsertOffer(orderData, out orderResult);
@@ -698,18 +678,18 @@ namespace ModularEncountersSpawner {
 
 					//Populate Store With Orders
 
-					if(spawnGroup != null) {
+					if (spawnGroup != null) {
 
-						if(spawnGroup.ContainerTypesForStoreOrders.Count > 0) {
+						if (spawnGroup.ContainerTypesForStoreOrders.Count > 0) {
 
 							var containerString = spawnGroup.ContainerTypesForStoreOrders[SpawnResources.rnd.Next(0, spawnGroup.ContainerTypesForStoreOrders.Count)];
 							var containerDef = MyDefinitionManager.Static.GetContainerTypeDefinition(containerString);
 
-							if(containerDef != null) {
+							if (containerDef != null) {
 
-								foreach(var item in containerDef.Items) {
+								foreach (var item in containerDef.Items) {
 
-									if(ItemsWithBadValue.Contains(item.DefinitionId) || MinimumValuesMaster.ContainsKey(item.DefinitionId) == false) {
+									if (ItemsWithBadValue.Contains(item.DefinitionId) || MinimumValuesMaster.ContainsKey(item.DefinitionId) == false) {
 
 										continue;
 
@@ -717,12 +697,12 @@ namespace ModularEncountersSpawner {
 
 									double markup = 1.2;
 									int itemCount = SpawnResources.rnd.Next((int)item.AmountMin, (int)item.AmountMax);
-									int itemValue = (int)Math.Floor((double)MinimumValuesMaster[item.DefinitionId] * markup);
+									int itemValue = (int)Math.Floor(MinimumValuesMaster[item.DefinitionId] * markup);
 									MyStoreItemData orderData = new MyStoreItemData(item.DefinitionId, itemCount, itemValue, null, null);
 									long orderResult = 0;
 									var storeAddResult = store.InsertOrder(orderData, out orderResult);
 
-									if(storeAddResult == Sandbox.ModAPI.Ingame.MyStoreInsertResults.Success && SpawnResources.IsIdentityNPC(store.OwnerId) == true) {
+									if (storeAddResult == Sandbox.ModAPI.Ingame.MyStoreInsertResults.Success && SpawnResources.IsIdentityNPC(store.OwnerId) == true) {
 
 										MyAPIGateway.Players.RequestChangeBalance(store.OwnerId, itemCount * itemValue);
 
@@ -741,18 +721,18 @@ namespace ModularEncountersSpawner {
 
 				}
 
-			} catch(Exception e) {
+			} catch (Exception e) {
 
 				Logger.AddMsg("Init Store Blocks for NPC Grid Failed. Please Provide The Log File To The Modular Encounters Spawner Mod Author:");
 				Logger.AddMsg(errorLog.ToString());
 
 			}
-			
+
 		}
 
 		public static void OnSaleComplete(int amtSold, int amtRemain, long cost, long storeOwner, long customer) {
 
-			if(customer == 0) {
+			if (customer == 0) {
 
 				Logger.AddMsg("Buyer is Nobody", true);
 				return;
@@ -764,7 +744,7 @@ namespace ModularEncountersSpawner {
 			if (faction != null) {
 
 				faction.RequestChangeBalance(cost);
-			
+
 			}
 
 			if (Settings.General.UseEconomyBuyingReputationIncrease == false || customer == 0) {
@@ -778,21 +758,21 @@ namespace ModularEncountersSpawner {
 
 			string saleDataString = "";
 
-			if(MyAPIGateway.Utilities.GetVariable<string>("MES-SaleTracker-" + customer.ToString(), out saleDataString) == true) {
+			if (MyAPIGateway.Utilities.GetVariable("MES-SaleTracker-" + customer.ToString(), out saleDataString) == true) {
 
 				try {
 
 					var saleByteData = Convert.FromBase64String(saleDataString);
 					var saleData = MyAPIGateway.Utilities.SerializeFromBinary<SaleTracker>(saleByteData);
 
-					if(saleData != null) {
+					if (saleData != null) {
 
 						Logger.AddMsg("Got Existing Player Sale Tracker", true);
 						playerSales = saleData;
 
 					}
 
-				} catch(Exception e) {
+				} catch (Exception e) {
 
 
 
@@ -802,7 +782,7 @@ namespace ModularEncountersSpawner {
 
 			long existingAmt = 0;
 
-			if(playerSales.Transactions.TryGetValue(storeOwner, out existingAmt) == false) {
+			if (playerSales.Transactions.TryGetValue(storeOwner, out existingAmt) == false) {
 
 				Logger.AddMsg("First Time Purchase From Faction", true);
 				playerSales.Transactions.Add(storeOwner, 0);
@@ -813,11 +793,11 @@ namespace ModularEncountersSpawner {
 			double dividedAmount = Math.Floor((double)existingAmt / Settings.General.EconomyBuyingReputationCostAmount);
 			Logger.AddMsg("Total Added To Cost: " + existingAmt.ToString(), true);
 
-			if(dividedAmount > 0) {
+			if (dividedAmount > 0) {
 
 				var npcFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(storeOwner);
 
-				if(npcFaction != null) {
+				if (npcFaction != null) {
 
 					Logger.AddMsg("Change Rep", true);
 					var rep = MyAPIGateway.Session.Factions.GetReputationBetweenPlayerAndFaction(customer, npcFaction.FactionId);
@@ -829,12 +809,12 @@ namespace ModularEncountersSpawner {
 			}
 
 			playerSales.Transactions[storeOwner] = existingAmt;
-			var newByteData = MyAPIGateway.Utilities.SerializeToBinary<SaleTracker>(playerSales);
+			var newByteData = MyAPIGateway.Utilities.SerializeToBinary(playerSales);
 			var newStringData = Convert.ToBase64String(newByteData);
-			MyAPIGateway.Utilities.SetVariable<string>("MES-SaleTracker-" + customer.ToString(), newStringData);
+			MyAPIGateway.Utilities.SetVariable("MES-SaleTracker-" + customer.ToString(), newStringData);
 
 		}
 
 	}
-	
+
 }

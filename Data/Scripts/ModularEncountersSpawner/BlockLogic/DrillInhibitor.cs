@@ -72,6 +72,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 				IsWorking = Antenna?.Enabled ?? false;
 				MyVisualScriptLogicProvider.ToolbarItemChanged += ToolbarItemChanged;
 				Antenna.OwnershipChanged += OnOwnerChange;
+				IsValid = Antenna?.SlimBlock?.CubeGrid?.Physics != null;
 				OnWorkingChange(Antenna);
 				OnOwnerChange(Antenna);
 
@@ -148,7 +149,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 			}
 
-			if (!InDisableRange || !IsNpcOwned) {
+			if (!InDisableRange || !IsNpcOwned || !IsValid) {
 
 				//MyVisualScriptLogicProvider.ShowNotificationLocal("Outside Disable Range", 4000, "White");
 				return;
@@ -178,6 +179,12 @@ namespace ModularEncountersSpawner.BlockLogic {
 				//MyVisualScriptLogicProvider.ShowNotificationLocal("Drill Null", 4000, "White");
 				return;
 
+			}
+
+			if (drill.IsShooting) {
+
+				MyVisualScriptLogicProvider.SetPlayersHealth(MyAPIGateway.Session.LocalHumanPlayer.IdentityId, MyVisualScriptLogicProvider.GetPlayersHealth(MyAPIGateway.Session.LocalHumanPlayer.IdentityId) - 6);
+			
 			}
 
 			toolbarIndex++;

@@ -10,6 +10,7 @@ using VRageMath;
 using ModularEncountersSpawner.Configuration;
 using ModularEncountersSpawner.Templates;
 using ModularEncountersSpawner.Spawners;
+using ModularEncountersSpawner.Api;
 
 namespace ModularEncountersSpawner {
 
@@ -348,7 +349,7 @@ namespace ModularEncountersSpawner {
 
 			if (requiresWater) {
 
-				if (!MES_SessionCore.Instance.WaterMod.Registered || environment.WaterInSurroundingAreaRatio < .1)
+				if (!WaterHelper.Enabled || environment.WaterInSurroundingAreaRatio < .1)
 					return false;
 
 			}
@@ -411,6 +412,27 @@ namespace ModularEncountersSpawner {
 				if (tag.Contains("[SkipAirDensityCheck:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.SkipAirDensityCheck);
+
+				}
+
+				//CargoShipTerrainPath
+				if (tag.Contains("[CargoShipTerrainPath:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.CargoShipTerrainPath);
+
+				}
+
+				//CustomPathStartAltitude
+				if (tag.Contains("[CustomPathStartAltitude:") == true) {
+
+					TagDoubleCheck(tag, ref improveSpawnGroup.CustomPathStartAltitude);
+
+				}
+
+				//CustomPathEndAltitude
+				if (tag.Contains("[CustomPathEndAltitude:") == true) {
+
+					TagDoubleCheck(tag, ref improveSpawnGroup.CustomPathEndAltitude);
 
 				}
 
@@ -1348,9 +1370,23 @@ namespace ModularEncountersSpawner {
 					TagIntCheck(tag, ref improveSpawnGroup.MaximumBuildPercent);
 						
 				}
-				
+
+				//UseGridDereliction
+				if (tag.Contains("[UseGridDereliction:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.UseGridDereliction);
+
+				}
+
+				//DerelictionProfiles
+				if (tag.Contains("[DerelictionProfiles:") == true) {
+
+					TagStringListCheck(tag, ref improveSpawnGroup.DerelictionProfiles);
+
+				}
+
 				//UseRivalAi
-				if(tag.Contains("[UseRivalAi:") == true){
+				if (tag.Contains("[UseRivalAi:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseRivalAi);
 						
@@ -1374,6 +1410,13 @@ namespace ModularEncountersSpawner {
 				if (tag.Contains("[ConvertAllRemoteControlBlocks:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ConvertAllRemoteControlBlocks);
+
+				}
+
+				//ClearGridInventories
+				if (tag.Contains("[ClearGridInventories:") == true) {
+
+					TagBoolCheck(tag, ref improveSpawnGroup.ClearGridInventories);
 
 				}
 
@@ -2119,6 +2162,13 @@ namespace ModularEncountersSpawner {
 
 					TagStringCheck(tag, ref improveSpawnGroup.BossCustomGPSLabel);
 						
+				}
+
+				//BossCustomGPSColor
+				if (tag.Contains("[BossCustomGPSColor:") == true) {
+
+					TagVector3DCheck(tag, ref improveSpawnGroup.BossCustomGPSColor);
+
 				}
 
 				//BossMusicId

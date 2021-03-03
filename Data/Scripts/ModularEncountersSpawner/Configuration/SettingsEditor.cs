@@ -1257,6 +1257,42 @@ namespace ModularEncountersSpawner.Configuration{
 
 			}
 
+			//ReplenishedAmmoMaxAmount
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.ReplenishedAmmoMaxAmount.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.ReplenishedAmmoMaxAmount.", "");
+				int result = 0;
+
+				if (int.TryParse(receivedValue, out result) == false) {
+
+					return "Failed To Parse Value: " + receivedValue;
+
+				}
+
+				Settings.Grids.ReplenishedAmmoMaxAmount = result;
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
+			//ReplenishedFuelMaxAmount
+			if (receivedCommand.StartsWith("/MES.Settings.Grids.ReplenishedFuelMaxAmount.") == true) {
+
+				var receivedValue = receivedCommand.Replace("/MES.Settings.Grids.ReplenishedFuelMaxAmount.", "");
+				int result = 0;
+
+				if (int.TryParse(receivedValue, out result) == false) {
+
+					return "Failed To Parse Value: " + receivedValue;
+
+				}
+
+				Settings.Grids.ReplenishedFuelMaxAmount = result;
+				var saveSetting = Settings.Grids.SaveSettings(Settings.Grids);
+				return saveSetting;
+
+			}
+
 			////////////////////////////////////////////////////////
 			//                   SpaceCargoShips
 			////////////////////////////////////////////////////////

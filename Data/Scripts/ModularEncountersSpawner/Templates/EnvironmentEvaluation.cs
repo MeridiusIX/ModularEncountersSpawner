@@ -85,68 +85,58 @@ namespace ModularEncountersSpawner.Templates {
 			directionList.Add(Vector3D.Normalize(matrix.Forward + matrix.Left));
 			directionList.Add(Vector3D.Normalize(matrix.Backward + matrix.Right));
 			directionList.Add(Vector3D.Normalize(matrix.Backward + matrix.Left));
+			SurfaceCoords = NearestPlanet.GetClosestSurfacePointGlobal(coords);
 
-			if (MES_SessionCore.Instance.WaterMod.Registered) {
+			if (WaterHelper.Enabled) {
 
-				MES_SessionCore.Instance.WaterMod.UpdateRadius();
+				var water = WaterHelper.GetWater(NearestPlanet);
 
-				if (MES_SessionCore.Instance.WaterMod.Waters != null) {
+				if (water != null) {
 
-					for (int i = MES_SessionCore.Instance.WaterMod.Waters.Count - 1; i >= 0; i--) {
+					PlanetWater = water;
+					PlanetHasWater = true;
+					PositionIsUnderWater = water.IsUnderwater(coords);
+					SurfaceIsUnderWater = water.IsUnderwater(SurfaceCoords);
 
-						if (i >= MES_SessionCore.Instance.WaterMod.Waters.Count)
-							continue;
+					if (SurfaceIsUnderWater)
+						SurfaceCoords = PlanetWater.GetClosestSurfacePoint(coords);
 
-						var water = MES_SessionCore.Instance.WaterMod.Waters[i];
+					int totalChecks = 0;
+					int waterHits = 0;
 
-						if (water == null || water.planetID != NearestPlanet.EntityId)
-							continue;
+					for (int j = 0; j < 12; j++) {
 
-						PlanetWater = water;
-						PlanetHasWater = true;
-						PositionIsUnderWater = water.IsUnderwater(coords);
-						SurfaceIsUnderWater = water.IsUnderwater(SurfaceCoords);
+						foreach (var direction in directionList) {
 
-						int totalChecks = 0;
-						int waterHits = 0;
+							try {
 
-						for (int j = 0; j < 12; j++) {
+								totalChecks++;
+								var checkCoordsRough = direction * (j * 1000) + coords;
+								var checkSurfaceCoords = NearestPlanet.GetClosestSurfacePointGlobal(checkCoordsRough);
 
-							foreach (var direction in directionList) {
+								if (WaterHelper.IsPositionUnderwater(checkSurfaceCoords, water))
+									waterHits++;
 
-								try {
+							} catch (Exception e) {
 
-									totalChecks++;
-									var checkCoordsRough = direction * (j * 1000) + coords;
-									var checkSurfaceCoords = NearestPlanet.GetClosestSurfacePointGlobal(checkCoordsRough);
-
-									if (water.IsUnderwater(checkSurfaceCoords))
-										waterHits++;
-
-								} catch (Exception e) {
-
-									Logger.AddMsg("Caught Exception Trying To Determine Water Data", true);
-									Logger.AddMsg(e.ToString(), true);
-
-								}
+								Logger.AddMsg("Caught Exception Trying To Determine Water Data", true);
+								Logger.AddMsg(e.ToString(), true);
 
 							}
 
 						}
 
-						Logger.AddMsg("Water Hits: " + waterHits.ToString(), true);
-						Logger.AddMsg("Total Hits: " + totalChecks.ToString(), true);
-						WaterInSurroundingAreaRatio = (float)waterHits / (float)totalChecks;
-
-						break;
-
 					}
+
+					Logger.AddMsg("Water Hits: " + waterHits.ToString(), true);
+					Logger.AddMsg("Total Hits: " + totalChecks.ToString(), true);
+					WaterInSurroundingAreaRatio = (float)waterHits / (float)totalChecks;
+
 
 				}
 
 			}
 
-			SurfaceCoords = SurfaceIsUnderWater ? PlanetWater.GetClosestSurfacePoint(coords) : NearestPlanet.GetClosestSurfacePointGlobal(coords);
 			AltitudeAtPosition = Vector3D.Distance(SurfaceCoords, coords);
 			NearestPlanetName = NearestPlanet.Generator.Id.SubtypeName;
 			PlanetDiameter = NearestPlanet.AverageRadius * 2;

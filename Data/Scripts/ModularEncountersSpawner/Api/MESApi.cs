@@ -13,6 +13,7 @@ namespace ModularEncountersSpawner.Api {
 
 		private static long _mesModId = 1521905890;
 		private static Action<Vector3D, string, double, int, int, int> _addKnownPlayerLocation;
+		private static Action<Vector3D, string, double, bool> _changeKnownPlayerLocationSize;
 		private static Func<string, string> _convertRandomNamePatterns;
 		private static Func<List<string>, MatrixD, Vector3, bool, string, string, bool> _customSpawnRequest;
 		private static Func<IMyCubeGrid, Vector3D> _getDespawnCoords;

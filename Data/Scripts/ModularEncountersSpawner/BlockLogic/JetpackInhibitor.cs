@@ -66,6 +66,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 				IsDedicated = MyAPIGateway.Multiplayer.IsServer && MyAPIGateway.Utilities.IsDedicated;
 				Antenna.IsWorkingChanged += OnWorkingChange;
 				Antenna.OwnershipChanged += OnOwnerChange;
+				IsValid = Antenna?.SlimBlock?.CubeGrid?.Physics != null;
 				Antenna.CustomName = "[Jetpack Inhibitor Field]";
 				SetRange();
 				IsWorking = Antenna?.Enabled ?? false;
@@ -85,7 +86,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 			if (IsDedicated)
 				return;
 
-			if (!IsWorking || !IsNpcOwned)
+			if (!IsWorking || !IsNpcOwned || !IsValid)
 				return;
 
 			if (!InDisableRange && !InDampenerRange)

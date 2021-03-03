@@ -263,381 +263,420 @@ namespace ModularEncountersSpawner.Manipulation {
 
 		public static void RandomWeaponReplacing(MyObjectBuilder_CubeGrid cubeGrid, ImprovedSpawnGroup spawnGroup) {
 
-			Logger.AddMsg("Getting Weapon Randomizer Blacklist/Whitelist from Global Settings", true);
-			//Update Lists
-			BlacklistedWeaponSubtypes = Settings.Grids.WeaponReplacerBlacklist.ToList();
-			WhitelistedWeaponSubtypes = Settings.Grids.WeaponReplacerWhitelist.ToList();
-			BlacklistedWeaponTargetSubtypes = Settings.Grids.WeaponReplacerTargetBlacklist.ToList();
-			WhitelistedWeaponTargetSubtypes = Settings.Grids.WeaponReplacerTargetWhitelist.ToList();
-
-
 			var errorDebugging = new StringBuilder();
-			bool allowRandomizeWeapons = true; //Backwards compatibility laziness
-			Dictionary<Vector3I, MyObjectBuilder_CubeBlock> blockMap = new Dictionary<Vector3I, MyObjectBuilder_CubeBlock>();
-			List<MyObjectBuilder_CubeBlock> weaponBlocks = new List<MyObjectBuilder_CubeBlock>();
-			List<MyObjectBuilder_CubeBlock> replaceBlocks = new List<MyObjectBuilder_CubeBlock>();
-			float availablePower = 0;
-			float gridBlockCount = 0;
-			bool shieldBlocksDetected = false;
 
-			if (cubeGrid?.CubeBlocks == null) {
+			try {
 
-				Logger.AddMsg("Provided CubeGrid for Weapon Replacing Was Somehow Null or Has No Blocks.");
-				return;
+				errorDebugging.Append("Starting Weapon Randomization On Grid.").AppendLine();
+				errorDebugging.Append("Getting Weapon Randomizer Blacklist and Whitelist from Settings...").AppendLine();
+				//Update Lists
+				BlacklistedWeaponSubtypes = Settings.Grids.WeaponReplacerBlacklist.ToList();
+				WhitelistedWeaponSubtypes = Settings.Grids.WeaponReplacerWhitelist.ToList();
+				BlacklistedWeaponTargetSubtypes = Settings.Grids.WeaponReplacerTargetBlacklist.ToList();
+				WhitelistedWeaponTargetSubtypes = Settings.Grids.WeaponReplacerTargetWhitelist.ToList();
 
-			}
+				bool allowRandomizeWeapons = true; //Backwards compatibility laziness
+				Dictionary<Vector3I, MyObjectBuilder_CubeBlock> blockMap = new Dictionary<Vector3I, MyObjectBuilder_CubeBlock>();
+				List<MyObjectBuilder_CubeBlock> weaponBlocks = new List<MyObjectBuilder_CubeBlock>();
+				List<MyObjectBuilder_CubeBlock> replaceBlocks = new List<MyObjectBuilder_CubeBlock>();
+				float availablePower = 0;
+				float gridBlockCount = 0;
+				bool shieldBlocksDetected = false;
 
-			//Build blockMap - This is used to determine which blocks occupy cells.
-			foreach (var block in cubeGrid.CubeBlocks) {
+				if (cubeGrid?.CubeBlocks == null) {
 
-				if (block == null)
-					continue;
-
-				gridBlockCount++;
-				string defIdString = block.GetId().ToString(); //Get MyDefinitionId from ObjectBuilder
-				MyCubeBlockDefinition blockDefinition = null;
-
-				//Check if block directory has block.
-				if (BlockDirectory.ContainsKey(defIdString) == true) {
-
-					blockDefinition = BlockDirectory[defIdString];
-
-				} else {
-
-					//If Block Definition Could Not Be Found, It 
-					//Likely Means The Target Grid Is Using Modded 
-					//Blocks And That Mod Is Not Loaded In The Game 
-					//World.
-
-					//Logger("Block Definition Could Not Be Found For [" + defIdString + "]. Weapon Randomizer May Produce Unexpected Results.");
-					continue;
+					errorDebugging.Append("Prefab CubeGrid Null Somehow...").AppendLine();
+					return;
 
 				}
 
-				if (PowerProviderBlocks.ContainsKey(defIdString) == true) {
+				//Build blockMap - This is used to determine which blocks occupy cells.
+				errorDebugging.Append("Building Block Cell List").AppendLine();
+				foreach (var block in cubeGrid.CubeBlocks) {
 
-					availablePower += PowerProviderBlocks[defIdString];
+					if (block == null)
+						continue;
 
-				}
+					gridBlockCount++;
+					string defIdString = block.GetId().ToString(); //Get MyDefinitionId from ObjectBuilder
+					MyCubeBlockDefinition blockDefinition = null;
 
-				//Returns a list of all cells the block occupies
-				var cellList = GetBlockCells(block.Min, blockDefinition.Size, block.BlockOrientation);
+					//Check if block directory has block.
+					if (BlockDirectory.ContainsKey(defIdString) == true) {
 
-				//Adds to map. Throws warning if a cell was already occupied, since it should not be.
-				foreach (var cell in cellList) {
-
-					if (blockMap.ContainsKey(cell) == false) {
-
-						blockMap.Add(cell, block);
+						blockDefinition = BlockDirectory[defIdString];
 
 					} else {
 
-						//Logger("Cell for "+ defIdString +" Already Occupied By Another Block. This May Cause Issues.");
+						//If Block Definition Could Not Be Found, It 
+						//Likely Means The Target Grid Is Using Modded 
+						//Blocks And That Mod Is Not Loaded In The Game 
+						//World.
 
-					}
-
-				}
-
-				//If block was a weapon, add it to the list of weapons we'll be replacing
-				if (block as MyObjectBuilder_UserControllableGun != null) {
-
-					weaponBlocks.Add(block);
-
-				}
-
-				//TODO: Check CustomData For MES-Replace-Block Tag
-
-			}
-
-			availablePower *= 0.666f; //We only want to allow 2/3 of grid power to be used by weapons - this should be ok for most NPCs
-
-			//Now Process Existing Weapon Blocks
-
-			if (allowRandomizeWeapons == true) {
-
-				foreach (var weaponBlock in weaponBlocks) {
-
-					//Get details of weapon block being replaced
-					string defIdString = weaponBlock.GetId().ToString();
-					errorDebugging.Append("Processing Grid Weapon: ").Append(defIdString).AppendLine();
-					MyCubeBlockDefinition blockDefinition = BlockDirectory[defIdString];
-					MyWeaponBlockDefinition targetWeaponBlockDef = (MyWeaponBlockDefinition)blockDefinition;
-
-					//Do Blacklist/Whitelist Check on Target Block
-					if (targetWeaponBlockDef == null) {
-
-						continue;
-
-					} else if (IsTargetWeaponAllowed(targetWeaponBlockDef, spawnGroup) == false) {
-
+						//Logger("Block Definition Could Not Be Found For [" + defIdString + "]. Weapon Randomizer May Produce Unexpected Results.");
 						continue;
 
 					}
 
-					string oldWeaponId = defIdString;
-					var weaponIds = WeaponProfiles.Keys.ToList();
-					bool isTurret = false;
-					bool targetNeutralSetting = false;
+					if (PowerProviderBlocks.ContainsKey(defIdString) == true) {
 
-					if (weaponBlock as MyObjectBuilder_TurretBase != null) {
-
-						var tempTurretOb = weaponBlock as MyObjectBuilder_TurretBase;
-						targetNeutralSetting = tempTurretOb.TargetNeutrals;
-						isTurret = true;
-						weaponIds = new List<string>(TurretIDs);
+						availablePower += PowerProviderBlocks[defIdString];
 
 					}
 
-					//Get Additional Details From Old Block.
-					var oldBlocksCells = GetBlockCells(weaponBlock.Min, blockDefinition.Size, weaponBlock.BlockOrientation);
-					var likelyMountingCell = GetLikelyBlockMountingPoint((MyWeaponBlockDefinition)blockDefinition, cubeGrid, blockMap, weaponBlock);
-					var oldOrientation = (MyBlockOrientation)weaponBlock.BlockOrientation;
-					var oldColor = (Vector3)weaponBlock.ColorMaskHSV;
-					var oldLocalForward = GetLocalGridDirection(weaponBlock.BlockOrientation.Forward);
-					var oldLocalUp = GetLocalGridDirection(weaponBlock.BlockOrientation.Up);
+					//Returns a list of all cells the block occupies
+					var cellList = GetBlockCells(block.Min, blockDefinition.Size, block.BlockOrientation);
 
-					var oldMatrix = new MatrixI(ref likelyMountingCell, ref oldLocalForward, ref oldLocalUp);
+					//Adds to map. Throws warning if a cell was already occupied, since it should not be.
+					foreach (var cell in cellList) {
 
-					//Check if Block Is Named Replacement
-					string blockName = (weaponBlock as MyObjectBuilder_TerminalBlock)?.CustomName;
-					string restrictedId = "";
-					bool onlyNamedReplacements = false;
+						if (blockMap.ContainsKey(cell) == false) {
 
-					if (!string.IsNullOrWhiteSpace(blockName)) {
-
-						MyDefinitionId id = new MyDefinitionId();
-
-						if (spawnGroup.NonRandomWeaponReference.TryGetValue(blockName, out id)) {
-
-							if (weaponIds.Contains(id.ToString())) {
-
-								restrictedId = id.ToString();
-
-							} else {
-
-								if (spawnGroup.NonRandomWeaponReplacingOnly)
-									onlyNamedReplacements = true;
-
-
-							}
+							blockMap.Add(cell, block);
 
 						} else {
 
-							onlyNamedReplacements = spawnGroup.NonRandomWeaponReplacingOnly;
+							//Logger("Cell for "+ defIdString +" Already Occupied By Another Block. This May Cause Issues.");
 
 						}
 
 					}
 
-					if (onlyNamedReplacements)
-						continue;
+					//If block was a weapon, add it to the list of weapons we'll be replacing
+					if (block as MyObjectBuilder_UserControllableGun != null) {
 
-					//Remove The Old Block
-					cubeGrid.CubeBlocks.Remove(weaponBlock);
-
-					foreach (var cell in oldBlocksCells) {
-
-						blockMap.Remove(cell);
+						weaponBlocks.Add(block);
 
 					}
 
-					//Loop through weapon IDs and choose one at random each run of the loop
-					while (weaponIds.Count > 0) {
+					//TODO: Check CustomData For MES-Replace-Block Tag
 
-						if (weaponIds.Count == 0) {
+				}
 
-							errorDebugging.Append(" - No further weapons available to process.").AppendLine();
-							break;
+				availablePower *= 0.666f; //We only want to allow 2/3 of grid power to be used by weapons - this should be ok for most NPCs
 
-						}
+				//Now Process Existing Weapon Blocks
 
-						var randIndex = Rnd.Next(0, weaponIds.Count);
-						var randId = weaponIds[randIndex];
-						weaponIds.RemoveAt(randIndex);
+				if (allowRandomizeWeapons == true) {
 
-						if (!string.IsNullOrWhiteSpace(restrictedId) && randId != restrictedId)
-							continue;
+					errorDebugging.Append("Beginning Randomization Of Individual Weapon Blocks.").AppendLine();
 
-						errorDebugging.Append(" - Attempting to replace with: ").Append(randId).AppendLine();
+					foreach (var weaponBlock in weaponBlocks) {
 
-						if (WeaponProfiles.ContainsKey(randId) == false) {
+						if (weaponBlock == null) {
 
-							errorDebugging.Append(" - No weapon profile for .").AppendLine();
+							errorDebugging.Append("A weapon was null. Skipping.").AppendLine();
 							continue;
 
 						}
 
-						var weaponProfile = WeaponProfiles[randId];
+						//Get details of weapon block being replaced
+						string defIdString = weaponBlock.GetId().ToString();
+						errorDebugging.Append("Processing Grid Weapon: ").Append(defIdString).AppendLine();
+						MyCubeBlockDefinition blockDefinition = BlockDirectory[defIdString];
+						MyWeaponBlockDefinition targetWeaponBlockDef = (MyWeaponBlockDefinition)blockDefinition;
 
-						if (IsWeaponSizeAllowed(blockDefinition.Size, weaponProfile.BlockDefinition.Size, spawnGroup.RandomWeaponSizeVariance)) {
+						//Do Blacklist/Whitelist Check on Target Block
+						if (targetWeaponBlockDef == null) {
 
-							errorDebugging.Append(" - Weapon Size Variance Outside Limit").AppendLine();
+							errorDebugging.Append("A weapon block definition was null. Skipping.").AppendLine();
+							continue;
 
-						}
+						} else if (IsTargetWeaponAllowed(targetWeaponBlockDef, spawnGroup) == false) {
 
-						if (IsWeaponStaticOrTurret(isTurret, weaponProfile) == false) {
-
-							errorDebugging.Append(" - Did not match Turret vs Static").AppendLine();
+							errorDebugging.Append("A weapon failed blacklist/whitelist checks. Skipping.").AppendLine();
 							continue;
 
 						}
 
-						if (IsRandomWeaponAllowed(weaponProfile.BlockDefinition, spawnGroup) == false) {
+						errorDebugging.Append("Collecting Weapon Info.").AppendLine();
+						string oldWeaponId = defIdString;
+						var weaponIds = WeaponProfiles.Keys.ToList();
+						bool isTurret = false;
+						bool targetNeutralSetting = false;
 
-							errorDebugging.Append(" - Did not pass Blacklist/Whitelist").AppendLine();
-							continue;
+						if (weaponBlock as MyObjectBuilder_TurretBase != null) {
+
+							var tempTurretOb = weaponBlock as MyObjectBuilder_TurretBase;
+							targetNeutralSetting = tempTurretOb.TargetNeutrals;
+							isTurret = true;
+							weaponIds = new List<string>(TurretIDs);
 
 						}
 
-						if (weaponProfile.BlockDefinition.CubeSize != cubeGrid.GridSizeEnum) {
+						errorDebugging.Append("Collecting Weapon Info Continued.").AppendLine();
+						//Get Additional Details From Old Block.
+						var oldBlocksCells = GetBlockCells(weaponBlock.Min, blockDefinition.Size, weaponBlock.BlockOrientation);
+						var likelyMountingCell = GetLikelyBlockMountingPoint((MyWeaponBlockDefinition)blockDefinition, cubeGrid, blockMap, weaponBlock);
+						var oldOrientation = (MyBlockOrientation)weaponBlock.BlockOrientation;
+						var oldColor = (Vector3)weaponBlock.ColorMaskHSV;
+						var oldLocalForward = GetLocalGridDirection(weaponBlock.BlockOrientation.Forward);
+						var oldLocalUp = GetLocalGridDirection(weaponBlock.BlockOrientation.Up);
 
-							errorDebugging.Append(" - Block not same grid size").AppendLine();
-							continue;
+						var oldMatrix = new MatrixI(ref likelyMountingCell, ref oldLocalForward, ref oldLocalUp);
 
-						}
+						//Check if Block Is Named Replacement
+						errorDebugging.Append("Checking if Block is a Name Specific Replacement.").AppendLine();
+						string blockName = (weaponBlock as MyObjectBuilder_TerminalBlock)?.CustomName;
+						string restrictedId = "";
+						bool onlyNamedReplacements = false;
+
+						if (!string.IsNullOrWhiteSpace(blockName)) {
+
+							MyDefinitionId id = new MyDefinitionId();
+
+							if (spawnGroup.NonRandomWeaponReference.TryGetValue(blockName, out id)) {
+
+								if (weaponIds.Contains(id.ToString())) {
+
+									restrictedId = id.ToString();
+
+								} else {
+
+									if (spawnGroup.NonRandomWeaponReplacingOnly)
+										onlyNamedReplacements = true;
 
 
-						bool isPowerHog = false;
-						float powerDrain = 0;
+								}
 
-						//Check against manually maintained list of Subtypes that draw energy for ammo generation.
-						if (PowerDrainingWeapons.ContainsKey(weaponProfile.BlockDefinition.Id.SubtypeName) == true) {
+							} else {
 
-							if (PowerDrainingWeapons[weaponProfile.BlockDefinition.Id.SubtypeName] > availablePower) {
-
-								continue;
+								onlyNamedReplacements = spawnGroup.NonRandomWeaponReplacingOnly;
 
 							}
 
-							isPowerHog = true;
-							powerDrain = PowerDrainingWeapons[weaponProfile.BlockDefinition.Id.SubtypeName];
+						}
+
+						if (onlyNamedReplacements)
+							continue;
+
+						//Remove The Old Block
+						errorDebugging.Append("Removing Old Block and Cells From Reference.").AppendLine();
+						cubeGrid.CubeBlocks.Remove(weaponBlock);
+
+						foreach (var cell in oldBlocksCells) {
+
+							blockMap.Remove(cell);
 
 						}
 
-						//Calculate Min and Get Block Cells of where new weapon would be placed.
-						var estimatedMin = CalculateMinPosition(weaponProfile.BlockDefinition.Size, likelyMountingCell, oldMatrix, isTurret);
-						var newBlocksCells = GetBlockCells(estimatedMin, weaponProfile.BlockDefinition.Size, oldOrientation);
-						bool foundOccupiedCell = false;
+						//Loop through weapon IDs and choose one at random each run of the loop
+						errorDebugging.Append("Beginning New Weapon Selection.").AppendLine();
+						while (weaponIds.Count > 0) {
 
-						//Check each cell against blockMap - skip weapon if a cell is occupied 
-						foreach (var cell in newBlocksCells) {
+							if (weaponIds.Count == 0) {
 
-							if (blockMap.ContainsKey(cell) == true) {
-
-								foundOccupiedCell = true;
+								errorDebugging.Append(" - No further weapons available to process.").AppendLine();
 								break;
 
 							}
 
-						}
+							errorDebugging.Append(" - Selecting Random Weapon ID.").AppendLine();
+							var randIndex = Rnd.Next(0, weaponIds.Count);
+							var randId = weaponIds[randIndex];
+							weaponIds.RemoveAt(randIndex);
 
-						if (foundOccupiedCell == true) {
+							if (!string.IsNullOrWhiteSpace(restrictedId) && randId != restrictedId)
+								continue;
 
-							errorDebugging.Append(" - Grid cell occupied in proposed position.").AppendLine();
-							continue;
+							errorDebugging.Append(" - Attempting to replace with: ").Append(randId).AppendLine();
 
-						}
+							if (WeaponProfiles.ContainsKey(randId) == false) {
 
-						//TODO: Learn How Mount Points Work And Try To Add That Check As Well
-						//Existing Method Should Work in Most Cases Though
+								errorDebugging.Append(" - No weapon profile for .").AppendLine();
+								continue;
 
-						//Create Object Builder From DefinitionID
-						var newBlockBuilder = MyObjectBuilderSerializer.CreateNewObject(weaponProfile.BlockDefinition.Id);
+							}
 
-						//Determine If Weapon Is Turret or Gun. Build Object For That Type
-						if (isTurret == true && !weaponProfile.IsWeaponCore) {
+							var weaponProfile = WeaponProfiles[randId];
 
-							var turretBuilder = newBlockBuilder as MyObjectBuilder_TurretBase;
-							turretBuilder.EntityId = 0;
-							turretBuilder.SubtypeName = weaponProfile.BlockDefinition.Id.SubtypeName;
-							turretBuilder.Min = estimatedMin;
-							turretBuilder.BlockOrientation = oldOrientation;
-							turretBuilder.ColorMaskHSV = oldColor;
+							if (IsWeaponSizeAllowed(blockDefinition.Size, weaponProfile.BlockDefinition.Size, spawnGroup.RandomWeaponSizeVariance)) {
 
-							var turretDef = (MyLargeTurretBaseDefinition)weaponProfile.BlockDefinition;
+								errorDebugging.Append(" - Weapon Size Variance Outside Limit").AppendLine();
 
-							if (turretDef.MaxRangeMeters <= 800) {
+							}
 
-								turretBuilder.Range = turretDef.MaxRangeMeters;
+							if (IsWeaponStaticOrTurret(isTurret, weaponProfile) == false) {
+
+								errorDebugging.Append(" - Did not match Turret vs Static").AppendLine();
+								continue;
+
+							}
+
+							if (IsRandomWeaponAllowed(weaponProfile.BlockDefinition, spawnGroup) == false) {
+
+								errorDebugging.Append(" - Did not pass Blacklist/Whitelist").AppendLine();
+								continue;
+
+							}
+
+							if (weaponProfile.BlockDefinition.CubeSize != cubeGrid.GridSizeEnum) {
+
+								errorDebugging.Append(" - Block not same grid size").AppendLine();
+								continue;
+
+							}
 
 
-							} else if (gridBlockCount <= 800) {
+							bool isPowerHog = false;
+							float powerDrain = 0;
+
+							errorDebugging.Append(" - Checking Old Power Drain Requirements").AppendLine();
+							//Check against manually maintained list of Subtypes that draw energy for ammo generation.
+							if (PowerDrainingWeapons.ContainsKey(weaponProfile.BlockDefinition.Id.SubtypeName) == true) {
+
+								if (PowerDrainingWeapons[weaponProfile.BlockDefinition.Id.SubtypeName] > availablePower) {
+
+									continue;
+
+								}
+
+								isPowerHog = true;
+								powerDrain = PowerDrainingWeapons[weaponProfile.BlockDefinition.Id.SubtypeName];
+
+							}
+
+							errorDebugging.Append(" - Calculating Block Cells").AppendLine();
+							//Calculate Min and Get Block Cells of where new weapon would be placed.
+							var estimatedMin = CalculateMinPosition(weaponProfile.BlockDefinition.Size, likelyMountingCell, oldMatrix, isTurret);
+							var newBlocksCells = GetBlockCells(estimatedMin, weaponProfile.BlockDefinition.Size, oldOrientation);
+							bool foundOccupiedCell = false;
+
+							//Check each cell against blockMap - skip weapon if a cell is occupied 
+							foreach (var cell in newBlocksCells) {
+
+								if (blockMap.ContainsKey(cell) == true) {
+
+									foundOccupiedCell = true;
+									break;
+
+								}
+
+							}
+
+							if (foundOccupiedCell == true) {
+
+								errorDebugging.Append(" - Grid cell occupied in proposed position.").AppendLine();
+								continue;
+
+							}
+
+							//TODO: Learn How Mount Points Work And Try To Add That Check As Well
+							//Existing Method Should Work in Most Cases Though
+
+							errorDebugging.Append(" - Grid Cell Checks Passed. Generating Weapon For Replacement").AppendLine();
+
+							//Create Object Builder From DefinitionID
+							var newBlockBuilder = MyObjectBuilderSerializer.CreateNewObject(weaponProfile.BlockDefinition.Id);
+
+							errorDebugging.Append(" - Check if weapon is turret, gun, or weaponcore").AppendLine();
+							//Determine If Weapon Is Turret or Gun. Build Object For That Type
+							if (isTurret == true && !weaponProfile.IsWeaponCore) {
+
+								errorDebugging.Append(" - Weapon is vanilla turret").AppendLine();
+								var turretBuilder = newBlockBuilder as MyObjectBuilder_TurretBase;
+								turretBuilder.EntityId = 0;
+								turretBuilder.SubtypeName = weaponProfile.BlockDefinition.Id.SubtypeName;
+								turretBuilder.Min = estimatedMin;
+								turretBuilder.BlockOrientation = oldOrientation;
+								turretBuilder.ColorMaskHSV = oldColor;
+
+								var turretDef = (MyLargeTurretBaseDefinition)weaponProfile.BlockDefinition;
 
 								if (turretDef.MaxRangeMeters <= 800) {
 
 									turretBuilder.Range = turretDef.MaxRangeMeters;
 
+
+								} else if (gridBlockCount <= 800) {
+
+									if (turretDef.MaxRangeMeters <= 800) {
+
+										turretBuilder.Range = turretDef.MaxRangeMeters;
+
+									} else {
+
+										turretBuilder.Range = 800;
+
+									}
+
 								} else {
 
-									turretBuilder.Range = 800;
+									var randRange = (float)Rnd.Next(800, (int)gridBlockCount);
+
+									if (randRange > turretDef.MaxRangeMeters) {
+
+										randRange = turretDef.MaxRangeMeters;
+
+									}
+
+									turretBuilder.Range = randRange;
+
 
 								}
+
+								turretBuilder.TargetMissiles = true;
+								turretBuilder.TargetCharacters = true;
+								turretBuilder.TargetSmallGrids = true;
+								turretBuilder.TargetLargeGrids = true;
+								turretBuilder.TargetStations = true;
+								turretBuilder.TargetNeutrals = targetNeutralSetting;
+
+								cubeGrid.CubeBlocks.Add(turretBuilder as MyObjectBuilder_CubeBlock);
 
 							} else {
 
-								var randRange = (float)Rnd.Next(800, (int)gridBlockCount);
+								errorDebugging.Append(" - Weapon is vanilla gun or weaponcore").AppendLine();
+								var gunBuilder = newBlockBuilder as MyObjectBuilder_CubeBlock;
+								gunBuilder.EntityId = 0;
+								gunBuilder.SubtypeName = weaponProfile.BlockDefinition.Id.SubtypeName;
+								gunBuilder.Min = estimatedMin;
+								gunBuilder.BlockOrientation = oldOrientation;
+								gunBuilder.ColorMaskHSV = oldColor;
 
-								if (randRange > turretDef.MaxRangeMeters) {
+								cubeGrid.CubeBlocks.Add(gunBuilder as MyObjectBuilder_CubeBlock);
 
-									randRange = turretDef.MaxRangeMeters;
+							}
+
+							if (isPowerHog == true) {
+
+								availablePower -= powerDrain;
+
+							}
+
+							errorDebugging.Append(" - Register new weapon cells").AppendLine();
+							foreach (var cell in newBlocksCells) {
+
+								if (blockMap.ContainsKey(cell) == false) {
+
+									blockMap.Add(cell, (MyObjectBuilder_CubeBlock)newBlockBuilder);
 
 								}
 
-								turretBuilder.Range = randRange;
-
-
 							}
 
-							turretBuilder.TargetMissiles = true;
-							turretBuilder.TargetCharacters = true;
-							turretBuilder.TargetSmallGrids = true;
-							turretBuilder.TargetLargeGrids = true;
-							turretBuilder.TargetStations = true;
-							turretBuilder.TargetNeutrals = targetNeutralSetting;
-
-							cubeGrid.CubeBlocks.Add(turretBuilder as MyObjectBuilder_CubeBlock);
-
-						} else {
-
-							var gunBuilder = newBlockBuilder as MyObjectBuilder_CubeBlock;
-							gunBuilder.EntityId = 0;
-							gunBuilder.SubtypeName = weaponProfile.BlockDefinition.Id.SubtypeName;
-							gunBuilder.Min = estimatedMin;
-							gunBuilder.BlockOrientation = oldOrientation;
-							gunBuilder.ColorMaskHSV = oldColor;
-
-							cubeGrid.CubeBlocks.Add(gunBuilder as MyObjectBuilder_CubeBlock);
+							Logger.AddMsg("Replaced " + oldWeaponId + " with new weapon " + weaponProfile.BlockDefinition.Id.ToString(), true);
+							errorDebugging.Append(" - Weapon replaced!").AppendLine();
+							break;
 
 						}
-
-						if (isPowerHog == true) {
-
-							availablePower -= powerDrain;
-
-						}
-
-						foreach (var cell in newBlocksCells) {
-
-							if (blockMap.ContainsKey(cell) == false) {
-
-								blockMap.Add(cell, (MyObjectBuilder_CubeBlock)newBlockBuilder);
-
-							}
-
-						}
-
-						Logger.AddMsg("Replaced " + oldWeaponId + " with new weapon " + weaponProfile.BlockDefinition.Id.ToString(), true);
-						break;
 
 					}
 
 				}
 
-			}
+				if (Logger.LoggerDebugMode == true) {
 
-			if (Logger.LoggerDebugMode == true) {
+					Logger.AddMsg(errorDebugging.ToString(), true);
 
-				Logger.AddMsg(errorDebugging.ToString(), true);
+				}
+
+			} catch (Exception e) {
+
+				MyVisualScriptLogicProvider.ShowNotificationToAll("Weapon Randomization Encountered A Critical Error. Please Provide Log To Author", 10000, "Red");
+				Logger.AddMsg("Weapon Randomization Encountered A Critical Error. Please See Below:");
+				Logger.AddMsg(e.ToString());
+				Logger.AddMsg(errorDebugging.ToString());
 
 			}
 

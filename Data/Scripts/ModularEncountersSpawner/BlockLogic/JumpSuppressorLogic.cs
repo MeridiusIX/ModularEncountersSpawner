@@ -26,6 +26,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 		bool IsWorking = false;
 		bool IsNpcOwned = false;
 		bool InRange = false;
+		bool IsValid = false;
 
 		List<IMyFunctionalBlock> SuppressedBlocksInWorld = new List<IMyFunctionalBlock>();
 		List<IMyCubeGrid> AllGridsRegistered = new List<IMyCubeGrid>();
@@ -177,6 +178,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 			Antenna.IsWorkingChanged += OnWorkingChange;
 			Antenna.OwnershipChanged += OnOwnerChange;
+			IsValid = Antenna?.SlimBlock?.CubeGrid?.Physics != null;
 			OnOwnerChange(Antenna);
 			OnWorkingChange(Antenna);
 
@@ -235,7 +237,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 		void SuppressedBlockChanged(IMyCubeBlock block) {
 
-			if (!block.IsWorking || !block.IsFunctional)
+			if (!block.IsWorking || !block.IsFunctional || !IsValid)
 				return;
 
 			if (Antenna == null || Antenna.MarkedForClose) {

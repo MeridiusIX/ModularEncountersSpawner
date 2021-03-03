@@ -37,6 +37,12 @@ namespace ModularEncountersSpawner.Zones {
 		public string Name;
 
 
+		public string ZoneProfileName;
+
+
+		public ZoneProfile Profile;
+
+
 		public List<string> Factions;
 
 
@@ -56,6 +62,42 @@ namespace ModularEncountersSpawner.Zones {
 
 
 		public double MaxShellRadius;
+
+
+		public DateTime TimeCreated;
+
+
+		public int TimeToExpiration;
+
+
+		public int SpawnedEncounters;
+
+
+		public int MaxSpawnedEncounters;
+
+
+		public bool UseAllowedSpawnGroups;
+
+
+		public List<string> AllowedSpawnGroups;
+
+
+		public bool UseRestrictedSpawnGroups;
+
+
+		public List<string> RestrictedSpawnGroups;
+
+
+		public bool UseAllowedModIDs;
+
+
+		public List<string> AllowedModIDs;
+
+
+		public bool UseRestrictedModIDs;
+
+
+		public List<string> RestrictedModIDs;
 
 
 
