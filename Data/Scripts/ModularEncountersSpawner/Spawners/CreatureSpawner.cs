@@ -13,6 +13,7 @@ using ModularEncountersSpawner.Templates;
 using Sandbox.Game;
 using VRage.Game;
 using ModularEncountersSpawner.Zones;
+using ModularEncountersSpawner.World;
 
 namespace ModularEncountersSpawner.Spawners {
 
@@ -130,6 +131,14 @@ namespace ModularEncountersSpawner.Spawners {
 			
 			}
 
+			if (spawnGroup.UniqueEncounter == true) {
+
+				SpawnGroupManager.UniqueGroupsSpawned.Add(spawnGroup.SpawnGroup.Id.SubtypeName);
+				string[] uniqueSpawnedArray = SpawnGroupManager.UniqueGroupsSpawned.ToArray();
+				MyAPIGateway.Utilities.SetVariable<string[]>("MES-UniqueGroupsSpawned", uniqueSpawnedArray);
+
+			}
+
 			Logger.SkipNextMessage = false;
 			return "Spawning Group - " + spawnGroup.SpawnGroup.Id.SubtypeName;
 			
@@ -230,7 +239,7 @@ namespace ModularEncountersSpawner.Spawners {
 				}
 				*/
 
-				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
+				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest, SpawnType.None) == false){
 
 					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Common Conditions Failed");
 					continue;

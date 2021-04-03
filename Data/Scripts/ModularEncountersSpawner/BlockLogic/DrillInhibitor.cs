@@ -12,7 +12,7 @@ using VRageMath;
 namespace ModularEncountersSpawner.BlockLogic {
 
 	//Change MyObjectBuilder_LargeGatlingTurret to the matching ObjectBuilder for your block
-	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "MES-Suppressor-Drill-Large")]
+	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "MES-Suppressor-Drill-Large", "MES-Suppressor-Drill-Small")]
 	 
 	public class DrillInhibitor : MyGameLogicComponent{
 		

@@ -27,24 +27,50 @@ namespace ModularEncountersSpawner.Manipulation {
 		public static List<MyDefinitionId> SmallArmor = new List<MyDefinitionId>();
 		public static List<MyDefinitionId> LargeArmor = new List<MyDefinitionId>();
 
+		public static List<MyDefinitionId> SmallModules = new List<MyDefinitionId>();
+		public static List<MyDefinitionId> LargeModules = new List<MyDefinitionId>();
+
+		public static List<string> ModuleSubtypes = new List<string>();
+
 		private static Random _rnd = new Random();
 		private static bool _setupComplete = false;
 
+		public static void Setup() {
+
+			_setupComplete = true;
+			SmallArmor.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "SmallBlockArmorBlock"));
+			SmallArmor.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "SmallHeavyBlockArmorBlock"));
+			LargeArmor.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "LargeBlockArmorBlock"));
+			LargeArmor.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "LargeHeavyBlockArmorBlock"));
+
+			SmallModules.Add(new MyDefinitionId(typeof(MyObjectBuilder_RadioAntenna), "MES-Suppressor-Nanobots-Small"));
+			SmallModules.Add(new MyDefinitionId(typeof(MyObjectBuilder_RadioAntenna), "MES-Suppressor-JumpDrive-Small"));
+			SmallModules.Add(new MyDefinitionId(typeof(MyObjectBuilder_RadioAntenna), "MES-Suppressor-Jetpack-Small"));
+			SmallModules.Add(new MyDefinitionId(typeof(MyObjectBuilder_RadioAntenna), "MES-Suppressor-Drill-Small"));
+
+			LargeModules.Add(new MyDefinitionId(typeof(MyObjectBuilder_RadioAntenna), "MES-Suppressor-Nanobots-Large"));
+			LargeModules.Add(new MyDefinitionId(typeof(MyObjectBuilder_RadioAntenna), "MES-Suppressor-JumpDrive-Large"));
+			LargeModules.Add(new MyDefinitionId(typeof(MyObjectBuilder_RadioAntenna), "MES-Suppressor-Jetpack-Large"));
+			LargeModules.Add(new MyDefinitionId(typeof(MyObjectBuilder_RadioAntenna), "MES-Suppressor-Drill-Large"));
+
+			foreach (var id in SmallModules)
+				ModuleSubtypes.Add(id.SubtypeName);
+
+			foreach (var id in LargeModules)
+				ModuleSubtypes.Add(id.SubtypeName);
+		}
+
 		public static void ProcessGridForModules(MyObjectBuilder_CubeGrid[] grids, ImprovedSpawnGroup spawnGroup) {
 
-			if (!_setupComplete) {
-
-				_setupComplete = true;
-				SmallArmor.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "SmallBlockArmorBlock"));
-				SmallArmor.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "SmallHeavyBlockArmorBlock"));
-				LargeArmor.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "LargeBlockArmorBlock"));
-				LargeArmor.Add(new MyDefinitionId(typeof(MyObjectBuilder_CubeBlock), "LargeHeavyBlockArmorBlock"));
-
-			}
+			if (!_setupComplete)
+				Setup();
 
 			bool setArmor = false;
 			List<MyDefinitionId> allowedArmor = null;
+			List<MyDefinitionId> allowedModules = null;
+			List<MyDefinitionId> usedModules = new List<MyDefinitionId>();
 			var availableArmor = new List<ArmorForReplacement>();
+
 
 			foreach (var grid in grids) {
 
@@ -55,6 +81,7 @@ namespace ModularEncountersSpawner.Manipulation {
 
 					setArmor = true;
 					allowedArmor = grid.GridSizeEnum == MyCubeSize.Large ? LargeArmor : SmallArmor;
+					allowedModules = grid.GridSizeEnum == MyCubeSize.Large ? LargeModules : SmallModules;
 
 				}
 		
@@ -77,13 +104,39 @@ namespace ModularEncountersSpawner.Manipulation {
 
 				var armorIndex = availableArmor.Count == 1 ? 0 : _rnd.Next(0, availableArmor.Count);
 
-				if (!ReplaceArmorWithModule(availableArmor[armorIndex].Blocks, availableArmor[armorIndex].Block, spawnGroup.ModulesForArmorReplacement[i])) {
+				if (usedModules.Contains(spawnGroup.ModulesForArmorReplacement[i]) || !allowedModules.Contains(spawnGroup.ModulesForArmorReplacement[i]) || !ReplaceArmorWithModule(availableArmor[armorIndex].Blocks, availableArmor[armorIndex].Block, spawnGroup.ModulesForArmorReplacement[i])) {
 
 					continue;
 
 				}
 
 				availableArmor.RemoveAt(armorIndex);
+				usedModules.Add(spawnGroup.ModulesForArmorReplacement[i]);
+
+			}
+
+			if (MES_SessionCore.InhibitorModDetected) {
+
+				for (int i = 0; i < allowedModules.Count; i++) {
+
+					if (availableArmor.Count == 0) {
+
+						break;
+
+					}
+
+					var armorIndex = availableArmor.Count == 1 ? 0 : _rnd.Next(0, availableArmor.Count);
+
+					if (usedModules.Contains(allowedModules[i]) || !allowedModules.Contains(allowedModules[i]) || !ReplaceArmorWithModule(availableArmor[armorIndex].Blocks, availableArmor[armorIndex].Block, allowedModules[i])) {
+
+						continue;
+
+					}
+
+					availableArmor.RemoveAt(armorIndex);
+					usedModules.Add(allowedModules[i]);
+
+				}
 
 			}
 
@@ -131,6 +184,18 @@ namespace ModularEncountersSpawner.Manipulation {
 				antenna.BroadcastRadius = 1000;
 
 			if (antenna.SubtypeName == "MES-Suppressor-Drill-Large")
+				antenna.BroadcastRadius = 500;
+
+			if (antenna.SubtypeName == "MES-Suppressor-Nanobots-Small")
+				antenna.BroadcastRadius = 1000;
+
+			if (antenna.SubtypeName == "MES-Suppressor-JumpDrive-Small")
+				antenna.BroadcastRadius = 6000;
+
+			if (antenna.SubtypeName == "MES-Suppressor-Jetpack-Small")
+				antenna.BroadcastRadius = 1000;
+
+			if (antenna.SubtypeName == "MES-Suppressor-Drill-Small")
 				antenna.BroadcastRadius = 500;
 
 		}

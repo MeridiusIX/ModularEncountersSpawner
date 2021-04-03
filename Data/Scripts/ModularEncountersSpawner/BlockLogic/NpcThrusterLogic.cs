@@ -60,9 +60,11 @@ namespace ModularEncountersSpawner.BlockLogic{
 		public ThrustSettings Settings;
 		public string SettingsString;
 
-		public bool RestrictThrustUse;
-		public float ThrustForceMultiplier;
-		public float ThrustPowerMultiplier;
+		public bool Setup;
+
+		public bool RestrictThrustUse = false;
+		public float ThrustForceMultiplier = 1;
+		public float ThrustPowerMultiplier = 1;
 
 		public IMyCubeGrid OriginalGrid;
 
@@ -89,8 +91,23 @@ namespace ModularEncountersSpawner.BlockLogic{
 		}
 		
 		public override void UpdateBeforeSimulation(){
-			
-			if(Thruster == null && Entity != null){
+
+			if (!Setup)
+				SetupBlock();
+
+		}
+
+		public override void UpdateBeforeSimulation100() {
+
+			if (!Setup)
+				SetupBlock();
+
+		}
+
+		public void SetupBlock() {
+
+			Setup = true;
+			if (Thruster == null && Entity != null) {
 
 				//Logger.AddMsg("NPC Thruster Setup", true);
 				Thruster = Entity as IMyThrust;
@@ -176,12 +193,6 @@ namespace ModularEncountersSpawner.BlockLogic{
 				NeedsUpdate = MyEntityUpdateEnum.EACH_100TH_FRAME;
 
 			}
-
-		}
-
-		public override void UpdateBeforeSimulation100() {
-
-
 
 		}
 

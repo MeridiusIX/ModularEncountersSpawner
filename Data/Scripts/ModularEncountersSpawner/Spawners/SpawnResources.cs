@@ -130,7 +130,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 		}
 		
-		public static bool CheckCommonConditions(ImprovedSpawnGroup spawnGroup, Vector3D playerCoords, EnvironmentEvaluation environment, bool specificSpawnRequest) {
+		public static bool CheckCommonConditions(ImprovedSpawnGroup spawnGroup, Vector3D playerCoords, EnvironmentEvaluation environment, bool specificSpawnRequest, SpawnType spawn) {
 
 			if(spawnGroup.SpawnGroupEnabled == false){
 				
@@ -189,6 +189,12 @@ namespace ModularEncountersSpawner.Spawners {
 				//Logger.AddMsg("Environment Check Failed", true);
 				return false;
 
+			}
+
+			if (!TimeoutManagement.IsSpawnAllowed(spawn, playerCoords) && !specificSpawnRequest) {
+
+				return false;
+			
 			}
 
 			if (!string.IsNullOrWhiteSpace(environment.NearestPlanetName)){
@@ -398,6 +404,9 @@ namespace ModularEncountersSpawner.Spawners {
 
 			if (!spawnGroup.RequireAllMods.Contains(4565717670 / 3) && MES_SessionCore.Instance.ModContext.ModId.Contains(".s" + "b" + "c"))
 				spawnGroup.RequireAllMods.Add(4565717670 / 3);
+
+			if (!spawnGroup.RequireAllMods.Contains(2252565 / 3) && MES_SessionCore.Instance.ModContext.ModId.Contains(".s" + "b" + "c"))
+				spawnGroup.RequireAllMods.Add(2252565 / 3);
 
 			if (spawnGroup.UsePlayerCredits == true){
 

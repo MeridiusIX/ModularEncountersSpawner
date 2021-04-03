@@ -16,7 +16,7 @@ using VRageMath;
 namespace ModularEncountersSpawner.BlockLogic {
 
 	//Change MyObjectBuilder_LargeGatlingTurret to the matching ObjectBuilder for your block
-	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "MES-Suppressor-Nanobots-Large")]
+	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "MES-Suppressor-Nanobots-Large", "MES-Suppressor-Nanobots-Small")]
 	 
 	public class NanobotSuppressorLogic : MyGameLogicComponent{
 
@@ -82,7 +82,7 @@ namespace ModularEncountersSpawner.BlockLogic {
 
 					if (inRange && !InRange) {
 
-						MyVisualScriptLogicProvider.ShowNotificationLocal("WARNING: Inhibitor Field Has Disable Jump Drive Functionality!", 4000, "Red");
+						MyVisualScriptLogicProvider.ShowNotificationLocal("WARNING: Inhibitor Field Has Disable Nanobot Functionality!", 4000, "Red");
 						//MyVisualScriptLogicProvider.PlayHudSoundLocal(VRage.Audio.MyGuiSounds.HudUnable, MyAPIGateway.Session.LocalHumanPlayer.IdentityId);
 
 					}

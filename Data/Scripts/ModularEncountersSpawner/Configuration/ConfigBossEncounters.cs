@@ -58,91 +58,32 @@ namespace ModularEncountersSpawner.Configuration{
 		 
 	*/
 
-	public class ConfigBossEncounters{
+	public class ConfigBossEncounters : ConfigBase {
 		
-		public int PlayerSpawnCooldown {get; set;}
-		public int SpawnTimerTrigger {get; set;}
-		public int SignalActiveTimer {get; set;}
-		public int MaxShipsPerArea {get; set;}
-		public double AreaSize {get; set;}
-		public double TriggerDistance {get; set;}
-		public int PathCalculationAttempts {get; set;}
-		public double MinCoordsDistanceSpace {get; set;}
-		public double MaxCoordsDistanceSpace {get; set;}
-		public double MinCoordsDistancePlanet {get; set;}
-		public double MaxCoordsDistancePlanet {get; set;}
-		public double PlayersWithinDistance {get; set;}
-		public double MinPlanetAltitude {get; set;}
-		public double MinSignalDistFromOtherEntities {get; set;}
-		public double MinSpawnDistFromCoords {get; set;}
-		public double MaxSpawnDistFromCoords {get; set;}
-		public float MinAirDensity {get; set;}
+		public int PlayerSpawnCooldown;
+		public int SpawnTimerTrigger;
+		public int SignalActiveTimer;
+		public int MaxShipsPerArea;
+		public double AreaSize;
+		public double TriggerDistance;
+		public int PathCalculationAttempts;
+		public double MinCoordsDistanceSpace;
+		public double MaxCoordsDistanceSpace;
+		public double MinCoordsDistancePlanet;
+		public double MaxCoordsDistancePlanet;
+		public double PlayersWithinDistance;
+		public double MinPlanetAltitude;
+		public double MinSignalDistFromOtherEntities;
+		public double MinSpawnDistFromCoords;
+		public double MaxSpawnDistFromCoords;
+		public float MinAirDensity;
 		
-		public bool UseMaxSpawnGroupFrequency {get; set;}
-		public int MaxSpawnGroupFrequency {get; set;}
+		public bool UseMaxSpawnGroupFrequency;
+		public int MaxSpawnGroupFrequency;
 		
-		public double DespawnDistanceFromPlayer {get; set;}
+		public double DespawnDistanceFromPlayer;
+
 		
-		public bool UseCleanupSettings {get; set;}
-		public bool CleanupUseDistance {get; set;}
-		public bool CleanupUseTimer {get; set;}
-		public bool CleanupUseBlockLimit {get; set;}
-		public bool CleanupDistanceStartsTimer {get; set;}
-		public bool CleanupResetTimerWithinDistance {get; set;}
-		public double CleanupDistanceTrigger {get; set;}
-		public int CleanupTimerTrigger {get; set;}
-		public int CleanupBlockLimitTrigger {get; set;}
-		public bool CleanupIncludeUnowned {get; set;}
-		public bool CleanupUnpoweredOverride {get; set;}
-		public double CleanupUnpoweredDistanceTrigger {get; set;}
-		public int CleanupUnpoweredTimerTrigger {get; set;}
-		
-		public bool UseBlockDisable {get; set;}
-		public bool DisableAirVent {get; set;}
-		public bool DisableAntenna {get; set;}
-		public bool DisableArtificialMass {get; set;}
-		public bool DisableAssembler {get; set;}
-		public bool DisableBattery {get; set;}
-		public bool DisableBeacon {get; set;}
-		public bool DisableCollector {get; set;}
-		public bool DisableConnector {get; set;}
-		public bool DisableConveyorSorter {get; set;}
-		public bool DisableDecoy {get; set;}
-		public bool DisableDrill {get; set;}
-		public bool DisableJumpDrive {get; set;}
-		public bool DisableGasGenerator {get; set;}
-		public bool DisableGasTank {get; set;}
-		public bool DisableGatlingGun {get; set;}
-		public bool DisableGatlingTurret {get; set;}
-		public bool DisableGravityGenerator {get; set;}
-		public bool DisableGrinder {get; set;}
-		public bool DisableGyro {get; set;}
-		public bool DisableInteriorTurret {get; set;}
-		public bool DisableLandingGear {get; set;}
-		public bool DisableLaserAntenna {get; set;}
-		public bool DisableLcdPanel {get; set;}
-		public bool DisableLightBlock {get; set;}
-		public bool DisableMedicalRoom {get; set;}
-		public bool DisableMergeBlock {get; set;}
-		public bool DisableMissileTurret {get; set;}
-		public bool DisableOxygenFarm {get; set;}
-		public bool DisableParachuteHatch {get; set;}
-		public bool DisablePiston {get; set;}
-		public bool DisableProgrammableBlock {get; set;}
-		public bool DisableProjector {get; set;}
-		public bool DisableReactor {get; set;}
-		public bool DisableRefinery {get; set;}
-		public bool DisableRocketLauncher {get; set;}
-		public bool DisableReloadableRocketLauncher {get; set;}
-		public bool DisableRotor {get; set;}
-		public bool DisableSensor {get; set;}
-		public bool DisableSolarPanel {get; set;}
-		public bool DisableSoundBlock {get; set;}
-		public bool DisableSpaceBall {get; set;}
-		public bool DisableTimerBlock {get; set;}
-		public bool DisableThruster {get; set;}
-		public bool DisableWelder {get; set;}
-		public bool DisableUpgradeModule {get; set;}
 		
 		public ConfigBossEncounters(){
 			
@@ -168,7 +109,12 @@ namespace ModularEncountersSpawner.Configuration{
 			MaxSpawnGroupFrequency = 5;
 			
 			DespawnDistanceFromPlayer = 1000;
-			
+
+			UseTimeout = false;
+			TimeoutDuration = 900;
+			TimeoutRadius = 10000;
+			TimeoutSpawnLimit = 4;
+
 			UseCleanupSettings = true;
 			CleanupUseDistance = true;
 			CleanupUseTimer = false;
@@ -182,53 +128,6 @@ namespace ModularEncountersSpawner.Configuration{
 			CleanupUnpoweredOverride = true;
 			CleanupUnpoweredDistanceTrigger = 25000;
 			CleanupUnpoweredTimerTrigger = 900;
-			
-			UseBlockDisable = false;
-			DisableAirVent = false;
-			DisableAntenna = false;
-			DisableArtificialMass = false;
-			DisableAssembler = false;
-			DisableBattery = false;
-			DisableBeacon = false;
-			DisableCollector = false;
-			DisableConnector = false;
-			DisableConveyorSorter = false;
-			DisableDecoy = false;
-			DisableDrill = false;
-			DisableJumpDrive = false;
-			DisableGasGenerator = false;
-			DisableGasTank = false;
-			DisableGatlingGun = false;
-			DisableGatlingTurret = false;
-			DisableGravityGenerator = false;
-			DisableGrinder = false;
-			DisableGyro = false;
-			DisableInteriorTurret = false;
-			DisableLandingGear = false;
-			DisableLaserAntenna = false;
-			DisableLcdPanel = false;
-			DisableLightBlock = false;
-			DisableMedicalRoom = false;
-			DisableMergeBlock = false;
-			DisableMissileTurret = false;
-			DisableOxygenFarm = false;
-			DisableParachuteHatch = false;
-			DisablePiston = false;
-			DisableProgrammableBlock = false;
-			DisableProjector = false;
-			DisableReactor = false;
-			DisableRefinery = false;
-			DisableRocketLauncher = false;
-			DisableReloadableRocketLauncher = false;
-			DisableRotor = false;
-			DisableSensor = false;
-			DisableSolarPanel = false;
-			DisableSoundBlock = false;
-			DisableSpaceBall = false;
-			DisableTimerBlock = false;
-			DisableThruster = false;
-			DisableWelder = false;
-			DisableUpgradeModule = false;
 			
 		}
 		

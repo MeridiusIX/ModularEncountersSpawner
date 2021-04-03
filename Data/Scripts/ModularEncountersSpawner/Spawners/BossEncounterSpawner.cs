@@ -154,8 +154,9 @@ namespace ModularEncountersSpawner.Spawners {
 		   
 
 			Logger.SkipNextMessage = false;
+			TimeoutManagement.ApplySpawnTimeoutToZones(SpawnType.BossEncounter, spawnCoords);
 			return "Boss Encounter GPS Created with Spawngroup: " + spawnGroup.SpawnGroup.Id.SubtypeName;
-		
+
 		}
 		
 		public static List<ImprovedSpawnGroup> GetBossEncounters(Vector3D playerCoords, Vector3D spawnCoords, List<string> eligibleNames){
@@ -267,7 +268,7 @@ namespace ModularEncountersSpawner.Spawners {
 				
 				}
 				
-				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
+				if(SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest, SpawnType.BossEncounter) == false){
 					
 					continue;
 					
@@ -566,7 +567,15 @@ namespace ModularEncountersSpawner.Spawners {
 					MyVisualScriptLogicProvider.MusicPlayMusicCue(encounter.SpawnGroup.BossMusicId);
 				
 				}
-				
+
+				if (encounter.SpawnGroup.UniqueEncounter == true) {
+
+					SpawnGroupManager.UniqueGroupsSpawned.Add(encounter.SpawnGroup.SpawnGroup.Id.SubtypeName);
+					string[] uniqueSpawnedArray = SpawnGroupManager.UniqueGroupsSpawned.ToArray();
+					MyAPIGateway.Utilities.SetVariable<string[]>("MES-UniqueGroupsSpawned", uniqueSpawnedArray);
+
+				}
+
 				return true;
 				
 			}

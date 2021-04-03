@@ -54,7 +54,13 @@ namespace ModularEncountersSpawner.Templates{
 		
 		[ProtoMember(8)]
 		public Vector3D PlayerPosition {get; set;}
-		
+
+		[ProtoIgnore]
+		public bool BlockSource { get; set; }
+
+		[ProtoIgnore]
+		public IMyTerminalBlock Block { get; set; }
+
 		public SyncData(){
 			
 			Instruction = "";
@@ -65,7 +71,9 @@ namespace ModularEncountersSpawner.Templates{
 			GpsCoords = Vector3D.Zero;
 			ClipboardContents = "";
 			PlayerPosition = Vector3D.Zero;
-			
+			BlockSource = false;
+			Block = null;
+
 		}
 		
 	}

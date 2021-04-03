@@ -1,32 +1,18 @@
+using ModularEncountersSpawner.Configuration;
+using ModularEncountersSpawner.Manipulation;
+using ModularEncountersSpawner.Templates;
+using ModularEncountersSpawner.World;
+using ModularEncountersSpawner.Zones;
+using Sandbox.Definitions;
+using Sandbox.Game.Entities;
+using Sandbox.ModAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sandbox.Common;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.Definitions;
-using Sandbox.Definitions;
-using Sandbox.Game;
-using Sandbox.Game.Entities;
-using Sandbox.Game.EntityComponents;
-using Sandbox.Game.GameSystems;
-using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using SpaceEngineers.Game.ModAPI;
-using VRage.Game;
-using VRage.Game.Components;
-using VRage.Game.Entity;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
-using VRage.ObjectBuilders;
 using VRage.Utils;
 using VRageMath;
-using ModularEncountersSpawner.Configuration;
-using ModularEncountersSpawner.Templates;
-using ModularEncountersSpawner.Manipulation;
-using ModularEncountersSpawner.World;
-using ModularEncountersSpawner.Zones;
 
 namespace ModularEncountersSpawner.Spawners {
 
@@ -222,6 +208,8 @@ namespace ModularEncountersSpawner.Spawners {
 				pendingNPC.KeenAiName = prefab.Behaviour;
 				pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
 
+				TimeoutManagement.ApplySpawnTimeoutToZones(SpawnType.RandomEncounter, spawnPosition);
+
 				if (string.IsNullOrEmpty(pendingNPC.KeenAiName) == false) {
 
 					if (RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(pendingNPC.KeenAiName) && spawnGroup.UseRivalAi) {
@@ -256,7 +244,15 @@ namespace ModularEncountersSpawner.Spawners {
 				NPCWatcher.PendingNPCs.Add(pendingNPC);
 				
 			}
-			
+
+			if (spawnGroup.UniqueEncounter == true) {
+
+				SpawnGroupManager.UniqueGroupsSpawned.Add(spawnGroup.SpawnGroup.Id.SubtypeName);
+				string[] uniqueSpawnedArray = SpawnGroupManager.UniqueGroupsSpawned.ToArray();
+				MyAPIGateway.Utilities.SetVariable<string[]>("MES-UniqueGroupsSpawned", uniqueSpawnedArray);
+
+			}
+
 			Logger.SkipNextMessage = false;
 			return "Spawning Group - " + spawnGroup.SpawnGroup.Id.SubtypeName;
 			
@@ -332,7 +328,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 				}
 
-				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
+				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest, SpawnType.RandomEncounter) == false){
 					
 					continue;
 					

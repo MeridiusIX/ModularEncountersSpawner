@@ -26,7 +26,7 @@ namespace ModularEncountersSpawner {
 	
 	public class MES_SessionCore : MySessionComponentBase{
 		
-		public static float ModVersion = 1.119f;
+		public static float ModVersion = 1.124f;
 		public static string SaveName = "";
 		public static int PlayerWatcherTimer = 0;
 		public static Dictionary<IMyPlayer, PlayerWatcher> playerWatchList = new Dictionary<IMyPlayer, PlayerWatcher>();
@@ -56,7 +56,9 @@ namespace ModularEncountersSpawner {
 		public static bool NPCWeaponUpgradesModDetected = false;
 		public static bool SpaceWaveSpawnerModDetected = false;
 		public static bool CreatureOverrideModDetected = false;
+		public static bool InhibitorModDetected = false;
 		public static ulong CreatureOverrideModId = 2371761016;
+		public static ulong InhibitorModId = 2442393434;
 		public static bool spawningInProgress = false;
 
 		//WeaponCore and DefenseSheld API Requirements
@@ -109,6 +111,25 @@ namespace ModularEncountersSpawner {
 
 			Logger.AddMsg("Loading Settings From Modular Encounters Spawner Version: " + ModVersion.ToString());
 
+			ArmorModuleReplacement.Setup();
+
+			var defs = MyDefinitionManager.Static.GetAllDefinitions();
+
+			foreach (var def in defs) {
+
+				if (!ArmorModuleReplacement.ModuleSubtypes.Contains(def.Id.SubtypeName))
+					continue;
+
+				var block = def as MyRadioAntennaDefinition;
+
+				if (block == null)
+					continue;
+
+				block.MaxBroadcastRadius = 50000;
+				block.Size = new Vector3I(1, 1, 1);
+
+			}
+
 			if (MyAPIGateway.Multiplayer.IsServer == false)
 				return;
 
@@ -138,6 +159,12 @@ namespace ModularEncountersSpawner {
 
 					Logger.AddMsg("Creature Spawn Override Mod Detected");
 					CreatureOverrideModDetected = true;
+
+				}
+
+				if (mod.PublishedFileId == InhibitorModId) {
+
+					InhibitorModDetected = true;
 
 				}
 
@@ -482,6 +509,9 @@ namespace ModularEncountersSpawner {
 			//Rival AI Stuff
 			Logger.AddMsg("Initializing RivalAI Helper");
 			RivalAIHelper.SetupRivalAIHelper();
+
+			//Init Chat Command Alternative Controls
+			Debug.SpawnProgramBlockForControls();
 
 			//Disable Vanilla Spawners
 			Logger.AddMsg("Checking World Settings.");

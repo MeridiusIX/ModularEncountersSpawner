@@ -122,6 +122,8 @@ namespace ModularEncountersSpawner.Spawners {
 				pendingNPC.KeenAiName = prefab.Behaviour;
 				pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
 
+				TimeoutManagement.ApplySpawnTimeoutToZones(SpawnType.OtherNPC, spawnPosition);
+
 				if (string.IsNullOrEmpty(pendingNPC.KeenAiName) == false) {
 
 					if (RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(pendingNPC.KeenAiName) && spawnGroup.UseRivalAi) {

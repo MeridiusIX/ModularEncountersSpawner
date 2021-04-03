@@ -652,6 +652,25 @@ namespace ModularEncountersSpawner {
 
 			}
 
+			sb.AppendLine();
+
+			//Timeouts
+			sb.Append("::: Timeout Zones :::").AppendLine().AppendLine();
+
+			foreach (var zone in TimeoutManagement.Timeouts) {
+
+				if (!zone.InsideRadius(coords))
+					continue;
+
+				var times = zone.TimeoutLength();
+
+				if (times.X >= times.Y)
+					continue;
+
+				sb.Append(zone.GetInfo(coords)).AppendLine();
+
+			}
+
 			return sb.ToString();
 			
 			

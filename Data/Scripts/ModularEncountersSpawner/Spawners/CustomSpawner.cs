@@ -154,6 +154,8 @@ namespace ModularEncountersSpawner.Spawners {
 				pendingNPC.KeenAiName = prefab.Behaviour;
 				pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
 
+				TimeoutManagement.ApplySpawnTimeoutToZones(SpawnType.OtherNPC, startPathCoords);
+
 				if (string.IsNullOrEmpty(pendingNPC.KeenAiName) == false) {
 
 					if (RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(pendingNPC.KeenAiName) && spawnGroup.UseRivalAi) {
@@ -187,7 +189,15 @@ namespace ModularEncountersSpawner.Spawners {
 				NPCWatcher.PendingNPCs.Add(pendingNPC);
 				
 			}
-			
+
+			if (spawnGroup.UniqueEncounter == true) {
+
+				SpawnGroupManager.UniqueGroupsSpawned.Add(spawnGroup.SpawnGroup.Id.SubtypeName);
+				string[] uniqueSpawnedArray = SpawnGroupManager.UniqueGroupsSpawned.ToArray();
+				MyAPIGateway.Utilities.SetVariable<string[]>("MES-UniqueGroupsSpawned", uniqueSpawnedArray);
+
+			}
+
 			Logger.SkipNextMessage = false;
 			//return "Spawning Group - " + spawnGroup.SpawnGroup.Id.SubtypeName;
 			return true;
@@ -242,7 +252,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 				}
 
-				if(SpawnResources.CheckCommonConditions(spawnGroup, coords, environment, false) == false){
+				if(SpawnResources.CheckCommonConditions(spawnGroup, coords, environment, false, SpawnType.OtherNPC) == false){
 					
 					continue;
 					

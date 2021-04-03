@@ -12,7 +12,7 @@ using VRageMath;
 namespace ModularEncountersSpawner.BlockLogic {
 
 	//Change MyObjectBuilder_LargeGatlingTurret to the matching ObjectBuilder for your block
-	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "MES-Suppressor-Jetpack-Large")]
+	[MyEntityComponentDescriptor(typeof(MyObjectBuilder_RadioAntenna), false, "MES-Suppressor-Jetpack-Large", "MES-Suppressor-Jetpack-Small")]
 	 
 	public class JetpackInhibitor : MyGameLogicComponent{
 		

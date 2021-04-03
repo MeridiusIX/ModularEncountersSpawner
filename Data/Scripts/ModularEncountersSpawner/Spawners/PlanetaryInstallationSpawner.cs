@@ -47,6 +47,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 			if (!MES_SessionCore.SpawnerEnabled) {
 
+				Logger.SkipNextMessage = true;
 				return "Spawner Disabled Due To Incompatible World Settings (Selective Physics Updates)";
 
 			}
@@ -56,7 +57,8 @@ namespace ModularEncountersSpawner.Spawners {
 				var totalNPCs = NPCWatcher.ActiveNPCs.Count;
 				
 				if(totalNPCs >= Settings.General.MaxGlobalNpcGrids){
-					
+
+					Logger.SkipNextMessage = true;
 					return "Spawning Aborted. Max Global NPCs Limit Reached.";
 					
 				}
@@ -64,7 +66,8 @@ namespace ModularEncountersSpawner.Spawners {
 			}
 			
 			if(NPCWatcher.ActiveNpcTypeLimitReachedForArea("PlanetaryInstallation", startCoords, Settings.PlanetaryInstallations.MaxShipsPerArea, Settings.PlanetaryInstallations.AreaSize) == true){
-				
+
+				Logger.SkipNextMessage = true;
 				return "Too Many Planetary Installation Grids in Player Area";
 				
 			}
@@ -72,13 +75,15 @@ namespace ModularEncountersSpawner.Spawners {
 			MyPlanet planet = SpawnResources.GetNearestPlanet(startCoords);
 			
 			if(planet == null){
-				
+
+				Logger.SkipNextMessage = true;
 				return "Player Not On Planet Or No Planets In Game World Found.";
 				
 			}else{
 				
 				if(SpawnResources.GetDistanceFromSurface(startCoords, planet) > Settings.PlanetaryInstallations.PlayerMaximumDistanceFromSurface || SpawnResources.IsPositionInGravity(startCoords, planet) == false){
-					
+
+					Logger.SkipNextMessage = true;
 					return "Player Not In Planet Gravity Or Too Far From Surface.";
 					
 				}
@@ -102,7 +107,8 @@ namespace ModularEncountersSpawner.Spawners {
 
 					if (Vector3D.Distance(MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck, playerSurface) < Settings.PlanetaryInstallations.PlayerDistanceSpawnTrigger) {
 
-						Logger.AddMsg("Player Travelled: " + Vector3D.Distance(MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck, playerSurface) + " Distance From Last Saved Position.");
+						Logger.AddMsg("Player Travelled: " + Vector3D.Distance(MES_SessionCore.playerWatchList[player].InstallationDistanceCoordCheck, playerSurface) + " Distance From Last Saved Position.", true);
+						Logger.SkipNextMessage = true;
 						return "Player Hasn't Traveled Far Enough Yet.";
 
 					}
@@ -368,7 +374,9 @@ namespace ModularEncountersSpawner.Spawners {
 				pendingNPC.ForceStaticGrid = spawnGroup.ForceStaticGrid;
 				pendingNPC.KeenAiName = prefab.Behaviour;
 				pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
-				
+
+				TimeoutManagement.ApplySpawnTimeoutToZones(SpawnType.PlanetaryInstallation, spawnPosition);
+
 				if (string.IsNullOrEmpty(pendingNPC.KeenAiName) == false) {
 
 					if (RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(pendingNPC.KeenAiName) && spawnGroup.UseRivalAi) {
@@ -633,7 +641,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 				}
 
-				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
+				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest, SpawnType.PlanetaryInstallation) == false){
 					
 					continue;
 					

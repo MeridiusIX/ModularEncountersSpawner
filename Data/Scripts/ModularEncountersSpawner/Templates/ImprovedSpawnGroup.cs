@@ -196,7 +196,7 @@ namespace ModularEncountersSpawner.Templates{
 
 		public bool UseRandomNameGenerator; 
 		public string RandomGridNamePrefix; 
-		public string RandomGridNamePattern; 
+		public List<string> RandomGridNamePattern; 
 		public string ReplaceAntennaNameWithRandomizedName;
 
 		public bool UseBlockNameReplacer; 
@@ -282,9 +282,13 @@ namespace ModularEncountersSpawner.Templates{
 		public double MinSpawnFromWorldCenter;
 		public double MaxSpawnFromWorldCenter;
 		public Vector3D CustomWorldCenter;
-		public Vector3D DirectionFromWorldCenter;
+		public List<Vector3D> DirectionFromWorldCenter;
 		public double MinAngleFromDirection;
 		public double MaxAngleFromDirection;
+
+		public List<Vector3D> DirectionFromPlanetCenter;
+		public double MinAngleFromPlanetCenterDirection;
+		public double MaxAngleFromPlanetCenterDirection;
 
 		public double MinSpawnFromPlanetSurface;
 		public double MaxSpawnFromPlanetSurface;
@@ -529,7 +533,7 @@ namespace ModularEncountersSpawner.Templates{
 
 			UseRandomNameGenerator = false;
 			RandomGridNamePrefix = "";
-			RandomGridNamePattern = "";
+			RandomGridNamePattern = new List<string>();
 			ReplaceAntennaNameWithRandomizedName = "";
 
 			UseBlockNameReplacer = false;
@@ -615,9 +619,13 @@ namespace ModularEncountersSpawner.Templates{
 			MinSpawnFromWorldCenter = -1;
 			MaxSpawnFromWorldCenter = -1;
 			CustomWorldCenter = Vector3D.Zero;
-			DirectionFromWorldCenter = Vector3D.Zero;
+			DirectionFromWorldCenter = new List<Vector3D>();
 			MinAngleFromDirection = -1;
 			MaxAngleFromDirection = -1;
+
+			DirectionFromPlanetCenter = new List<Vector3D>();
+			MinAngleFromPlanetCenterDirection = -1;
+			MaxAngleFromPlanetCenterDirection = -1;
 
 			MinSpawnFromPlanetSurface = -1;
 			MaxSpawnFromPlanetSurface = -1;

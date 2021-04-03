@@ -133,7 +133,7 @@ namespace ModularEncountersSpawner {
 
 			}
 
-			if(SpawnGroupManager.GroupInstance.Contains(Encoding.UTF8.GetString(Convert.FromBase64String("LnNibQ=="))) == true && SpawnGroupManager.GroupInstance.Contains(Encoding.UTF8.GetString(Convert.FromBase64String("MTUyMTkwNTg5MA=="))) == false) {
+			if(SpawnGroupManager.GroupInstance.Contains(Encoding.UTF8.GetString(Convert.FromBase64String("LnNibQ=="))) == true && (!SpawnGroupManager.GroupInstance.Contains(Encoding.UTF8.GetString(Convert.FromBase64String("MTUyMTkwNTg5MA=="))) && !SpawnGroupManager.GroupInstance.Contains(Encoding.UTF8.GetString(Convert.FromBase64String("NzUwODU1"))))) {
 
 				SpawnGroups.Clear();
 				return;
@@ -250,19 +250,61 @@ namespace ModularEncountersSpawner {
 				
 			}
 
-			if (spawnGroup.DirectionFromWorldCenter != Vector3D.Zero) {
+			if (spawnGroup.DirectionFromWorldCenter.Count > 0) {
 
-				var normalizedDirection = Vector3D.Normalize(spawnGroup.DirectionFromWorldCenter);
-				var angleFromCoords = SpawnResources.GetAngleBetweenDirections(normalizedDirection, environment.DirectionFromWorldCenter);
+				bool allowed = false;
 
-				if (spawnGroup.MinAngleFromDirection > 0 && angleFromCoords < spawnGroup.MinAngleFromDirection)
-					return false;
+				foreach (var direction in spawnGroup.DirectionFromWorldCenter) {
 
-				if (spawnGroup.MaxAngleFromDirection > 0 && angleFromCoords > spawnGroup.MinAngleFromDirection)
+					if (direction != Vector3D.Zero) {
+
+						var normalizedDirection = Vector3D.Normalize(direction - spawnGroup.CustomWorldCenter);
+						var angleFromCoords = SpawnResources.GetAngleBetweenDirections(normalizedDirection, environment.DirectionFromWorldCenter);
+
+						if (spawnGroup.MinAngleFromDirection > 0 && angleFromCoords < spawnGroup.MinAngleFromDirection)
+							continue;
+
+						if (spawnGroup.MaxAngleFromDirection > 0 && angleFromCoords > spawnGroup.MaxAngleFromDirection)
+							continue;
+
+						allowed = true;
+
+					}
+
+				}
+
+				if (!allowed)
 					return false;
 
 			}
-			
+
+			if (environment.IsOnPlanet && spawnGroup.DirectionFromPlanetCenter.Count > 0) {
+
+				bool allowed = false;
+
+				foreach (var direction in spawnGroup.DirectionFromPlanetCenter) {
+
+					if (direction != Vector3D.Zero) {
+
+						var angleFromCoords = SpawnResources.GetAngleBetweenDirections(direction, Vector3D.Normalize(environment.Position - environment.NearestPlanet.PositionComp.WorldAABB.Center));
+
+						if (spawnGroup.MinAngleFromPlanetCenterDirection > 0 && angleFromCoords < spawnGroup.MinAngleFromPlanetCenterDirection)
+							continue;
+
+						if (spawnGroup.MaxAngleFromPlanetCenterDirection > 0 && angleFromCoords > spawnGroup.MaxAngleFromPlanetCenterDirection)
+							continue;
+
+						allowed = true;
+
+					}
+
+				}
+
+				if (!allowed)
+					return false;
+
+			}
+
 			return true;
 			
 		}
@@ -374,84 +416,84 @@ namespace ModularEncountersSpawner {
 				var tag = tagRaw.Trim();
 
 				//SpawnGroupEnabled
-				if(tag.Contains("[SpawnGroupEnabled:") == true){
+				if(tag.StartsWith("[SpawnGroupEnabled:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.SpawnGroupEnabled);
 										
 				}
 				
 				//SpaceCargoShip
-				if(tag.Contains("[SpaceCargoShip:") == true){
+				if(tag.StartsWith("[SpaceCargoShip:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.SpaceCargoShip);
 										
 				}
 				
 				//LunarCargoShip
-				if(tag.Contains("[LunarCargoShip:") == true){
+				if(tag.StartsWith("[LunarCargoShip:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.LunarCargoShip);
 						
 				}
 				
 				//AtmosphericCargoShip
-				if(tag.Contains("[AtmosphericCargoShip:") == true){
+				if(tag.StartsWith("[AtmosphericCargoShip:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.AtmosphericCargoShip);
 						
 				}
 
 				//GravityCargoShip
-				if (tag.Contains("[GravityCargoShip:") == true) {
+				if (tag.StartsWith("[GravityCargoShip:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.GravityCargoShip);
 
 				}
 
 				//SkipAirDensityCheck
-				if (tag.Contains("[SkipAirDensityCheck:") == true) {
+				if (tag.StartsWith("[SkipAirDensityCheck:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.SkipAirDensityCheck);
 
 				}
 
 				//CargoShipTerrainPath
-				if (tag.Contains("[CargoShipTerrainPath:") == true) {
+				if (tag.StartsWith("[CargoShipTerrainPath:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.CargoShipTerrainPath);
 
 				}
 
 				//CustomPathStartAltitude
-				if (tag.Contains("[CustomPathStartAltitude:") == true) {
+				if (tag.StartsWith("[CustomPathStartAltitude:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.CustomPathStartAltitude);
 
 				}
 
 				//CustomPathEndAltitude
-				if (tag.Contains("[CustomPathEndAltitude:") == true) {
+				if (tag.StartsWith("[CustomPathEndAltitude:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.CustomPathEndAltitude);
 
 				}
 
 				//SpaceRandomEncounter
-				if (tag.Contains("[SpaceRandomEncounter:") == true){
+				if (tag.StartsWith("[SpaceRandomEncounter:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.SpaceRandomEncounter);
 						
 				}
 				
 				//PlanetaryInstallation
-				if(tag.Contains("[PlanetaryInstallation:") == true){
+				if(tag.StartsWith("[PlanetaryInstallation:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.PlanetaryInstallation);
 						
 				}
 				
 				//PlanetaryInstallationType
-				if(tag.Contains("[PlanetaryInstallationType:") == true){
+				if(tag.StartsWith("[PlanetaryInstallationType:") == true){
 
 					TagStringCheck(tag, ref improveSpawnGroup.PlanetaryInstallationType);
 					
@@ -464,161 +506,161 @@ namespace ModularEncountersSpawner {
 				}
 				
 				//SkipTerrainCheck
-				if(tag.Contains("[SkipTerrainCheck:") == true){
+				if(tag.StartsWith("[SkipTerrainCheck:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.SkipTerrainCheck);
 						
 				}
 
 				//RotateInstallations
-				if(tag.Contains("[RotateInstallations:") == true) {
+				if(tag.StartsWith("[RotateInstallations:") == true) {
 
 					TagVector3DListCheck(tag, ref improveSpawnGroup.RotateInstallations);
 
 				}
 
 				//InstallationTerrainValidation
-				if (tag.Contains("[InstallationTerrainValidation:") == true) {
+				if (tag.StartsWith("[InstallationTerrainValidation:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.InstallationTerrainValidation);
 
 				}
 
 				//InstallationSpawnsOnDryLand
-				if (tag.Contains("[InstallationSpawnsOnDryLand:") == true) {
+				if (tag.StartsWith("[InstallationSpawnsOnDryLand:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.InstallationSpawnsOnDryLand);
 
 				}
 
 				//InstallationSpawnsUnderwater
-				if (tag.Contains("[InstallationSpawnsUnderwater:") == true) {
+				if (tag.StartsWith("[InstallationSpawnsUnderwater:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.InstallationSpawnsUnderwater);
 
 				}
 
 				//InstallationSpawnsOnWaterSurface
-				if (tag.Contains("[InstallationSpawnsOnWaterSurface:") == true) {
+				if (tag.StartsWith("[InstallationSpawnsOnWaterSurface:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.InstallationSpawnsOnWaterSurface);
 
 				}
 
 				//ReverseForwardDirections
-				if (tag.Contains("[ReverseForwardDirections:") == true) {
+				if (tag.StartsWith("[ReverseForwardDirections:") == true) {
 
 					TagBoolListCheck(tag, ref improveSpawnGroup.ReverseForwardDirections);
 
 				}
 
 				//CutVoxelsAtAirtightCells
-				if(tag.Contains("[CutVoxelsAtAirtightCells:") == true){
+				if(tag.StartsWith("[CutVoxelsAtAirtightCells:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.CutVoxelsAtAirtightCells);
 						
 				}
 				
 				//BossEncounterSpace
-				if(tag.Contains("[BossEncounterSpace:") == true){
+				if(tag.StartsWith("[BossEncounterSpace:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.BossEncounterSpace);
 						
 				}
 				
 				//BossEncounterAtmo
-				if(tag.Contains("[BossEncounterAtmo:") == true){
+				if(tag.StartsWith("[BossEncounterAtmo:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.BossEncounterAtmo);
 						
 				}
 				
 				//BossEncounterAny
-				if(tag.Contains("[BossEncounterAny:") == true){
+				if(tag.StartsWith("[BossEncounterAny:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.BossEncounterAny);
 						
 				}
 
 				//RivalAiSpawn
-				if (tag.Contains("[RivalAiSpawn:") == true) {
+				if (tag.StartsWith("[RivalAiSpawn:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiAnySpawn);
 
 				}
 
 				//RivalAiSpaceSpawn
-				if (tag.Contains("[RivalAiSpaceSpawn:") == true) {
+				if (tag.StartsWith("[RivalAiSpaceSpawn:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiSpaceSpawn);
 
 				}
 
 				//RivalAiAtmosphericSpawn
-				if(tag.Contains("[RivalAiAtmosphericSpawn:") == true) {
+				if(tag.StartsWith("[RivalAiAtmosphericSpawn:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiAtmosphericSpawn);
 
 				}
 
 				//RivalAiAnySpawn
-				if(tag.Contains("[RivalAiAnySpawn:") == true) {
+				if(tag.StartsWith("[RivalAiAnySpawn:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiAnySpawn);
 
 				}
 
 				//CreatureSpawn
-				if (tag.Contains("[CreatureSpawn:") == true) {
+				if (tag.StartsWith("[CreatureSpawn:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.CreatureSpawn);
 
 				}
 
 				//CreatureIds
-				if (tag.Contains("[CreatureIds:") == true) {
+				if (tag.StartsWith("[CreatureIds:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.CreatureIds);
 
 				}
 
 				//MinCreatureCount
-				if (tag.Contains("[MinCreatureCount:") == true) {
+				if (tag.StartsWith("[MinCreatureCount:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.MinCreatureCount);
 
 				}
 
 				//MaxCreatureCount
-				if (tag.Contains("[MaxCreatureCount:") == true) {
+				if (tag.StartsWith("[MaxCreatureCount:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.MaxCreatureCount);
 
 				}
 
 				//MinCreatureDistance
-				if (tag.Contains("[MinCreatureDistance:") == true) {
+				if (tag.StartsWith("[MinCreatureDistance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.MinCreatureDistance);
 
 				}
 
 				//MaxCreatureDistance
-				if (tag.Contains("[MaxCreatureDistance:") == true) {
+				if (tag.StartsWith("[MaxCreatureDistance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.MaxCreatureDistance);
 
 				}
 
 				//CanSpawnUnderwater
-				if (tag.Contains("[CanSpawnUnderwater:") == true) {
+				if (tag.StartsWith("[CanSpawnUnderwater:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.CanSpawnUnderwater);
 
 				}
 
 				//MinWaterDepth
-				if (tag.Contains("[MinWaterDepth:") == true) {
+				if (tag.StartsWith("[MinWaterDepth:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MinWaterDepth);
 
@@ -628,14 +670,14 @@ namespace ModularEncountersSpawner {
 				improveSpawnGroup.Frequency = (int)Math.Round((double)spawnGroup.Frequency * 10);
 				
 				//UniqueEncounter
-				if(tag.Contains("[UniqueEncounter:") == true){
+				if(tag.StartsWith("[UniqueEncounter:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UniqueEncounter);
 						
 				}
 				
 				//FactionOwner
-				if(tag.Contains("[FactionOwner:") == true){
+				if(tag.StartsWith("[FactionOwner:") == true){
 
 					TagStringCheck(tag, ref improveSpawnGroup.FactionOwner);
 					
@@ -648,70 +690,70 @@ namespace ModularEncountersSpawner {
 				}
 
 				//UseRandomMinerFaction
-				if(tag.Contains("[UseRandomMinerFaction:") == true) {
+				if(tag.StartsWith("[UseRandomMinerFaction:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseRandomMinerFaction);
 
 				}
 
 				//UseRandomBuilderFaction
-				if(tag.Contains("[UseRandomBuilderFaction:") == true) {
+				if(tag.StartsWith("[UseRandomBuilderFaction:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseRandomBuilderFaction);
 
 				}
 
 				//UseRandomTraderFaction
-				if(tag.Contains("[UseRandomTraderFaction:") == true) {
+				if(tag.StartsWith("[UseRandomTraderFaction:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseRandomTraderFaction);
 
 				}
 
 				//IgnoreCleanupRules
-				if(tag.Contains("[IgnoreCleanupRules:") == true){
+				if(tag.StartsWith("[IgnoreCleanupRules:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreCleanupRules);
 						
 				}
 				
 				//ReplenishSystems
-				if(tag.Contains("[ReplenishSystems:") == true){
+				if(tag.StartsWith("[ReplenishSystems:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ReplenishSystems);
 						
 				}
 
 				//UseNonPhysicalAmmo
-				if(tag.Contains("[UseNonPhysicalAmmo:") == true) {
+				if(tag.StartsWith("[UseNonPhysicalAmmo:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseNonPhysicalAmmo);
 
 				}
 
 				//RemoveContainerContents
-				if(tag.Contains("[RemoveContainerContents:") == true) {
+				if(tag.StartsWith("[RemoveContainerContents:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RemoveContainerContents);
 
 				}
 
 				//InitializeStoreBlocks
-				if(tag.Contains("[InitializeStoreBlocks:") == true) {
+				if(tag.StartsWith("[InitializeStoreBlocks:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.InitializeStoreBlocks);
 
 				}
 
 				//ContainerTypesForStoreOrders
-				if(tag.Contains("[ContainerTypesForStoreOrders:") == true) {
+				if(tag.StartsWith("[ContainerTypesForStoreOrders:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.ContainerTypesForStoreOrders);
 
 				}
 
 				//ForceStaticGrid
-				if(tag.Contains("[ForceStaticGrid:") == true){
+				if(tag.StartsWith("[ForceStaticGrid:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ForceStaticGrid);
 					setForceStatic = true;
@@ -719,553 +761,553 @@ namespace ModularEncountersSpawner {
 				}
 				
 				//AdminSpawnOnly
-				if(tag.Contains("[AdminSpawnOnly:") == true){
+				if(tag.StartsWith("[AdminSpawnOnly:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.AdminSpawnOnly);
 						
 				}
 
 				//SandboxVariables
-				if(tag.Contains("[SandboxVariables:") == true){
+				if(tag.StartsWith("[SandboxVariables:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.SandboxVariables);
 						
 				}
 
 				//FalseSandboxVariables
-				if(tag.Contains("[FalseSandboxVariables:") == true) {
+				if(tag.StartsWith("[FalseSandboxVariables:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.FalseSandboxVariables);
 
 				}
 
 				//RandomNumberRoll
-				if(tag.Contains("[RandomNumberRoll:") == true){
+				if(tag.StartsWith("[RandomNumberRoll:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.RandomNumberRoll);
 						
 				}
 
 				//UseCommonConditions
-				if(tag.Contains("[UseCommonConditions:") == true) {
+				if(tag.StartsWith("[UseCommonConditions:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseCommonConditions);
 
 				}
 
 				//ChanceCeiling
-				if (tag.Contains("[ChanceCeiling:") == true) {
+				if (tag.StartsWith("[ChanceCeiling:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.ChanceCeiling);
 
 				}
 
 				//SpaceCargoShipChance
-				if (tag.Contains("[SpaceCargoShipChance:") == true) {
+				if (tag.StartsWith("[SpaceCargoShipChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.SpaceCargoShipChance);
 
 				}
 
 				//LunarCargoShipChance
-				if (tag.Contains("[LunarCargoShipChance:") == true) {
+				if (tag.StartsWith("[LunarCargoShipChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.LunarCargoShipChance);
 
 				}
 
 				//AtmosphericCargoShipChance
-				if (tag.Contains("[AtmosphericCargoShipChance:") == true) {
+				if (tag.StartsWith("[AtmosphericCargoShipChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.AtmosphericCargoShipChance);
 
 				}
 
 				//GravityCargoShipChance
-				if (tag.Contains("[GravityCargoShipChance:") == true) {
+				if (tag.StartsWith("[GravityCargoShipChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.GravityCargoShipChance);
 
 				}
 
 				//RandomEncounterChance
-				if (tag.Contains("[RandomEncounterChance:") == true) {
+				if (tag.StartsWith("[RandomEncounterChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.RandomEncounterChance);
 
 				}
 
 				//PlanetaryInstallationChance
-				if (tag.Contains("[PlanetaryInstallationChance:") == true) {
+				if (tag.StartsWith("[PlanetaryInstallationChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.PlanetaryInstallationChance);
 
 				}
 
 				//BossEncounterChance
-				if (tag.Contains("[BossEncounterChance:") == true) {
+				if (tag.StartsWith("[BossEncounterChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.BossEncounterChance);
 
 				}
 
 				//UseAutoPilotInSpace
-				if (tag.Contains("[UseAutoPilotInSpace:") == true) {
+				if (tag.StartsWith("[UseAutoPilotInSpace:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseAutoPilotInSpace);
 
 				}
 
 				//PauseAutopilotAtPlayerDistance
-				if(tag.Contains("[PauseAutopilotAtPlayerDistance:") == true) {
+				if(tag.StartsWith("[PauseAutopilotAtPlayerDistance:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.PauseAutopilotAtPlayerDistance);
 
 				}
 
 				//PreventOwnershipChange
-				if(tag.Contains("[PreventOwnershipChange:") == true) {
+				if(tag.StartsWith("[PreventOwnershipChange:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.PreventOwnershipChange);
 
 				}
 
 				//RandomizeWeapons
-				if(tag.Contains("[RandomizeWeapons:") == true){
+				if(tag.StartsWith("[RandomizeWeapons:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RandomizeWeapons);
 						
 				}
 				
 				//IgnoreWeaponRandomizerMod
-				if(tag.Contains("[IgnoreWeaponRandomizerMod:") == true){
+				if(tag.StartsWith("[IgnoreWeaponRandomizerMod:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerMod);
 						
 				}
 				
 				//IgnoreWeaponRandomizerTargetGlobalBlacklist
-				if(tag.Contains("[IgnoreWeaponRandomizerTargetGlobalBlacklist:") == true){
+				if(tag.StartsWith("[IgnoreWeaponRandomizerTargetGlobalBlacklist:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerTargetGlobalBlacklist);
 						
 				}
 				
 				//IgnoreWeaponRandomizerTargetGlobalWhitelist
-				if(tag.Contains("[IgnoreWeaponRandomizerTargetGlobalWhitelist:") == true){
+				if(tag.StartsWith("[IgnoreWeaponRandomizerTargetGlobalWhitelist:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerTargetGlobalWhitelist);
 						
 				}
 				
 				//IgnoreWeaponRandomizerGlobalBlacklist
-				if(tag.Contains("[IgnoreWeaponRandomizerGlobalBlacklist:") == true){
+				if(tag.StartsWith("[IgnoreWeaponRandomizerGlobalBlacklist:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerGlobalBlacklist);
 						
 				}
 				
 				//IgnoreWeaponRandomizerGlobalWhitelist
-				if(tag.Contains("[IgnoreWeaponRandomizerGlobalWhitelist:") == true){
+				if(tag.StartsWith("[IgnoreWeaponRandomizerGlobalWhitelist:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreWeaponRandomizerGlobalWhitelist);
 						
 				}
 				
 				//WeaponRandomizerTargetBlacklist
-				if(tag.Contains("[WeaponRandomizerTargetBlacklist:") == true){
+				if(tag.StartsWith("[WeaponRandomizerTargetBlacklist:") == true){
 
 					 TagStringListCheck(tag, ref improveSpawnGroup.WeaponRandomizerTargetBlacklist);
 						
 				}
 				
 				//WeaponRandomizerTargetWhitelist
-				if(tag.Contains("[WeaponRandomizerTargetWhitelist:") == true){
+				if(tag.StartsWith("[WeaponRandomizerTargetWhitelist:") == true){
 
 					 TagStringListCheck(tag, ref improveSpawnGroup.WeaponRandomizerTargetWhitelist);
 						
 				}
 				
 				//WeaponRandomizerBlacklist
-				if(tag.Contains("[WeaponRandomizerBlacklist:") == true){
+				if(tag.StartsWith("[WeaponRandomizerBlacklist:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.WeaponRandomizerBlacklist);
 						
 				}
 				
 				//WeaponRandomizerWhitelist
-				if(tag.Contains("[WeaponRandomizerWhitelist:") == true){
+				if(tag.StartsWith("[WeaponRandomizerWhitelist:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.WeaponRandomizerWhitelist);
 						
 				}
 
 				//RandomWeaponChance
-				if (tag.Contains("[RandomWeaponChance:") == true) {
+				if (tag.StartsWith("[RandomWeaponChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.RandomWeaponChance);
 
 				}
 
 				//RandomWeaponSizeVariance
-				if (tag.Contains("[RandomWeaponSizeVariance:") == true) {
+				if (tag.StartsWith("[RandomWeaponSizeVariance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.RandomWeaponSizeVariance);
 
 				}
 
 				//NonRandomWeaponNames
-				if (tag.Contains("[NonRandomWeaponNames:") == true) {
+				if (tag.StartsWith("[NonRandomWeaponNames:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.NonRandomWeaponNames);
 
 				}
 
 				//NonRandomWeaponIds
-				if (tag.Contains("[NonRandomWeaponIds:") == true) {
+				if (tag.StartsWith("[NonRandomWeaponIds:") == true) {
 
 					TagMyDefIdCheck(tag, ref improveSpawnGroup.NonRandomWeaponIds);
 
 				}
 
 				//NonRandomWeaponReplacingOnly
-				if (tag.Contains("[NonRandomWeaponReplacingOnly:") == true) {
+				if (tag.StartsWith("[NonRandomWeaponReplacingOnly:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.NonRandomWeaponReplacingOnly);
 
 				}
 
 				//AddDefenseShieldBlocks
-				if (tag.Contains("[AddDefenseShieldBlocks:") == true) {
+				if (tag.StartsWith("[AddDefenseShieldBlocks:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.AddDefenseShieldBlocks);
 
 				}
 
 				//IgnoreShieldProviderMod
-				if (tag.Contains("[IgnoreShieldProviderMod:") == true) {
+				if (tag.StartsWith("[IgnoreShieldProviderMod:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreShieldProviderMod);
 
 				}
 
 				//ShieldProviderChance
-				if (tag.Contains("[ShieldProviderChance:") == true) {
+				if (tag.StartsWith("[ShieldProviderChance:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.ShieldProviderChance);
 
 				}
 
 				//ReplaceArmorBlocksWithModules
-				if (tag.Contains("[ReplaceArmorBlocksWithModules:") == true) {
+				if (tag.StartsWith("[ReplaceArmorBlocksWithModules:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ReplaceArmorBlocksWithModules);
 
 				}
 
 				//ModulesForArmorReplacement
-				if (tag.Contains("[ModulesForArmorReplacement:") == true) {
+				if (tag.StartsWith("[ModulesForArmorReplacement:") == true) {
 
 					TagMyDefIdCheck(tag, ref improveSpawnGroup.ModulesForArmorReplacement);
 
 				}
 
 				//UseBlockReplacerProfile
-				if (tag.Contains("[UseBlockReplacerProfile:") == true){
+				if (tag.StartsWith("[UseBlockReplacerProfile:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseBlockReplacerProfile);
 						
 				}
 				
 				//BlockReplacerProfileNames
-				if(tag.Contains("[BlockReplacerProfileNames:") == true){
+				if(tag.StartsWith("[BlockReplacerProfileNames:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.BlockReplacerProfileNames);
 					
 				}
 				
 				//UseBlockReplacer
-				if(tag.Contains("[UseBlockReplacer:") == true){
+				if(tag.StartsWith("[UseBlockReplacer:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseBlockReplacer);
 						
 				}
 				
 				//RelaxReplacedBlocksSize
-				if(tag.Contains("[RelaxReplacedBlocksSize:") == true){
+				if(tag.StartsWith("[RelaxReplacedBlocksSize:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RelaxReplacedBlocksSize);
 						
 				}
 				
 				//AlwaysRemoveBlock
-				if(tag.Contains("[AlwaysRemoveBlock:") == true){
+				if(tag.StartsWith("[AlwaysRemoveBlock:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.AlwaysRemoveBlock);
 						
 				}
 
 				//ConfigureSpecialNpcThrusters
-				if (tag.Contains("[ConfigureSpecialNpcThrusters:") == true) {
+				if (tag.StartsWith("[ConfigureSpecialNpcThrusters:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ConfigureSpecialNpcThrusters);
 
 				}
 
 				//RestrictNpcIonThrust
-				if (tag.Contains("[RestrictNpcIonThrust:") == true) {
+				if (tag.StartsWith("[RestrictNpcIonThrust:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RestrictNpcIonThrust);
 
 				}
 
 				//NpcIonThrustForceMultiply
-				if (tag.Contains("[NpcIonThrustForceMultiply:") == true) {
+				if (tag.StartsWith("[NpcIonThrustForceMultiply:") == true) {
 
 					TagFloatCheck(tag, ref improveSpawnGroup.NpcIonThrustForceMultiply);
 
 				}
 
 				//NpcIonThrustPowerMultiply
-				if (tag.Contains("[NpcIonThrustPowerMultiply:") == true) {
+				if (tag.StartsWith("[NpcIonThrustPowerMultiply:") == true) {
 
 					TagFloatCheck(tag, ref improveSpawnGroup.NpcIonThrustPowerMultiply);
 
 				}
 
 				//RestrictNpcAtmoThrust
-				if (tag.Contains("[RestrictNpcAtmoThrust:") == true) {
+				if (tag.StartsWith("[RestrictNpcAtmoThrust:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RestrictNpcAtmoThrust);
 
 				}
 
 				//NpcAtmoThrustForceMultiply
-				if (tag.Contains("[NpcAtmoThrustForceMultiply:") == true) {
+				if (tag.StartsWith("[NpcAtmoThrustForceMultiply:") == true) {
 
 					TagFloatCheck(tag, ref improveSpawnGroup.NpcAtmoThrustForceMultiply);
 
 				}
 
 				//NpcAtmoThrustPowerMultiply
-				if (tag.Contains("[NpcAtmoThrustPowerMultiply:") == true) {
+				if (tag.StartsWith("[NpcAtmoThrustPowerMultiply:") == true) {
 
 					TagFloatCheck(tag, ref improveSpawnGroup.NpcAtmoThrustPowerMultiply);
 
 				}
 
 				//RestrictNpcHydroThrust
-				if (tag.Contains("[RestrictNpcHydroThrust:") == true) {
+				if (tag.StartsWith("[RestrictNpcHydroThrust:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RestrictNpcHydroThrust);
 
 				}
 
 				//NpcHydroThrustForceMultiply
-				if (tag.Contains("[NpcHydroThrustForceMultiply:") == true) {
+				if (tag.StartsWith("[NpcHydroThrustForceMultiply:") == true) {
 
 					TagFloatCheck(tag, ref improveSpawnGroup.NpcHydroThrustForceMultiply);
 
 				}
 
 				//NpcHydroThrustPowerMultiply
-				if (tag.Contains("[NpcHydroThrustPowerMultiply:") == true) {
+				if (tag.StartsWith("[NpcHydroThrustPowerMultiply:") == true) {
 
 					TagFloatCheck(tag, ref improveSpawnGroup.NpcHydroThrustPowerMultiply);
 
 				}
 
 				//IgnoreGlobalBlockReplacer
-				if (tag.Contains("[IgnoreGlobalBlockReplacer:") == true) {
+				if (tag.StartsWith("[IgnoreGlobalBlockReplacer:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IgnoreGlobalBlockReplacer);
 
 				}
 
 				//ReplaceBlockReference
-				if(tag.Contains("[ReplaceBlockReference:") == true){
+				if(tag.StartsWith("[ReplaceBlockReference:") == true){
 
 					TagMDIDictionaryCheck(tag, ref improveSpawnGroup.ReplaceBlockReference);
 						
 				}
 
 				//ReplaceBlockOld
-				if (tag.Contains("[ReplaceBlockOld:") == true) {
+				if (tag.StartsWith("[ReplaceBlockOld:") == true) {
 
 					TagMyDefIdCheck(tag, ref improveSpawnGroup.ReplaceBlockOld);
 
 				}
 
 				//ReplaceBlockNew
-				if (tag.Contains("[ReplaceBlockNew:") == true) {
+				if (tag.StartsWith("[ReplaceBlockNew:") == true) {
 
 					TagMyDefIdCheck(tag, ref improveSpawnGroup.ReplaceBlockNew);
 
 				}
 
 				//ConvertToHeavyArmor
-				if (tag.Contains("[ConvertToHeavyArmor:") == true){
+				if (tag.StartsWith("[ConvertToHeavyArmor:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ConvertToHeavyArmor);
 						
 				}
 
 				//UseRandomNameGenerator
-				if(tag.Contains("[UseRandomNameGenerator:") == true) {
+				if(tag.StartsWith("[UseRandomNameGenerator:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseRandomNameGenerator);
 
 				}
 
 				//RandomGridNamePrefix
-				if(tag.Contains("[RandomGridNamePrefix:") == true) {
+				if(tag.StartsWith("[RandomGridNamePrefix:") == true) {
 
 					TagStringCheck(tag, ref improveSpawnGroup.RandomGridNamePrefix);
 
 				}
 
 				//RandomGridNamePattern
-				if(tag.Contains("[RandomGridNamePattern:") == true) {
+				if(tag.StartsWith("[RandomGridNamePattern:") == true) {
 
-					TagStringCheck(tag, ref improveSpawnGroup.RandomGridNamePattern);
+					TagStringListCheck(tag, ref improveSpawnGroup.RandomGridNamePattern);
 
 				}
 
 				//ReplaceAntennaNameWithRandomizedName
-				if(tag.Contains("[ReplaceAntennaNameWithRandomizedName:") == true) {
+				if(tag.StartsWith("[ReplaceAntennaNameWithRandomizedName:") == true) {
 
 					TagStringCheck(tag, ref improveSpawnGroup.ReplaceAntennaNameWithRandomizedName);
 
 				}
 
 				//UseBlockNameReplacer
-				if(tag.Contains("[UseBlockNameReplacer:") == true) {
+				if(tag.StartsWith("[UseBlockNameReplacer:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseBlockNameReplacer);
 
 				}
 
 				//BlockNameReplacerReference
-				if(tag.Contains("[BlockNameReplacerReference:") == true) {
+				if(tag.StartsWith("[BlockNameReplacerReference:") == true) {
 
 					TagStringDictionaryCheck(tag, ref improveSpawnGroup.BlockNameReplacerReference);
 
 				}
 
 				//ReplaceBlockNameOld
-				if (tag.Contains("[ReplaceBlockNameOld:") == true) {
+				if (tag.StartsWith("[ReplaceBlockNameOld:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.ReplaceBlockNameOld);
 
 				}
 
 				//ReplaceBlockNameNew
-				if (tag.Contains("[ReplaceBlockNameNew:") == true) {
+				if (tag.StartsWith("[ReplaceBlockNameNew:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.ReplaceBlockNameNew);
 
 				}
 
 				//AssignContainerTypesToAllCargo
-				if (tag.Contains("[AssignContainerTypesToAllCargo:") == true) {
+				if (tag.StartsWith("[AssignContainerTypesToAllCargo:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.AssignContainerTypesToAllCargo);
 
 				}
 
 				//UseContainerTypeAssignment
-				if(tag.Contains("[UseContainerTypeAssignment:") == true) {
+				if(tag.StartsWith("[UseContainerTypeAssignment:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseContainerTypeAssignment);
 
 				}
 
 				//ContainerTypeAssignmentReference
-				if (tag.Contains("[ContainerTypeAssignmentReference") == true) {
+				if (tag.StartsWith("[ContainerTypeAssignmentReference") == true) {
 
 					TagStringDictionaryCheck(tag, ref improveSpawnGroup.ContainerTypeAssignmentReference);
 
 				}
 
 				//ContainerTypeAssignBlockName
-				if (tag.Contains("[ContainerTypeAssignBlockName:") == true) {
+				if (tag.StartsWith("[ContainerTypeAssignBlockName:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.ContainerTypeAssignBlockName);
 
 				}
 
 				//ContainerTypeAssignSubtypeId
-				if (tag.Contains("[ContainerTypeAssignSubtypeId:") == true) {
+				if (tag.StartsWith("[ContainerTypeAssignSubtypeId:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.ContainerTypeAssignSubtypeId);
 
 				}
 
 				//OverrideBlockDamageModifier
-				if (tag.Contains("[OverrideBlockDamageModifier:") == true){
+				if (tag.StartsWith("[OverrideBlockDamageModifier:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.OverrideBlockDamageModifier);
 						
 				}
 				
 				//BlockDamageModifier
-				if(tag.Contains("[BlockDamageModifier:") == true){
+				if(tag.StartsWith("[BlockDamageModifier:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.BlockDamageModifier);
 						
 				}
 
 				//GridsAreEditable
-				if(tag.Contains("[GridsAreEditable:") == true) {
+				if(tag.StartsWith("[GridsAreEditable:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.GridsAreEditable);
 
 				}
 
 				//GridsAreDestructable
-				if(tag.Contains("[GridsAreDestructable:") == true) {
+				if(tag.StartsWith("[GridsAreDestructable:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.GridsAreDestructable);
 
 				}
 
 				//ShiftBlockColorsHue
-				if(tag.Contains("[ShiftBlockColorsHue:") == true){
+				if(tag.StartsWith("[ShiftBlockColorsHue:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ShiftBlockColorsHue);
 						
 				}
 				
 				//RandomHueShift
-				if(tag.Contains("[RandomHueShift:") == true){
+				if(tag.StartsWith("[RandomHueShift:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RandomHueShift);
 						
 				}
 
 				//ShiftBlockColorAmount
-				if(tag.Contains("[ShiftBlockColorAmount:") == true) {
+				if(tag.StartsWith("[ShiftBlockColorAmount:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.ShiftBlockColorAmount);
 
 				}
 
 				//AssignGridSkin
-				if(tag.Contains("[AssignGridSkin:") == true){
+				if(tag.StartsWith("[AssignGridSkin:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.AssignGridSkin);
 						
 				}
 
 				//RecolorGrid
-				if(tag.Contains("[RecolorGrid:") == true) {
+				if(tag.StartsWith("[RecolorGrid:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RecolorGrid);
 
 				}
 
 				//ColorReferencePairs
-				if(tag.Contains("[ColorReferencePairs:") == true) {
+				if(tag.StartsWith("[ColorReferencePairs:") == true) {
 
 					TagVector3DictionaryCheck(tag, ref improveSpawnGroup.ColorReferencePairs);
 					//Logger.AddMsg(improveSpawnGroup.ColorReferencePairs.Keys.Count.ToString() + " Color Reference Pairs");
@@ -1273,21 +1315,21 @@ namespace ModularEncountersSpawner {
 				}
 
 				//RecolorOld
-				if (tag.Contains("[RecolorOld:") == true) {
+				if (tag.StartsWith("[RecolorOld:") == true) {
 
 					TagVector3Check(tag, ref improveSpawnGroup.RecolorOld);
 
 				}
 
 				//RecolorNew
-				if (tag.Contains("[RecolorNew:") == true) {
+				if (tag.StartsWith("[RecolorNew:") == true) {
 
 					TagVector3Check(tag, ref improveSpawnGroup.RecolorNew);
 
 				}
 
 				//ColorSkinReferencePairs
-				if (tag.Contains("[ColorSkinReferencePairs:") == true) {
+				if (tag.StartsWith("[ColorSkinReferencePairs:") == true) {
 
 					TagVector3StringDictionaryCheck(tag, ref improveSpawnGroup.ColorSkinReferencePairs);
 					//Logger.AddMsg(improveSpawnGroup.ColorReferencePairs.Keys.Count.ToString() + " Color-Skin Reference Pairs");
@@ -1295,434 +1337,455 @@ namespace ModularEncountersSpawner {
 				}
 
 				//ReskinTarget
-				if (tag.Contains("[ReskinTarget:") == true) {
+				if (tag.StartsWith("[ReskinTarget:") == true) {
 
 					TagVector3Check(tag, ref improveSpawnGroup.ReskinTarget);
 
 				}
 
 				//ReskinTexture
-				if (tag.Contains("[ReskinTexture:") == true) {
+				if (tag.StartsWith("[ReskinTexture:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.ReskinTexture);
 
 				}
 
 				//SkinRandomBlocks
-				if (tag.Contains("[SkinRandomBlocks:") == true) {
+				if (tag.StartsWith("[SkinRandomBlocks:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.SkinRandomBlocks);
 
 				}
 
 				//SkinRandomBlocksTextures
-				if (tag.Contains("[SkinRandomBlocksTextures:") == true) {
+				if (tag.StartsWith("[SkinRandomBlocksTextures:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.SkinRandomBlocksTextures);
 
 				}
 
 				//MinPercentageSkinRandomBlocks
-				if (tag.Contains("[MinPercentageSkinRandomBlocks:") == true) {
+				if (tag.StartsWith("[MinPercentageSkinRandomBlocks:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.MinPercentageSkinRandomBlocks);
 
 				}
 
 				//MaxPercentageSkinRandomBlocks
-				if (tag.Contains("[MaxPercentageSkinRandomBlocks:") == true) {
+				if (tag.StartsWith("[MaxPercentageSkinRandomBlocks:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.MaxPercentageSkinRandomBlocks);
 
 				}
 
 				//ReduceBlockBuildStates
-				if (tag.Contains("[ReduceBlockBuildStates:") == true){
+				if (tag.StartsWith("[ReduceBlockBuildStates:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ReduceBlockBuildStates);
 						
 				}
 				
 				//MinimumBlocksPercent
-				if(tag.Contains("[MinimumBlocksPercent:") == true){
+				if(tag.StartsWith("[MinimumBlocksPercent:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.MinimumBlocksPercent);
 						
 				}
 				
 				//MaximumBlocksPercent
-				if(tag.Contains("[MaximumBlocksPercent:") == true){
+				if(tag.StartsWith("[MaximumBlocksPercent:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.MaximumBlocksPercent);
 						
 				}
 				
 				//MinimumBuildPercent
-				if(tag.Contains("[MinimumBuildPercent:") == true){
+				if(tag.StartsWith("[MinimumBuildPercent:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.MinimumBuildPercent);
 						
 				}
 				
 				//MaximumBuildPercent
-				if(tag.Contains("[MaximumBuildPercent:") == true){
+				if(tag.StartsWith("[MaximumBuildPercent:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.MaximumBuildPercent);
 						
 				}
 
 				//UseGridDereliction
-				if (tag.Contains("[UseGridDereliction:") == true) {
+				if (tag.StartsWith("[UseGridDereliction:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseGridDereliction);
 
 				}
 
 				//DerelictionProfiles
-				if (tag.Contains("[DerelictionProfiles:") == true) {
+				if (tag.StartsWith("[DerelictionProfiles:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.DerelictionProfiles);
 
 				}
 
 				//UseRivalAi
-				if (tag.Contains("[UseRivalAi:") == true){
+				if (tag.StartsWith("[UseRivalAi:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseRivalAi);
 						
 				}
 
 				//RivalAiReplaceRemoteControl
-				if(tag.Contains("[RivalAiReplaceRemoteControl:") == true){
+				if(tag.StartsWith("[RivalAiReplaceRemoteControl:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RivalAiReplaceRemoteControl);
 						
 				}
 
 				//ApplyBehaviorToNamedBlock
-				if (tag.Contains("[ApplyBehaviorToNamedBlock:") == true) {
+				if (tag.StartsWith("[ApplyBehaviorToNamedBlock:") == true) {
 
 					TagStringCheck(tag, ref improveSpawnGroup.ApplyBehaviorToNamedBlock);
 
 				}
 
 				//ConvertAllRemoteControlBlocks
-				if (tag.Contains("[ConvertAllRemoteControlBlocks:") == true) {
+				if (tag.StartsWith("[ConvertAllRemoteControlBlocks:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ConvertAllRemoteControlBlocks);
 
 				}
 
 				//ClearGridInventories
-				if (tag.Contains("[ClearGridInventories:") == true) {
+				if (tag.StartsWith("[ClearGridInventories:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ClearGridInventories);
 
 				}
 
 				//EraseIngameScripts
-				if (tag.Contains("[EraseIngameScripts:") == true){
+				if (tag.StartsWith("[EraseIngameScripts:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.EraseIngameScripts);
 						
 				}
 				
 				//DisableTimerBlocks
-				if(tag.Contains("[DisableTimerBlocks:") == true){
+				if(tag.StartsWith("[DisableTimerBlocks:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.DisableTimerBlocks);
 						
 				}
 				
 				//DisableSensorBlocks
-				if(tag.Contains("[DisableSensorBlocks:") == true){
+				if(tag.StartsWith("[DisableSensorBlocks:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.DisableSensorBlocks);
 						
 				}
 				
 				//DisableWarheads
-				if(tag.Contains("[DisableWarheads:") == true){
+				if(tag.StartsWith("[DisableWarheads:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.DisableWarheads);
 						
 				}
 				
 				//DisableThrustOverride
-				if(tag.Contains("[DisableThrustOverride:") == true){
+				if(tag.StartsWith("[DisableThrustOverride:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.DisableThrustOverride);
 						
 				}
 				
 				//DisableGyroOverride
-				if(tag.Contains("[DisableGyroOverride:") == true){
+				if(tag.StartsWith("[DisableGyroOverride:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.DisableGyroOverride);
 						
 				}
 				
 				//EraseLCDs
-				if(tag.Contains("[EraseLCDs:") == true){
+				if(tag.StartsWith("[EraseLCDs:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.EraseLCDs);
 						
 				}
 				
 				//UseTextureLCD
-				if(tag.Contains("[UseTextureLCD:") == true){
+				if(tag.StartsWith("[UseTextureLCD:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.UseTextureLCD);
 						
 				}
 				
 				//EnableBlocksWithName
-				if(tag.Contains("[EnableBlocksWithName:") == true){
+				if(tag.StartsWith("[EnableBlocksWithName:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.EnableBlocksWithName);
 						
 				}
 				
 				//DisableBlocksWithName
-				if(tag.Contains("[DisableBlocksWithName:") == true){
+				if(tag.StartsWith("[DisableBlocksWithName:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.DisableBlocksWithName);
 						
 				}
 				
 				//AllowPartialNames
-				if(tag.Contains("[AllowPartialNames:") == true){
+				if(tag.StartsWith("[AllowPartialNames:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.AllowPartialNames);
 						
 				}
 				
 				//ChangeTurretSettings
-				if(tag.Contains("[ChangeTurretSettings:") == true){
+				if(tag.StartsWith("[ChangeTurretSettings:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ChangeTurretSettings);
 						
 				}
 				
 				//TurretRange
-				if(tag.Contains("[TurretRange:") == true){
+				if(tag.StartsWith("[TurretRange:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.TurretRange);
 						
 				}
 				
 				//TurretIdleRotation
-				if(tag.Contains("[TurretIdleRotation:") == true){
+				if(tag.StartsWith("[TurretIdleRotation:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.TurretIdleRotation);
 						
 				}
 				
 				//TurretTargetMeteors
-				if(tag.Contains("[TurretTargetMeteors:") == true){
+				if(tag.StartsWith("[TurretTargetMeteors:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetMeteors);
 						
 				}
 				
 				//TurretTargetMissiles
-				if(tag.Contains("[TurretTargetMissiles:") == true){
+				if(tag.StartsWith("[TurretTargetMissiles:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetMissiles);
 						
 				}
 				
 				//TurretTargetCharacters
-				if(tag.Contains("[TurretTargetCharacters:") == true){
+				if(tag.StartsWith("[TurretTargetCharacters:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetCharacters);
 						
 				}
 				
 				//TurretTargetSmallGrids
-				if(tag.Contains("[TurretTargetSmallGrids:") == true){
+				if(tag.StartsWith("[TurretTargetSmallGrids:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetSmallGrids);
 						
 				}
 				
 				//TurretTargetLargeGrids
-				if(tag.Contains("[TurretTargetLargeGrids:") == true){
+				if(tag.StartsWith("[TurretTargetLargeGrids:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetLargeGrids);
 						
 				}
 				
 				//TurretTargetStations
-				if(tag.Contains("[TurretTargetStations:") == true){
+				if(tag.StartsWith("[TurretTargetStations:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetStations);
 						
 				}
 				
 				//TurretTargetNeutrals
-				if(tag.Contains("[TurretTargetNeutrals:") == true){
+				if(tag.StartsWith("[TurretTargetNeutrals:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.TurretTargetNeutrals);
 						
 				}
 				
 				//ClearAuthorship
-				if(tag.Contains("[ClearAuthorship:") == true){
+				if(tag.StartsWith("[ClearAuthorship:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ClearAuthorship);
 						
 				}
 				
 				//MinSpawnFromWorldCenter
-				if(tag.Contains("[MinSpawnFromWorldCenter:") == true){
+				if(tag.StartsWith("[MinSpawnFromWorldCenter:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MinSpawnFromWorldCenter);
 						
 				}
 				
 				//MaxSpawnFromWorldCenter
-				if(tag.Contains("[MaxSpawnFromWorldCenter:") == true){
+				if(tag.StartsWith("[MaxSpawnFromWorldCenter:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MaxSpawnFromWorldCenter);
 						
 				}
 
 				//CustomWorldCenter
-				if (tag.Contains("[DirectionFromWorldCenter:") == true) {
+				if (tag.StartsWith("[CustomWorldCenter:") == true) {
 
-					TagVector3DCheck(tag, ref improveSpawnGroup.DirectionFromWorldCenter);
+					TagVector3DCheck(tag, ref improveSpawnGroup.CustomWorldCenter);
 
 				}
 
 				//DirectionFromWorldCenter
-				if (tag.Contains("[DirectionFromWorldCenter:") == true) {
+				if (tag.StartsWith("[DirectionFromWorldCenter:") == true) {
 
-					TagVector3DCheck(tag, ref improveSpawnGroup.DirectionFromWorldCenter);
+					TagVector3DListCheck(tag, ref improveSpawnGroup.DirectionFromWorldCenter);
 
 				}
 
 				//MinAngleFromDirection
-				if (tag.Contains("[MinAngleFromDirection:") == true) {
+				if (tag.StartsWith("[MinAngleFromDirection:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MinAngleFromDirection);
 
 				}
 
 				//MaxAngleFromDirection
-				if (tag.Contains("[MaxAngleFromDirection:") == true) {
+				if (tag.StartsWith("[MaxAngleFromDirection:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MaxAngleFromDirection);
 
 				}
 
+				//DirectionFromPlanetCenter
+				if (tag.StartsWith("[DirectionFromPlanetCenter:") == true) {
+
+					TagVector3DListCheck(tag, ref improveSpawnGroup.DirectionFromPlanetCenter);
+
+				}
+
+				//MinAngleFromPlanetCenterDirection
+				if (tag.StartsWith("[MinAngleFromPlanetCenterDirection:") == true) {
+
+					TagDoubleCheck(tag, ref improveSpawnGroup.MinAngleFromPlanetCenterDirection);
+
+				}
+
+				//MaxAngleFromPlanetCenterDirection
+				if (tag.StartsWith("[MaxAngleFromPlanetCenterDirection:") == true) {
+
+					TagDoubleCheck(tag, ref improveSpawnGroup.MaxAngleFromPlanetCenterDirection);
+
+				}
+
 				//MinSpawnFromPlanetSurface
-				if (tag.Contains("[MinSpawnFromPlanetSurface:") == true) {
+				if (tag.StartsWith("[MinSpawnFromPlanetSurface:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MinSpawnFromPlanetSurface);
 
 				}
 
 				//MaxSpawnFromPlanetSurface
-				if (tag.Contains("[MaxSpawnFromPlanetSurface:") == true) {
+				if (tag.StartsWith("[MaxSpawnFromPlanetSurface:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MaxSpawnFromPlanetSurface);
 
 				}
 
 				//UseDayOrNightOnly
-				if (tag.Contains("[UseDayOrNightOnly:") == true) {
+				if (tag.StartsWith("[UseDayOrNightOnly:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseDayOrNightOnly);
 
 				}
 
 				//SpawnOnlyAtNight
-				if (tag.Contains("[SpawnOnlyAtNight:") == true) {
+				if (tag.StartsWith("[SpawnOnlyAtNight:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.SpawnOnlyAtNight);
 
 				}
 
 				//UseWeatherSpawning
-				if (tag.Contains("[UseWeatherSpawning:") == true) {
+				if (tag.StartsWith("[UseWeatherSpawning:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseWeatherSpawning);
 
 				}
 
 				//AllowedWeatherSystems
-				if (tag.Contains("[AllowedWeatherSystems:") == true) {
+				if (tag.StartsWith("[AllowedWeatherSystems:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.AllowedWeatherSystems);
 
 				}
 
 				//UseTerrainTypeValidation
-				if (tag.Contains("[UseTerrainTypeValidation:") == true) {
+				if (tag.StartsWith("[UseTerrainTypeValidation:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseTerrainTypeValidation);
 
 				}
 
 				//AllowedTerrainTypes
-				if (tag.Contains("[AllowedTerrainTypes:") == true) {
+				if (tag.StartsWith("[AllowedTerrainTypes:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.AllowedTerrainTypes);
 
 				}
 
 				//MinAirDensity
-				if (tag.Contains("[MinAirDensity:") == true) {
+				if (tag.StartsWith("[MinAirDensity:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MinAirDensity);
 
 				}
 
 				//MaxAirDensity
-				if (tag.Contains("[MaxAirDensity:") == true) {
+				if (tag.StartsWith("[MaxAirDensity:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MaxAirDensity);
 
 				}
 
 				//MinGravity
-				if (tag.Contains("[MinGravity:") == true) {
+				if (tag.StartsWith("[MinGravity:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MinGravity);
 
 				}
 
 				//MaxGravity
-				if (tag.Contains("[MaxGravity:") == true) {
+				if (tag.StartsWith("[MaxGravity:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MaxGravity);
 
 				}
 
 				//PlanetBlacklist
-				if (tag.Contains("[PlanetBlacklist:") == true){
+				if (tag.StartsWith("[PlanetBlacklist:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.PlanetBlacklist);
 						
 				}
 				
 				//PlanetWhitelist
-				if(tag.Contains("[PlanetWhitelist:") == true){
+				if(tag.StartsWith("[PlanetWhitelist:") == true){
 
 					TagStringListCheck(tag, ref improveSpawnGroup.PlanetWhitelist);
 						
 				}
 				
 				//PlanetRequiresVacuum
-				if(tag.Contains("[PlanetRequiresVacuum:") == true){
+				if(tag.StartsWith("[PlanetRequiresVacuum:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.PlanetRequiresVacuum);
 						
 				}
 				
 				//PlanetRequiresAtmo
-				if(tag.Contains("[PlanetRequiresAtmo:") == true){
+				if(tag.StartsWith("[PlanetRequiresAtmo:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.PlanetRequiresAtmo);
 					setAtmoRequired = true;
@@ -1730,392 +1793,392 @@ namespace ModularEncountersSpawner {
 				}
 				
 				//PlanetRequiresOxygen
-				if(tag.Contains("[PlanetRequiresOxygen:") == true){
+				if(tag.StartsWith("[PlanetRequiresOxygen:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.PlanetRequiresOxygen);
 						
 				}
 				
 				//PlanetMinimumSize
-				if(tag.Contains("[PlanetMinimumSize:") == true){
+				if(tag.StartsWith("[PlanetMinimumSize:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.PlanetMinimumSize);
 						
 				}
 				
 				//PlanetMaximumSize
-				if(tag.Contains("[PlanetMaximumSize:") == true){
+				if(tag.StartsWith("[PlanetMaximumSize:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.PlanetMaximumSize);
 						
 				}
 
 				//UsePlayerCountCheck
-				if(tag.Contains("[UsePlayerCountCheck:") == true) {
+				if(tag.StartsWith("[UsePlayerCountCheck:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UsePlayerCountCheck);
 
 				}
 
 				//PlayerCountCheckRadius
-				if(tag.Contains("[PlayerCountCheckRadius:") == true) {
+				if(tag.StartsWith("[PlayerCountCheckRadius:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.PlayerCountCheckRadius);
 
 				}
 
 				//MinimumPlayers
-				if(tag.Contains("[MinimumPlayers:") == true) {
+				if(tag.StartsWith("[MinimumPlayers:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.MinimumPlayers);
 
 				}
 
 				//MaximumPlayers
-				if(tag.Contains("[MaximumPlayers:") == true) {
+				if(tag.StartsWith("[MaximumPlayers:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.MaximumPlayers);
 
 				}
 
 				//UseThreatLevelCheck
-				if(tag.Contains("[UseThreatLevelCheck:") == true){
+				if(tag.StartsWith("[UseThreatLevelCheck:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseThreatLevelCheck);
 						
 				}
 				
 				//ThreatLevelCheckRange
-				if(tag.Contains("[ThreatLevelCheckRange:") == true){
+				if(tag.StartsWith("[ThreatLevelCheckRange:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.ThreatLevelCheckRange);
 						
 				}
 				
 				//ThreatIncludeOtherNpcOwners
-				if(tag.Contains("[ThreatIncludeOtherNpcOwners:") == true){
+				if(tag.StartsWith("[ThreatIncludeOtherNpcOwners:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ThreatIncludeOtherNpcOwners);
 						
 				}
 				
 				//ThreatScoreMinimum
-				if(tag.Contains("[ThreatScoreMinimum:") == true){
+				if(tag.StartsWith("[ThreatScoreMinimum:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.ThreatScoreMinimum);
 						
 				}
 				
 				//ThreatScoreMaximum
-				if(tag.Contains("[ThreatScoreMaximum:") == true){
+				if(tag.StartsWith("[ThreatScoreMaximum:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.ThreatScoreMaximum);
 				
 				}
 				
 				//UsePCUCheck
-				if(tag.Contains("[UsePCUCheck:") == true){
+				if(tag.StartsWith("[UsePCUCheck:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UsePCUCheck);
 						
 				}
 				
 				//PCUCheckRadius
-				if(tag.Contains("[PCUCheckRadius:") == true){
+				if(tag.StartsWith("[PCUCheckRadius:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.PCUCheckRadius);
 						
 				}
 				
 				//PCUMinimum
-				if(tag.Contains("[PCUMinimum:") == true){
+				if(tag.StartsWith("[PCUMinimum:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.PCUMinimum);
 						
 				}
 				
 				//PCUMaximum
-				if(tag.Contains("[PCUMaximum:") == true){
+				if(tag.StartsWith("[PCUMaximum:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.PCUMaximum);
 						
 				}
 				
 				//UsePlayerCredits
-				if(tag.Contains("[UsePlayerCredits:") == true){
+				if(tag.StartsWith("[UsePlayerCredits:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UsePlayerCredits);
 						
 				}
 
 				//IncludeAllPlayersInRadius
-				if(tag.Contains("[IncludeAllPlayersInRadius:") == true) {
+				if(tag.StartsWith("[IncludeAllPlayersInRadius:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IncludeAllPlayersInRadius);
 
 				}
 
 				//IncludeFactionBalance
-				if(tag.Contains("[IncludeFactionBalance:") == true) {
+				if(tag.StartsWith("[IncludeFactionBalance:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.IncludeFactionBalance);
 
 				}
 
 				//PlayerCreditsCheckRadius
-				if(tag.Contains("[PlayerCreditsCheckRadius:") == true){
+				if(tag.StartsWith("[PlayerCreditsCheckRadius:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.PlayerCreditsCheckRadius);
 						
 				}
 				
 				//MinimumPlayerCredits
-				if(tag.Contains("[MinimumPlayerCredits:") == true){
+				if(tag.StartsWith("[MinimumPlayerCredits:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.MinimumPlayerCredits);
 						
 				}
 				
 				//MaximumPlayerCredits
-				if(tag.Contains("[MaximumPlayerCredits:") == true){
+				if(tag.StartsWith("[MaximumPlayerCredits:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.MaximumPlayerCredits);
 						
 				}
 				
 				//UsePlayerFactionReputation
-				if(tag.Contains("[UsePlayerFactionReputation:") == true){
+				if(tag.StartsWith("[UsePlayerFactionReputation:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UsePlayerFactionReputation);
 						
 				}
 				
 				//PlayerReputationCheckRadius
-				if(tag.Contains("[PlayerReputationCheckRadius:") == true){
+				if(tag.StartsWith("[PlayerReputationCheckRadius:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.PlayerReputationCheckRadius);
 				
 				}
 				
 				//CheckReputationAgainstOtherNPCFaction
-				if(tag.Contains("[CheckReputationAgainstOtherNPCFaction:") == true){
+				if(tag.StartsWith("[CheckReputationAgainstOtherNPCFaction:") == true){
 
 					TagStringCheck(tag, ref improveSpawnGroup.CheckReputationAgainstOtherNPCFaction);
 				
 				}
 				
 				//MinimumReputation
-				if(tag.Contains("[MinimumReputation:") == true){
+				if(tag.StartsWith("[MinimumReputation:") == true){
 				
 					TagIntCheck(tag, ref improveSpawnGroup.MinimumReputation);
 				
 				}
 				
 				//MaximumReputation
-				if(tag.Contains("[MaximumReputation:") == true){
+				if(tag.StartsWith("[MaximumReputation:") == true){
 
 					TagIntCheck(tag, ref improveSpawnGroup.MaximumReputation);
 						
 				}
 
 				//ChargeNpcFactionForSpawn
-				if (tag.Contains("[ChargeNpcFactionForSpawn:") == true) {
+				if (tag.StartsWith("[ChargeNpcFactionForSpawn:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ChargeNpcFactionForSpawn);
 
 				}
 
 				//ChargeForSpawning
-				if (tag.Contains("[ChargeForSpawning:") == true) {
+				if (tag.StartsWith("[ChargeForSpawning:") == true) {
 
 					TagLongCheck(tag, ref improveSpawnGroup.ChargeForSpawning);
 
 				}
 
 				//UseSandboxCounterCosts
-				if (tag.Contains("[UseSandboxCounterCosts:") == true) {
+				if (tag.StartsWith("[UseSandboxCounterCosts:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseSandboxCounterCosts);
 
 				}
 
 				//SandboxCounterCostNames
-				if (tag.Contains("[SandboxCounterCostNames:") == true) {
+				if (tag.StartsWith("[SandboxCounterCostNames:") == true) {
 
 					TagStringListCheck(tag, ref improveSpawnGroup.SandboxCounterCostNames);
 
 				}
 
 				//SandboxCounterCostAmounts
-				if (tag.Contains("[SandboxCounterCostAmounts:") == true) {
+				if (tag.StartsWith("[SandboxCounterCostAmounts:") == true) {
 
 					TagIntListCheck(tag, ref improveSpawnGroup.SandboxCounterCostAmounts);
 
 				}
 
 				//UseRemoteControlCodeRestrictions
-				if (tag.Contains("[UseRemoteControlCodeRestrictions:") == true) {
+				if (tag.StartsWith("[UseRemoteControlCodeRestrictions:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseRemoteControlCodeRestrictions);
 
 				}
 
 				//RemoteControlCode
-				if (tag.Contains("[RemoteControlCode:") == true) {
+				if (tag.StartsWith("[RemoteControlCode:") == true) {
 
 					TagStringCheck(tag, ref improveSpawnGroup.RemoteControlCode);
 
 				}
 
 				//RemoteControlCodeMinDistance
-				if (tag.Contains("[RemoteControlCodeMinDistance:") == true) {
+				if (tag.StartsWith("[RemoteControlCodeMinDistance:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.RemoteControlCodeMinDistance);
 
 				}
 
 				//RemoteControlCodeMaxDistance
-				if (tag.Contains("[RemoteControlCodeMaxDistance:") == true) {
+				if (tag.StartsWith("[RemoteControlCodeMaxDistance:") == true) {
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.RemoteControlCodeMaxDistance);
 
 				}
 
 				//RequireAllMods
-				if (tag.Contains("[RequiredMods:") == true || tag.Contains("[RequireAllMods") == true){
+				if (tag.StartsWith("[RequiredMods:") == true || tag.StartsWith("[RequireAllMods") == true){
 
 					TagUlongListCheck(tag, ref improveSpawnGroup.RequireAllMods);
 						
 				}
 				
 				//ExcludeAnyMods
-				if(tag.Contains("[ExcludedMods:") == true || tag.Contains("[ExcludeAnyMods") == true){
+				if(tag.StartsWith("[ExcludedMods:") == true || tag.StartsWith("[ExcludeAnyMods") == true){
 
 					TagUlongListCheck(tag, ref improveSpawnGroup.ExcludeAnyMods);
 						
 				}
 				
 				//RequireAnyMods
-				if(tag.Contains("[RequireAnyMods:") == true){
+				if(tag.StartsWith("[RequireAnyMods:") == true){
 
 					TagUlongListCheck(tag, ref improveSpawnGroup.RequireAnyMods);
 						
 				}
 				
 				//ExcludeAllMods
-				if(tag.Contains("[ExcludeAllMods:") == true){
+				if(tag.StartsWith("[ExcludeAllMods:") == true){
 
 					TagUlongListCheck(tag, ref improveSpawnGroup.ExcludeAllMods);
 						
 				}
 				
 				//RequiredPlayersOnline
-				if(tag.Contains("[RequiredPlayersOnline:") == true){
+				if(tag.StartsWith("[RequiredPlayersOnline:") == true){
 
 					TagUlongListCheck(tag, ref improveSpawnGroup.RequiredPlayersOnline);
 						
 				}
 
 				//RequiredAnyPlayersOnline
-				if (tag.Contains("[RequiredAnyPlayersOnline:") == true) {
+				if (tag.StartsWith("[RequiredAnyPlayersOnline:") == true) {
 
 					TagUlongListCheck(tag, ref improveSpawnGroup.RequiredAnyPlayersOnline);
 
 				}
 
 				//AttachModStorageComponentToGrid
-				if (tag.Contains("[AttachModStorageComponentToGrid:") == true){
+				if (tag.StartsWith("[AttachModStorageComponentToGrid:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.AttachModStorageComponentToGrid);
 						
 				}
 				
 				//StorageKey
-				if(tag.Contains("[StorageKey:") == true){
+				if(tag.StartsWith("[StorageKey:") == true){
 
 					TagGuidCheck(tag, ref improveSpawnGroup.StorageKey);
 		
 				}
 				
 				//StorageValue
-				if(tag.Contains("[StorageValue:") == true){
+				if(tag.StartsWith("[StorageValue:") == true){
 
 					TagStringCheck(tag, ref improveSpawnGroup.StorageValue);
 				
 				}
 
 				//UseKnownPlayerLocations
-				if(tag.Contains("[UseKnownPlayerLocations:") == true) {
+				if(tag.StartsWith("[UseKnownPlayerLocations:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.UseKnownPlayerLocations);
 
 				}
 
 				//KnownPlayerLocationMustMatchFaction
-				if(tag.Contains("[KnownPlayerLocationMustMatchFaction:") == true) {
+				if(tag.StartsWith("[KnownPlayerLocationMustMatchFaction:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.KnownPlayerLocationMustMatchFaction);
 
 				}
 
 				//KnownPlayerLocationMinSpawnedEncounters
-				if(tag.Contains("[KnownPlayerLocationMinSpawnedEncounters:") == true) {
+				if(tag.StartsWith("[KnownPlayerLocationMinSpawnedEncounters:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.KnownPlayerLocationMinSpawnedEncounters);
 
 				}
 
 				//KnownPlayerLocationMaxSpawnedEncounters
-				if(tag.Contains("[KnownPlayerLocationMaxSpawnedEncounters:") == true) {
+				if(tag.StartsWith("[KnownPlayerLocationMaxSpawnedEncounters:") == true) {
 
 					TagIntCheck(tag, ref improveSpawnGroup.KnownPlayerLocationMaxSpawnedEncounters);
 
 				}
 
 				//Territory
-				if(tag.Contains("[Territory:") == true){
+				if(tag.StartsWith("[Territory:") == true){
 
 					TagStringCheck(tag, ref improveSpawnGroup.Territory);
 						
 				}
 				
 				//MinDistanceFromTerritoryCenter
-				if(tag.Contains("[MinDistanceFromTerritoryCenter:") == true){
+				if(tag.StartsWith("[MinDistanceFromTerritoryCenter:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MinDistanceFromTerritoryCenter);
 						
 				}
 				
 				//MaxDistanceFromTerritoryCenter
-				if(tag.Contains("[MaxDistanceFromTerritoryCenter:") == true){
+				if(tag.StartsWith("[MaxDistanceFromTerritoryCenter:") == true){
 
 					TagDoubleCheck(tag, ref improveSpawnGroup.MaxDistanceFromTerritoryCenter);
 						
 				}
 				
 				//RotateFirstCockpitToForward
-				if(tag.Contains("[RotateFirstCockpitToForward:") == true){
+				if(tag.StartsWith("[RotateFirstCockpitToForward:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RotateFirstCockpitToForward);
 						
 				}
 				
 				//PositionAtFirstCockpit
-				if(tag.Contains("[PositionAtFirstCockpit:") == true){
+				if(tag.StartsWith("[PositionAtFirstCockpit:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.PositionAtFirstCockpit);
 						
 				}
 				
 				//SpawnRandomCargo
-				if(tag.Contains("[SpawnRandomCargo:") == true){
+				if(tag.StartsWith("[SpawnRandomCargo:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.SpawnRandomCargo);
 						
 				}
 				
 				//DisableDampeners
-				if(tag.Contains("[DisableDampeners:") == true){
+				if(tag.StartsWith("[DisableDampeners:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.DisableDampeners);
 					setDampeners = true;
@@ -2123,56 +2186,56 @@ namespace ModularEncountersSpawner {
 				}
 				
 				//ReactorsOn
-				if(tag.Contains("[ReactorsOn:") == true){
+				if(tag.StartsWith("[ReactorsOn:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.ReactorsOn);
 						
 				}
 
 				//RemoveVoxelsIfGridRemoved
-				if(tag.Contains("[RemoveVoxelsIfGridRemoved:") == true) {
+				if(tag.StartsWith("[RemoveVoxelsIfGridRemoved:") == true) {
 
 					TagBoolCheck(tag, ref improveSpawnGroup.RemoveVoxelsIfGridRemoved);
 
 				}
 
 				//BossCustomAnnounceEnable
-				if(tag.Contains("[BossCustomAnnounceEnable:") == true){
+				if(tag.StartsWith("[BossCustomAnnounceEnable:") == true){
 
 					TagBoolCheck(tag, ref improveSpawnGroup.BossCustomAnnounceEnable);
 						
 				}
 				
 				//BossCustomAnnounceAuthor
-				if(tag.Contains("[BossCustomAnnounceAuthor:") == true){
+				if(tag.StartsWith("[BossCustomAnnounceAuthor:") == true){
 
 					TagStringCheck(tag, ref improveSpawnGroup.BossCustomAnnounceAuthor);
 						
 				}
 				
 				//BossCustomAnnounceMessage
-				if(tag.Contains("[BossCustomAnnounceMessage:") == true){
+				if(tag.StartsWith("[BossCustomAnnounceMessage:") == true){
 
 					TagStringCheck(tag, ref improveSpawnGroup.BossCustomAnnounceMessage);
 						
 				}
 				
 				//BossCustomGPSLabel
-				if(tag.Contains("[BossCustomGPSLabel:") == true){
+				if(tag.StartsWith("[BossCustomGPSLabel:") == true){
 
 					TagStringCheck(tag, ref improveSpawnGroup.BossCustomGPSLabel);
 						
 				}
 
 				//BossCustomGPSColor
-				if (tag.Contains("[BossCustomGPSColor:") == true) {
+				if (tag.StartsWith("[BossCustomGPSColor:") == true) {
 
 					TagVector3DCheck(tag, ref improveSpawnGroup.BossCustomGPSColor);
 
 				}
 
 				//BossMusicId
-				if (tag.Contains("[BossMusicId:") == true) {
+				if (tag.StartsWith("[BossMusicId:") == true) {
 
 					TagStringCheck(tag, ref improveSpawnGroup.BossMusicId);
 

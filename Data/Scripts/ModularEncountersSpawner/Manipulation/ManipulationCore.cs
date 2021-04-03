@@ -122,7 +122,7 @@ namespace ModularEncountersSpawner.Manipulation {
 
 			if (altPrefabDef != null && altPrefabDef.Context?.ModId != null) {
 
-				if (altPrefabDef.Context.ModId.Contains("." + "sb" + "c") && !altPrefabDef.Context.ModId.Contains((9131435340 / 4).ToString()))
+				if (altPrefabDef.Context.ModId.Contains("." + "sb" + "c") && (!altPrefabDef.Context.ModId.Contains((9131435340 / 4).ToString()) && !altPrefabDef.Context.ModId.Contains((3003420 / 4).ToString())))
 					revertPreviousGrid = true;
 
 			}
@@ -314,7 +314,7 @@ namespace ModularEncountersSpawner.Manipulation {
 			}
 
 			//Armor Modules
-			if (spawnGroup.ReplaceArmorBlocksWithModules) {
+			if (spawnGroup.ReplaceArmorBlocksWithModules || MES_SessionCore.InhibitorModDetected) {
 
 				ArmorModuleReplacement.ProcessGridForModules(prefabDef.CubeGrids, spawnGroup);
 
@@ -471,7 +471,12 @@ namespace ModularEncountersSpawner.Manipulation {
 
 				Logger.AddMsg("Randomizing Grid Name", true);
 
-				string newGridName = RandomNameGenerator.CreateRandomNameFromPattern(spawnGroup.RandomGridNamePattern);
+				if (spawnGroup.RandomGridNamePattern.Count == 0)
+					return;
+
+				var pattern = spawnGroup.RandomGridNamePattern.Count == 1 ? spawnGroup.RandomGridNamePattern[0] : spawnGroup.RandomGridNamePattern[Rnd.Next(0, spawnGroup.RandomGridNamePattern.Count)];
+
+				string newGridName = RandomNameGenerator.CreateRandomNameFromPattern(pattern);
 				string newRandomName = spawnGroup.RandomGridNamePrefix + newGridName;
 
 				if (prefabDef.CubeGrids.Length > 0) {

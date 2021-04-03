@@ -185,8 +185,10 @@ namespace ModularEncountersSpawner.Spawners {
 				pendingNPC.ForceStaticGrid = spawnGroup.ForceStaticGrid;
 				pendingNPC.KeenAiName = prefab.Behaviour;
 				pendingNPC.KeenAiTriggerDistance = prefab.BehaviourActivationDistance;
-				
-				if(string.IsNullOrEmpty(pendingNPC.KeenAiName) == false){
+
+				TimeoutManagement.ApplySpawnTimeoutToZones(SpawnType.SpaceCargoShip, spawnPosition);
+
+				if (string.IsNullOrEmpty(pendingNPC.KeenAiName) == false){
 
 					if (RivalAIHelper.RivalAiBehaviorProfiles.ContainsKey(pendingNPC.KeenAiName) && spawnGroup.UseRivalAi) {
 
@@ -220,7 +222,15 @@ namespace ModularEncountersSpawner.Spawners {
 				NPCWatcher.PendingNPCs.Add(pendingNPC);
 				
 			}
-			
+
+			if (spawnGroup.UniqueEncounter == true) {
+
+				SpawnGroupManager.UniqueGroupsSpawned.Add(spawnGroup.SpawnGroup.Id.SubtypeName);
+				string[] uniqueSpawnedArray = SpawnGroupManager.UniqueGroupsSpawned.ToArray();
+				MyAPIGateway.Utilities.SetVariable<string[]>("MES-UniqueGroupsSpawned", uniqueSpawnedArray);
+
+			}
+
 			Logger.SkipNextMessage = false;
 			return "Spawning Group - " + spawnGroup.SpawnGroup.Id.SubtypeName;
 			
@@ -558,7 +568,7 @@ namespace ModularEncountersSpawner.Spawners {
 
 				}
 
-				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest) == false){
+				if (SpawnResources.CheckCommonConditions(spawnGroup, playerCoords, environment, specificSpawnRequest, SpawnType.SpaceCargoShip) == false){
 
 					Logger.SpawnGroupDebug(spawnGroup.SpawnGroup.Id.SubtypeName, "Common Conditions Failed");
 					continue;

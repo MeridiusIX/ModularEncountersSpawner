@@ -362,6 +362,35 @@ namespace ModularEncountersSpawner.Admin {
 
 				}
 
+				//ClearTimeoutsAtPosition
+				if (receivedData.ChatMessage.StartsWith("/MES.ClearTimeoutsAtPosition")) {
+
+					foreach (var zone in TimeoutManagement.Timeouts) {
+
+						if (zone.InsideRadius(receivedData.PlayerPosition))
+							zone.Remove = true;
+					
+					}
+
+					MyVisualScriptLogicProvider.ShowNotification("All Timeout Zones at Position Cleared.", 5000, "White", receivedData.PlayerId);
+					return;
+
+				}
+
+				//ClearAllTimeouts
+				if (receivedData.ChatMessage.StartsWith("/MES.ClearAllTimeouts")) {
+
+					foreach (var zone in TimeoutManagement.Timeouts) {
+
+						zone.Remove = true;
+
+					}
+
+					MyVisualScriptLogicProvider.ShowNotification("All Timeout Zones Cleared.", 5000, "White", receivedData.PlayerId);
+					return;
+
+				}
+
 				//CreateKPL
 				if (receivedData.ChatMessage.StartsWith("/MES.CreateKPL.")) {
 
@@ -705,7 +734,7 @@ namespace ModularEncountersSpawner.Admin {
 				}
 
 				//ClearShipInventory
-				if (receivedData.ChatMessage.StartsWith("/MES.ClearShipInventory.")){
+				if (receivedData.ChatMessage.StartsWith("/MES.ClearShipInventory")){
 
 					var playerList = new List<IMyPlayer>();
 					MyAPIGateway.Players.GetPlayers(playerList);
@@ -965,6 +994,7 @@ namespace ModularEncountersSpawner.Admin {
 					var syncData = receivedData;
 					syncData.Instruction = "MESClipboard";
 					syncData.ClipboardContents = Logger.SpawnGroupResults();
+					SendClipboardDataToBlock(syncData);
 					var sendData = MyAPIGateway.Utilities.SerializeToBinary(syncData);
 					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
 					MyVisualScriptLogicProvider.ShowNotification("Spawn Group Data To Clipboard. Success: " + sendStatus.ToString(), 5000, "White", receivedData.PlayerId);
@@ -978,6 +1008,7 @@ namespace ModularEncountersSpawner.Admin {
 					var syncData = receivedData;
 					syncData.Instruction = "MESClipboard";
 					syncData.ClipboardContents = Logger.GetActiveNPCs();
+					SendClipboardDataToBlock(syncData);
 					var sendData = MyAPIGateway.Utilities.SerializeToBinary(syncData);
 					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
 					MyVisualScriptLogicProvider.ShowNotification("Active NPC Data To Clipboard. Success: " + sendStatus.ToString(), 5000, "White", receivedData.PlayerId);
@@ -991,6 +1022,7 @@ namespace ModularEncountersSpawner.Admin {
 					var syncData = receivedData;
 					syncData.Instruction = "MESClipboard";
 					syncData.ClipboardContents = Logger.GetBlockDefinitionInfo();
+					SendClipboardDataToBlock(syncData);
 					var sendData = MyAPIGateway.Utilities.SerializeToBinary(syncData);
 					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
 					MyVisualScriptLogicProvider.ShowNotification("Block Data To Clipboard. Success: " + sendStatus.ToString(), 5000, "White", receivedData.PlayerId);
@@ -1004,6 +1036,7 @@ namespace ModularEncountersSpawner.Admin {
 					var syncData = receivedData;
 					syncData.Instruction = "MESClipboard";
 					syncData.ClipboardContents = Logger.GetColorListFromGrid(SpawnResources.GetPlayerById(syncData.PlayerId));
+					SendClipboardDataToBlock(syncData);
 					var sendData = MyAPIGateway.Utilities.SerializeToBinary(syncData);
 					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
 					return;
@@ -1016,6 +1049,7 @@ namespace ModularEncountersSpawner.Admin {
 					var syncData = receivedData;
 					syncData.Instruction = "MESClipboard";
 					syncData.ClipboardContents = Logger.GetPlayerWatcherData();
+					SendClipboardDataToBlock(syncData);
 					var sendData = MyAPIGateway.Utilities.SerializeToBinary(syncData);
 					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
 					MyVisualScriptLogicProvider.ShowNotification("Player Watch Data To Clipboard. Success: " + sendStatus.ToString(), 5000, "White", receivedData.PlayerId);
@@ -1111,6 +1145,7 @@ namespace ModularEncountersSpawner.Admin {
 					var syncData = receivedData;
 					syncData.Instruction = "MESClipboard";
 					syncData.ClipboardContents = Logger.GetSpawnedUniqueEncounters();
+					SendClipboardDataToBlock(syncData);
 					var sendData = MyAPIGateway.Utilities.SerializeToBinary(syncData);
 					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
 					MyVisualScriptLogicProvider.ShowNotification("Spawned Unique Encounters List Sent To Clipboard. Success: " + sendStatus.ToString(), 5000, "White", receivedData.PlayerId);
@@ -1124,6 +1159,7 @@ namespace ModularEncountersSpawner.Admin {
 					var syncData = receivedData;
 					syncData.Instruction = "MESClipboard";
 					syncData.ClipboardContents = Logger.EligibleSpawnGroupsAtPosition(receivedData.PlayerPosition);
+					SendClipboardDataToBlock(syncData);
 					var sendData = MyAPIGateway.Utilities.SerializeToBinary(syncData);
 					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
 					MyVisualScriptLogicProvider.ShowNotification("List of Eligible Spawn Groups At Position Sent To Clipboard. Success: " + sendStatus.ToString(), 5000, "White", receivedData.PlayerId);
@@ -1157,7 +1193,7 @@ namespace ModularEncountersSpawner.Admin {
 
 					}
 
-
+					SendClipboardDataToBlock(syncData);
 					var sendData = MyAPIGateway.Utilities.SerializeToBinary(syncData);
 					bool sendStatus = MyAPIGateway.Multiplayer.SendMessageTo(8877, sendData, receivedData.SteamUserId);
 					MyVisualScriptLogicProvider.ShowNotification("Direction From Planet Core Values Sent To Clipboard. Success: " + sendStatus.ToString(), 5000, "White", receivedData.PlayerId);
@@ -1169,6 +1205,15 @@ namespace ModularEncountersSpawner.Admin {
 
 			//Settings Commands
 
+		}
+
+		public static void SendClipboardDataToBlock(SyncData data) {
+
+			if (!data.BlockSource || data.Block == null)
+				return;
+
+			data.Block.CustomData = data.ClipboardContents;
+		
 		}
 
 		public static string SpecificSpawnGroupRequest(string msg, string spawnType) {

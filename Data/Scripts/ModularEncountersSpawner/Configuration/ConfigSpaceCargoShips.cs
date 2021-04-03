@@ -58,102 +58,41 @@ namespace ModularEncountersSpawner.Configuration{
 		 
 	*/
 
-	public class ConfigSpaceCargoShips{
+	public class ConfigSpaceCargoShips : ConfigBase {
 		
-		public float ModVersion {get; set;}
-		public int FirstSpawnTime {get; set;} //Time Until Spawn When World Starts
-		public int MinSpawnTime {get; set;} //Min Time Until Next Spawn
-		public int MaxSpawnTime {get; set;} //Max Time Until Next Spawn
-		public int MaxShipsPerArea {get; set;}
-		public double AreaSize {get; set;}
-		public int MaxSpawnAttempts {get; set;} //Number Of Attempts To Spawn Ship(s)
-		public double MinPathDistanceFromPlayer {get; set;}
-		public double MaxPathDistanceFromPlayer {get; set;}
-		public double MinLunarSpawnHeight {get; set;}
-		public double MaxLunarSpawnHeight {get; set;}
-		public double MinSpawnDistFromEntities {get; set;}
-		public double MinPathDistance {get; set;} //Minimum Path Distance Of Cargo Ship
-		public double MaxPathDistance {get; set;} //Maximum Path Distance Of Cargo Ship
-		public double PathCheckStep {get; set;}
-		public double DespawnDistanceFromEndPath {get; set;} // Ship Will Despawn If Within This Distance Of Path End Coordinates
-		public double DespawnDistanceFromPlayer {get; set;}
-		public bool UseMinimumSpeed {get; set;}
-		public float MinimumSpeed {get; set;}
-		public bool UseSpeedOverride {get; set;} //If True, The Cargo Ship Will Use Override Speed Instead Of Prefab Speed
-		public float SpeedOverride {get; set;} //Override Speed Value For Cargo Ship (If Used)
+		public float ModVersion;
+		public int FirstSpawnTime; //Time Until Spawn When World Starts
+		public int MinSpawnTime; //Min Time Until Next Spawn
+		public int MaxSpawnTime; //Max Time Until Next Spawn
+		public int MaxShipsPerArea;
+		public double AreaSize;
+		public int MaxSpawnAttempts; //Number Of Attempts To Spawn Ship(s)
+		public double MinPathDistanceFromPlayer;
+		public double MaxPathDistanceFromPlayer;
+		public double MinLunarSpawnHeight;
+		public double MaxLunarSpawnHeight;
+		public double MinSpawnDistFromEntities;
+		public double MinPathDistance; //Minimum Path Distance Of Cargo Ship
+		public double MaxPathDistance; //Maximum Path Distance Of Cargo Ship
+		public double PathCheckStep;
+		public double DespawnDistanceFromEndPath; // Ship Will Despawn If Within This Distance Of Path End Coordinates
+		public double DespawnDistanceFromPlayer;
+		public bool UseMinimumSpeed;
+		public float MinimumSpeed;
+		public bool UseSpeedOverride; //If True, The Cargo Ship Will Use Override Speed Instead Of Prefab Speed
+		public float SpeedOverride; //Override Speed Value For Cargo Ship (If Used)
 		
-		public bool UseMaxSpawnGroupFrequency {get; set;}
-		public int MaxSpawnGroupFrequency {get; set;}
-		
-		public bool EnableWaveSpawner {get; set;}
-		public string[] UseSpecificRandomGroups {get; set;}
-		public int MinWaveSpawnTime {get; set;}
-		public int MaxWaveSpawnTime {get; set;}
-		public int TotalSpawnEventsPerCluster {get; set;}
-		public int TimeBetweenWaveSpawns {get; set;}
-		public double PlayerClusterDistance {get; set;}
-		
-		public bool UseCleanupSettings {get; set;}
-		public bool CleanupUseDistance {get; set;}
-		public bool CleanupUseTimer {get; set;}
-		public bool CleanupUseBlockLimit {get; set;}
-		public bool CleanupDistanceStartsTimer {get; set;}
-		public bool CleanupResetTimerWithinDistance {get; set;}
-		public double CleanupDistanceTrigger {get; set;}
-		public int CleanupTimerTrigger {get; set;}
-		public int CleanupBlockLimitTrigger {get; set;}
-		public bool CleanupIncludeUnowned {get; set;}
-		public bool CleanupUnpoweredOverride {get; set;}
-		public double CleanupUnpoweredDistanceTrigger {get; set;}
-		public int CleanupUnpoweredTimerTrigger {get; set;}
+		public bool UseMaxSpawnGroupFrequency;
+		public int MaxSpawnGroupFrequency;
 
-		public bool UseBlockDisable {get; set;}
-		public bool DisableAirVent {get; set;}
-		public bool DisableAntenna {get; set;}
-		public bool DisableArtificialMass {get; set;}
-		public bool DisableAssembler {get; set;}
-		public bool DisableBattery {get; set;}
-		public bool DisableBeacon {get; set;}
-		public bool DisableCollector {get; set;}
-		public bool DisableConnector {get; set;}
-		public bool DisableConveyorSorter {get; set;}
-		public bool DisableDecoy {get; set;}
-		public bool DisableDrill {get; set;}
-		public bool DisableJumpDrive {get; set;}
-		public bool DisableGasGenerator {get; set;}
-		public bool DisableGasTank {get; set;}
-		public bool DisableGatlingGun {get; set;}
-		public bool DisableGatlingTurret {get; set;}
-		public bool DisableGravityGenerator {get; set;}
-		public bool DisableGrinder {get; set;}
-		public bool DisableGyro {get; set;}
-		public bool DisableInteriorTurret {get; set;}
-		public bool DisableLandingGear {get; set;}
-		public bool DisableLaserAntenna {get; set;}
-		public bool DisableLcdPanel {get; set;}
-		public bool DisableLightBlock {get; set;}
-		public bool DisableMedicalRoom {get; set;}
-		public bool DisableMergeBlock {get; set;}
-		public bool DisableMissileTurret {get; set;}
-		public bool DisableOxygenFarm {get; set;}
-		public bool DisableParachuteHatch {get; set;}
-		public bool DisablePiston {get; set;}
-		public bool DisableProgrammableBlock {get; set;}
-		public bool DisableProjector {get; set;}
-		public bool DisableReactor {get; set;}
-		public bool DisableRefinery {get; set;}
-		public bool DisableRocketLauncher {get; set;}
-		public bool DisableReloadableRocketLauncher {get; set;}
-		public bool DisableRotor {get; set;}
-		public bool DisableSensor {get; set;}
-		public bool DisableSolarPanel {get; set;}
-		public bool DisableSoundBlock {get; set;}
-		public bool DisableSpaceBall {get; set;}
-		public bool DisableTimerBlock {get; set;}
-		public bool DisableThruster {get; set;}
-		public bool DisableWelder {get; set;}
-		public bool DisableUpgradeModule {get; set;}
-
+		public bool EnableWaveSpawner;
+		public string[] UseSpecificRandomGroups;
+		public int MinWaveSpawnTime;
+		public int MaxWaveSpawnTime;
+		public int TotalSpawnEventsPerCluster;
+		public int TimeBetweenWaveSpawns;
+		public double PlayerClusterDistance;
+		
 		public ConfigSpaceCargoShips(){
 			
 			ModVersion = MES_SessionCore.ModVersion;
@@ -180,7 +119,12 @@ namespace ModularEncountersSpawner.Configuration{
 			
 			UseMaxSpawnGroupFrequency = false;
 			MaxSpawnGroupFrequency = 5;
-			
+
+			UseTimeout = true;
+			TimeoutDuration = 900;
+			TimeoutRadius = 10000;
+			TimeoutSpawnLimit = 4;
+
 			EnableWaveSpawner = false;
 			UseSpecificRandomGroups = new string[]{"SomeSpawnGroupNameHere", "AnotherSpawnGroupNameHere", "EtcEtcEtc"};
 			MinWaveSpawnTime = 1980;
@@ -202,53 +146,6 @@ namespace ModularEncountersSpawner.Configuration{
 			CleanupUnpoweredOverride = true;
 			CleanupUnpoweredDistanceTrigger = 20000;
 			CleanupUnpoweredTimerTrigger = 900;
-
-			UseBlockDisable = false;
-			DisableAirVent = false;
-			DisableAntenna = false;
-			DisableArtificialMass = false;
-			DisableAssembler = false;
-			DisableBattery = false;
-			DisableBeacon = false;
-			DisableCollector = false;
-			DisableConnector = false;
-			DisableConveyorSorter = false;
-			DisableDecoy = false;
-			DisableDrill = false;
-			DisableJumpDrive = false;
-			DisableGasGenerator = false;
-			DisableGasTank = false;
-			DisableGatlingGun = false;
-			DisableGatlingTurret = false;
-			DisableGravityGenerator = false;
-			DisableGrinder = false;
-			DisableGyro = false;
-			DisableInteriorTurret = false;
-			DisableLandingGear = false;
-			DisableLaserAntenna = false;
-			DisableLcdPanel = false;
-			DisableLightBlock = false;
-			DisableMedicalRoom = false;
-			DisableMergeBlock = false;
-			DisableMissileTurret = false;
-			DisableOxygenFarm = false;
-			DisableParachuteHatch = false;
-			DisablePiston = false;
-			DisableProgrammableBlock = false;
-			DisableProjector = false;
-			DisableReactor = false;
-			DisableRefinery = false;
-			DisableRocketLauncher = false;
-			DisableReloadableRocketLauncher = false;
-			DisableRotor = false;
-			DisableSensor = false;
-			DisableSolarPanel = false;
-			DisableSoundBlock = false;
-			DisableSpaceBall = false;
-			DisableTimerBlock = false;
-			DisableThruster = false;
-			DisableWelder = false;
-			DisableUpgradeModule = false;
 
 		}
 		

@@ -31,52 +31,52 @@ namespace ModularEncountersSpawner.Configuration{
 	
 	public class ConfigDisableBlocks{
 		
-		public bool UseBlockDisable {get; set;}
-		public bool DisableAirVent {get; set;}
-		public bool DisableAntenna {get; set;}
-		public bool DisableArtificialMass {get; set;}
-		public bool DisableAssembler {get; set;}
-		public bool DisableBattery {get; set;}
-		public bool DisableBeacon {get; set;}
-		public bool DisableCollector {get; set;}
-		public bool DisableConnector {get; set;}
-		public bool DisableConveyorSorter {get; set;}
-		public bool DisableDecoy {get; set;}
-		public bool DisableDrill {get; set;}
-		public bool DisableJumpDrive {get; set;}
-		public bool DisableGasGenerator {get; set;}
-		public bool DisableGasTank {get; set;}
-		public bool DisableGatlingGun {get; set;}
-		public bool DisableGatlingTurret {get; set;}
-		public bool DisableGravityGenerator {get; set;}
-		public bool DisableGrinder {get; set;}
-		public bool DisableGyro {get; set;}
-		public bool DisableInteriorTurret {get; set;}
-		public bool DisableLandingGear {get; set;}
-		public bool DisableLaserAntenna {get; set;}
-		public bool DisableLcdPanel {get; set;}
-		public bool DisableLightBlock {get; set;}
-		public bool DisableMedicalRoom {get; set;}
-		public bool DisableMergeBlock {get; set;}
-		public bool DisableMissileTurret {get; set;}
-		public bool DisableOxygenFarm {get; set;}
-		public bool DisableParachuteHatch {get; set;}
-		public bool DisablePiston {get; set;}
-		public bool DisableProgrammableBlock {get; set;}
-		public bool DisableProjector {get; set;}
-		public bool DisableReactor {get; set;}
-		public bool DisableRefinery {get; set;}
-		public bool DisableRocketLauncher {get; set;}
-		public bool DisableReloadableRocketLauncher {get; set;}
-		public bool DisableRotor {get; set;}
-		public bool DisableSensor {get; set;}
-		public bool DisableSolarPanel {get; set;}
-		public bool DisableSoundBlock {get; set;}
-		public bool DisableSpaceBall {get; set;}
-		public bool DisableTimerBlock {get; set;}
-		public bool DisableThruster {get; set;}
-		public bool DisableWelder {get; set;}
-		public bool DisableUpgradeModule {get; set;}
+		public bool UseBlockDisable;
+		public bool DisableAirVent;
+		public bool DisableAntenna;
+		public bool DisableArtificialMass;
+		public bool DisableAssembler;
+		public bool DisableBattery;
+		public bool DisableBeacon;
+		public bool DisableCollector;
+		public bool DisableConnector;
+		public bool DisableConveyorSorter;
+		public bool DisableDecoy;
+		public bool DisableDrill;
+		public bool DisableJumpDrive;
+		public bool DisableGasGenerator;
+		public bool DisableGasTank;
+		public bool DisableGatlingGun;
+		public bool DisableGatlingTurret;
+		public bool DisableGravityGenerator;
+		public bool DisableGrinder;
+		public bool DisableGyro;
+		public bool DisableInteriorTurret;
+		public bool DisableLandingGear;
+		public bool DisableLaserAntenna;
+		public bool DisableLcdPanel;
+		public bool DisableLightBlock;
+		public bool DisableMedicalRoom;
+		public bool DisableMergeBlock;
+		public bool DisableMissileTurret;
+		public bool DisableOxygenFarm;
+		public bool DisableParachuteHatch;
+		public bool DisablePiston;
+		public bool DisableProgrammableBlock;
+		public bool DisableProjector;
+		public bool DisableReactor;
+		public bool DisableRefinery;
+		public bool DisableRocketLauncher;
+		public bool DisableReloadableRocketLauncher;
+		public bool DisableRotor;
+		public bool DisableSensor;
+		public bool DisableSolarPanel;
+		public bool DisableSoundBlock;
+		public bool DisableSpaceBall;
+		public bool DisableTimerBlock;
+		public bool DisableThruster;
+		public bool DisableWelder;
+		public bool DisableUpgradeModule;
 		
 		public ConfigDisableBlocks(){
 			
